@@ -39,6 +39,9 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
     AliAnalysisTaskMyTask::AliAnalysisTaskMyTask()
     : AliAnalysisTaskSE(),
       fAOD(nullptr),
+      fV0Reader(nullptr),
+      fV0ReaderName("NoInit"),
+      fReaderGammas(nullptr),
       fOutputList(nullptr),
       fHistPt(nullptr),
       fHistPtvertexZ(nullptr),
@@ -88,7 +91,9 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistMCall(nullptr),
       fHistAllSpeciesKaon(nullptr),
       fHistPureKaon(nullptr),
-      fHistAllPureKaon(nullptr) {
+      fHistAllPureKaon(nullptr),
+      fHistPhotonPt(nullptr),
+      fHistArmenteronPodolandski(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -96,6 +101,9 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
 AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
     : AliAnalysisTaskSE(name),
       fAOD(nullptr),
+      fV0Reader(nullptr),
+      fV0ReaderName("NoInit"),
+      fReaderGammas(nullptr),
       fOutputList(nullptr),
       fHistPt(nullptr),
       fHistPtvertexZ(nullptr),
@@ -145,7 +153,9 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistMCall(nullptr),
       fHistAllSpeciesKaon(nullptr),
       fHistPureKaon(nullptr),
-      fHistAllPureKaon(nullptr)
+      fHistAllPureKaon(nullptr),
+      fHistPhotonPt(nullptr),
+      fHistArmenteronPodolandski(nullptr)
 
 {
   // constructor
@@ -188,6 +198,9 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fOutputList->SetOwner(kTRUE);  // memory stuff: the list is owner of all
                                  // objects it contains and will delete them
                                  // if requested (dont worry about this now)
+
+
+  fEventCuts.AddQAplotsToList(fOutputList);
 
   // example of a histogram
   fHistPt =
@@ -483,6 +496,14 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       "Kaon Sig. (combined) distribution;momentum p;Sig. $/Sigma$");
   fOutputList->Add(fHistNSigAddKaon);
 
+  fHistPhotonPt = new TH1F("fHistPhotonPt", "; #it{p}_{T} (GeV/#it{c}); Entries",
+                           100, 0, 10);
+  fHistArmenteronPodolandski = new TH2F(
+      "fHistArmenteronPodolandski", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
+      500, -1, 1, 500, 0, 1);
+  fOutputList->Add(fHistPhotonPt);
+  fOutputList->Add(fHistArmenteronPodolandski);
+
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
                              // changes / updates to the
   // fOutputList object. the manager will in the end take care of writing your
@@ -519,11 +540,43 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       }
     }
   }
-  if (!fAOD)
-    return;  // if the pointer to the event is empty (getting it failed) skip
-             // this event
-             // example part: i'll show how to loop over the tracks in an event
-  // and extract some information from them which we'll store in a histogram
+  if (!fAOD) return;
+
+  // Event cuts - check whether the event is good for analysis
+  if (!fEventCuts.AcceptEvent(fAOD)) {
+    PostData(1, fOutputList);
+    return;
+  }
+
+  AliAnalysisManager *man = AliAnalysisManager::GetAnalysisManager();
+  fV0Reader = (AliV0ReaderV1 *)man->GetTask(fV0ReaderName.Data());
+  if (!fV0Reader) {
+    std::cout << "Error: No V0 Reader " << fV0ReaderName.Data() << "\n";
+    return;
+  }
+
+  // Get the reconstructed photons
+  fReaderGammas = fV0Reader->GetReconstructedGammas();
+
+  for (int iGamma = 0; iGamma < fReaderGammas->GetEntriesFast(); ++iGamma) {
+    auto *PhotonCandidate =
+        dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
+    if (!PhotonCandidate) continue;
+    fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
+  }
+
+  for (int iV0 = 0; iV0 < fAOD->GetNumberOfV0s(); ++iV0) {
+    auto *v0 = static_cast<AliAODv0 *>(fAOD->GetV0(iV0));
+    if (!v0) continue;
+    AliAODTrack *posTrack = static_cast<AliAODTrack*>(fAOD->GetTrack(v0->GetPosID()));
+    AliAODTrack *negTrack = static_cast<AliAODTrack*>(fAOD->GetTrack(v0->GetNegID()));
+    if(!posTrack || !negTrack) continue;
+
+    const float armAlpha = v0->AlphaV0();
+    const float armQt = v0->PtArmV0();
+    fHistArmenteronPodolandski->Fill(armAlpha, armQt);
+  }
+
   Int_t iTracks(
       fAOD->GetNumberOfTracks());  // see how many tracks there are in the event
   float vertexZ = fAOD->GetPrimaryVertex()->GetZ();

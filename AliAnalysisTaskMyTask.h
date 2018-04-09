@@ -6,7 +6,10 @@
 #define AliAnalysisTaskMyTask_H
 #include <vector>
 #include "AliAnalysisTaskSE.h"
+#include "AliEventCuts.h"
 #include "AliPIDResponse.h"
+#include "AliV0ReaderV1.h"
+
 class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
  public:
   AliAnalysisTaskMyTask();
@@ -18,9 +21,15 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   virtual void Terminate(Option_t* option);
   float GetBeta(AliAODTrack* track);
   void Setismc(Bool_t ismc) { fismc = ismc; };
+  void SetV0ReaderName(TString name) { fV0ReaderName = name; }
+
+  AliEventCuts fEventCuts;
 
  private:
   AliAODEvent* fAOD;                 //! input event
+  AliV0ReaderV1* fV0Reader;          //! basic photon Selection Task
+  TString fV0ReaderName;             //
+  TClonesArray* fReaderGammas;       //!
   TList* fOutputList;                //! output list
   TH1F* fHistPt;                     //! dummy histogram
   TH1F* fHistPtvertexZ;              //!
@@ -75,12 +84,13 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   Bool_t fismc;
   TH1F* fHistPKaon;  //!
   // TH1F*			fHistSum_PKaon;
-  TH1F* fHistMCall;           //!
-  TH1F* fHistAllSpeciesKaon;  //!
-  TH1F* fHistPureKaon;        //!
-  TH1F* fHistAllPureKaon;     //!
-  //! \brief AliAnalysisTaskMyTask
-  //!
+  TH1F* fHistMCall;                  //!
+  TH1F* fHistAllSpeciesKaon;         //!
+  TH1F* fHistPureKaon;               //!
+  TH1F* fHistAllPureKaon;            //!
+  TH1F* fHistPhotonPt;               //!
+  TH2F* fHistArmenteronPodolandski;  //!
+
   AliAnalysisTaskMyTask(const AliAnalysisTaskMyTask&);  // not implemented
   AliAnalysisTaskMyTask& operator=(
       const AliAnalysisTaskMyTask&);  // not implemented

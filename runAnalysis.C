@@ -8,7 +8,7 @@ void runAnalysis(Bool_t ismc = kFALSE) {
   // set if you want to run the analysis locally (kTRUE), or on grid (kFALSE)
   Bool_t local = kFALSE;
   // if you run on grid, specify test mode (kTRUE) or full grid model (kFALSE)
-  Bool_t gridTest = kFALSE;
+  Bool_t gridTest = kTRUE;
 
 // since we will compile a class, tell root where to look for headers
 #if !defined(__CINT__) || defined(__CLING__)
@@ -82,6 +82,10 @@ void runAnalysis(Bool_t ismc = kFALSE) {
     alienHandler->SetAliPhysicsVersion("vAN-20180330-1");
     // set the Alien API version
     alienHandler->SetAPIVersion("V1.1x");
+
+    // Use Gamma satellites for the photons
+    alienHandler->SetFriendChainName("AliAODGammaConversion.root",
+                                     "libPWGGAGammaConv.so");
     // select the input data
     if (ismc) {
       alienHandler->SetGridDataDir("/alice/sim/2017/LHC17d20a2");
@@ -89,8 +93,9 @@ void runAnalysis(Bool_t ismc = kFALSE) {
     } else {
       alienHandler->SetRunPrefix("000");
       alienHandler->SetGridDataDir("/alice/data/2016/LHC16l");
-      alienHandler->SetDataPattern("pass1/AOD/*/AliAOD.root");
+      alienHandler->SetDataPattern("pass2/AOD/*/AliAOD.root");
     }
+
     // runnumber
     Int_t runlist[] = {
         259888, 259868, 259867, 259866, 259860, 259842, 259841, 259822, 259789,
