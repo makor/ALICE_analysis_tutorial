@@ -20,6 +20,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   virtual void UserExec(Option_t* option);
   virtual void Terminate(Option_t* option);
   float GetBeta(AliAODTrack* track);
+  void StoreGlobalTrackReference();
   void Setismc(Bool_t ismc) { fismc = ismc; };
   void SetV0ReaderName(TString name) { fV0ReaderName = name; }
 
@@ -30,6 +31,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   AliV0ReaderV1* fV0Reader;          //! basic photon Selection Task
   TString fV0ReaderName;             //
   TClonesArray* fReaderGammas;       //!
+  std::vector<AliAODTrack *> fGlobalTrackReference;  //!
   TList* fOutputList;                //! output list
   TH1F* fHistPt;                     //! dummy histogram
   TH1F* fHistPtvertexZ;              //!
