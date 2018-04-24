@@ -30,6 +30,7 @@
 #include "TChain.h"
 #include "TH1F.h"
 #include "TList.h"
+#include "AliConversionPhotonBase.h"
 
 class AliAnalysisTaskMyTask;  // your analysis class
 
@@ -578,14 +579,13 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
   }
 
-  /*for (auto v0obj : *(fAOD->GetV0s())) {
+  for (auto v0obj : *(fAOD->GetV0s())) {
       auto* v0 = static_cast<AliAODv0 *>(v0obj);
       if (!v0) continue;
       AliMCParticle *MCPosDaughter = nullptr;
       AliMCParticle *MCNegDaughter = nullptr;
       if (fismc && fMC)
-        {MCPosDaughter =
-                  static_cast<AliMCParticle *>(fMC->GetTrack(track->GetLabel()));}*/
+        {MCPosDaughter = GetPositiveMCDaughter(fMC)}
 
 
 
@@ -619,7 +619,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         const float armQt = v0->PtArmV0();
         fHistArmenterosPodolandski->Fill(armAlpha, armQt);
       }
-    }*/
+    }
 
     /*const float nCls = track->GetTPCNcls();
     const short nFindable = track->GetTPCNclsF();
@@ -628,9 +628,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
-    fHistArmenterosPodolandski->Fill(armAlpha, armQt);*/
-  }
-  // End of bad code segment
+    fHistArmenterosPodolandski->Fill(armAlpha, armQt);
+  }*/
+
   Int_t iTracks(
       fAOD->GetNumberOfTracks());  // see how many tracks there are in the event
   float vertexZ = fAOD->GetPrimaryVertex()->GetZ();
