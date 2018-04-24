@@ -22,6 +22,7 @@
 #include "AliAnalysisTask.h"
 #include <iostream>
 #include "AliAODEvent.h"
+#include "AliAODTrack.h"
 #include "AliAODInputHandler.h"
 #include "AliAnalysisManager.h"
 #include "AliAnalysisTaskMyTask.h"
@@ -43,6 +44,12 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fV0ReaderName("NoInit"),
       fReaderGammas(nullptr),
       fOutputList(nullptr),
+      fHistPTPCKaon(nullptr),
+      fHistPTOFKaon(nullptr),
+      fHistPTPCElectron(nullptr),
+      fHistPTOFElectron(nullptr),
+      fHistPBetaPion(nullptr),
+      fHistNSigAddElectron(nullptr),
       fHistPt(nullptr),
       fHistPtvertexZ(nullptr),
       fHistPtcentrality(nullptr),
@@ -93,7 +100,7 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistPureKaon(nullptr),
       fHistAllPureKaon(nullptr),
       fHistPhotonPt(nullptr),
-      fHistArmenteronPodolandski(nullptr) {
+      fHistArmenterosPodolandski(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -105,6 +112,12 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fV0ReaderName("NoInit"),
       fReaderGammas(nullptr),
       fOutputList(nullptr),
+      fHistPTPCKaon(nullptr),
+      fHistPTOFKaon(nullptr),
+      fHistPTPCElectron(nullptr),
+      fHistPTOFElectron(nullptr),
+      fHistPBetaPion(nullptr),
+      fHistNSigAddElectron(nullptr),
       fHistPt(nullptr),
       fHistPtvertexZ(nullptr),
       fHistPtcentrality(nullptr),
@@ -155,7 +168,7 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistPureKaon(nullptr),
       fHistAllPureKaon(nullptr),
       fHistPhotonPt(nullptr),
-      fHistArmenteronPodolandski(nullptr)
+      fHistArmenterosPodolandski(nullptr)
 
 {
   // constructor
@@ -198,7 +211,6 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fOutputList->SetOwner(kTRUE);  // memory stuff: the list is owner of all
                                  // objects it contains and will delete them
                                  // if requested (dont worry about this now)
-
 
   fEventCuts.AddQAplotsToList(fOutputList);
 
@@ -496,13 +508,14 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       "Kaon Sig. (combined) distribution;momentum p;Sig. $/Sigma$");
   fOutputList->Add(fHistNSigAddKaon);
 
-  fHistPhotonPt = new TH1F("fHistPhotonPt", "; #it{p}_{T} (GeV/#it{c}); Entries",
-                           100, 0, 10);
-  fHistArmenteronPodolandski = new TH2F(
-      "fHistArmenteronPodolandski", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
-      500, -1, 1, 500, 0, 1);
+  fHistPhotonPt = new TH1F("fHistPhotonPt",
+                           "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
   fOutputList->Add(fHistPhotonPt);
-  fOutputList->Add(fHistArmenteronPodolandski);
+
+  fHistArmenterosPodolandski = new TH2F(
+      "fHistArmenterosPodolandski", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
+      500, -1, 1, 500, 0, 1);
+  fOutputList->Add(fHistArmenterosPodolandski);
 
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
                              // changes / updates to the
@@ -565,18 +578,59 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
   }
 
-  for (int iV0 = 0; iV0 < fAOD->GetNumberOfV0s(); ++iV0) {
-    auto *v0 = static_cast<AliAODv0 *>(fAOD->GetV0(iV0));
+  /*for (auto v0obj : *(fAOD->GetV0s())) {
+      auto* v0 = static_cast<AliAODv0 *>(v0obj);
+      if (!v0) continue;
+      AliMCParticle *MCPosDaughter = nullptr;
+      AliMCParticle *MCNegDaughter = nullptr;
+      if (fismc && fMC)
+        {MCPosDaughter =
+                  static_cast<AliMCParticle *>(fMC->GetTrack(track->GetLabel()));}*/
+
+
+
+
+  /*for (auto v0obj : *(fAOD->GetV0s())) {
+    auto* v0 = static_cast<AliAODv0 *>(v0obj);
     if (!v0) continue;
-    AliAODTrack *posTrack = static_cast<AliAODTrack*>(fAOD->GetTrack(v0->GetPosID()));
-    AliAODTrack *negTrack = static_cast<AliAODTrack*>(fAOD->GetTrack(v0->GetNegID()));
-    if(!posTrack || !negTrack) continue;
+     //std::cout << v0->MassLambda() << "\n";
+    AliAODTrack *posTrack =
+        static_cast<AliAODTrack *>(fAOD->GetTrack(v0->GetPosID()));
+    AliAODTrack *negTrack =
+        static_cast<AliAODTrack *>(fAOD->GetTrack(v0->GetNegID()));
+    if (!posTrack || !negTrack) continue;
+
+    if (posTrack->Eta() < 0.8 ) {
+      const float nCls = posTrack->GetTPCNcls();
+      const short nFindable = posTrack->GetTPCNclsF();
+      const float ratioFindable = nCls / static_cast<float>(nFindable);
+      if (ratioFindable > 0.8) {
+        const float armAlpha = v0->AlphaV0();
+        const float armQt = v0->PtArmV0();
+        fHistArmenterosPodolandski->Fill(armAlpha, armQt);
+      }
+    }
+    if (negTrack->Eta() < 0.8) {
+      const float nCls = negTrack->GetTPCNcls();
+      const short nFindable = negTrack->GetTPCNclsF();
+      const float ratioFindable = nCls / static_cast<float>(nFindable);
+      if (ratioFindable > 0.8) {
+        const float armAlpha = v0->AlphaV0();
+        const float armQt = v0->PtArmV0();
+        fHistArmenterosPodolandski->Fill(armAlpha, armQt);
+      }
+    }*/
+
+    /*const float nCls = track->GetTPCNcls();
+    const short nFindable = track->GetTPCNclsF();
+    const float ratioFindable = nCls / static_cast<float>(nFindable);
+    ratioFindable > 0.8
 
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
-    fHistArmenteronPodolandski->Fill(armAlpha, armQt);
+    fHistArmenterosPodolandski->Fill(armAlpha, armQt);*/
   }
-
+  // End of bad code segment
   Int_t iTracks(
       fAOD->GetNumberOfTracks());  // see how many tracks there are in the event
   float vertexZ = fAOD->GetPrimaryVertex()->GetZ();

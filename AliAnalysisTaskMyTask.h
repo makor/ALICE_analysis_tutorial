@@ -89,7 +89,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH1F* fHistPureKaon;               //!
   TH1F* fHistAllPureKaon;            //!
   TH1F* fHistPhotonPt;               //!
-  TH2F* fHistArmenteronPodolandski;  //!
+  TH2F* fHistArmenterosPodolandski;  //!
 
   AliAnalysisTaskMyTask(const AliAnalysisTaskMyTask&);  // not implemented
   AliAnalysisTaskMyTask& operator=(

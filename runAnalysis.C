@@ -125,7 +125,8 @@ void runAnalysis(Bool_t ismc = kFALSE) {
     // (see below) mode, set SetMergeViaJDL(kFALSE)
     // to collect final results
     alienHandler->SetMaxMergeStages(1);
-    alienHandler->SetMergeViaJDL(kTRUE);
+    // alienHandler->SetMergeViaJDL(kTRUE);    //normal run
+    alienHandler->SetMergeViaJDL(kFALSE);   //merging run
 
     // define the output folders
     alienHandler->SetGridWorkingDir("myWorkingDir");
