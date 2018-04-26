@@ -30,7 +30,6 @@
 #include "TChain.h"
 #include "TH1F.h"
 #include "TList.h"
-#include "AliConversionPhotonBase.h"
 
 class AliAnalysisTaskMyTask;  // your analysis class
 
@@ -44,6 +43,7 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fV0Reader(nullptr),
       fV0ReaderName("NoInit"),
       fReaderGammas(nullptr),
+      fGlobalTrackReference(),
       fOutputList(nullptr),
       fHistPTPCKaon(nullptr),
       fHistPTOFKaon(nullptr),
@@ -112,6 +112,7 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fV0Reader(nullptr),
       fV0ReaderName("NoInit"),
       fReaderGammas(nullptr),
+      fGlobalTrackReference(),
       fOutputList(nullptr),
       fHistPTPCKaon(nullptr),
       fHistPTOFKaon(nullptr),
@@ -562,6 +563,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     return;
   }
 
+  // Keep track of the global tracks
+  StoreGlobalTrackReference();
+
   AliAnalysisManager *man = AliAnalysisManager::GetAnalysisManager();
   fV0Reader = (AliV0ReaderV1 *)man->GetTask(fV0ReaderName.Data());
   if (!fV0Reader) {
@@ -580,24 +584,13 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   }
 
   for (auto v0obj : *(fAOD->GetV0s())) {
-      auto* v0 = static_cast<AliAODv0 *>(v0obj);
-      if (!v0) continue;
-      AliMCParticle *MCPosDaughter = nullptr;
-      AliMCParticle *MCNegDaughter = nullptr;
-      if (fismc && fMC)
-        {MCPosDaughter = GetPositiveMCDaughter(fMC)}
-
-
-
-
-  /*for (auto v0obj : *(fAOD->GetV0s())) {
     auto* v0 = static_cast<AliAODv0 *>(v0obj);
     if (!v0) continue;
      //std::cout << v0->MassLambda() << "\n";
     AliAODTrack *posTrack =
-        static_cast<AliAODTrack *>(fAOD->GetTrack(v0->GetPosID()));
+        static_cast<AliAODTrack *>(fGlobalTrackReference[v0->GetPosID()]);
     AliAODTrack *negTrack =
-        static_cast<AliAODTrack *>(fAOD->GetTrack(v0->GetNegID()));
+        static_cast<AliAODTrack *>(fGlobalTrackReference[v0->GetNegID()]);
     if (!posTrack || !negTrack) continue;
 
     if (posTrack->Eta() < 0.8 ) {
@@ -620,7 +613,6 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         fHistArmenterosPodolandski->Fill(armAlpha, armQt);
       }
     }
-
     /*const float nCls = track->GetTPCNcls();
     const short nFindable = track->GetTPCNclsF();
     const float ratioFindable = nCls / static_cast<float>(nFindable);
@@ -629,7 +621,8 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
     fHistArmenterosPodolandski->Fill(armAlpha, armQt);
-  }*/
+  */
+}
 
   Int_t iTracks(
       fAOD->GetNumberOfTracks());  // see how many tracks there are in the event
@@ -875,6 +868,56 @@ float AliAnalysisTaskMyTask::GetBeta(AliAODTrack *track) {
   }
   return beta;
 }
+
+//____________________________________________________________________________________________________
+void AliAnalysisTaskMyTask::StoreGlobalTrackReference() {
+  // This method was inherited form H. Beck & O. Arnold analysis
+  // Stores the pointer to the global track
+  // Modified to work with vectors
+
+  fGlobalTrackReference.clear();
+  fGlobalTrackReference.resize(1000);
+  AliAODEvent *aodEvent = static_cast<AliAODEvent *>(fInputEvent);
+  for (int iTrack = 0; iTrack < aodEvent->GetNumberOfTracks(); ++iTrack) {
+    AliAODTrack *track = static_cast<AliAODTrack *>(aodEvent->GetTrack(iTrack));
+    if (!track) continue;
+
+    // Check that the id is positive
+    if (track->GetID() < 0) continue;
+
+    // Check id is not too big for buffer
+    if (track->GetID() >= static_cast<int>(fGlobalTrackReference.size()))
+      fGlobalTrackReference.resize(track->GetID() + 1);
+
+    // Warn if we overwrite a track
+    auto *trackRef = fGlobalTrackReference[track->GetID()];
+    if (trackRef) {
+      // Seems like there are FilterMap 0 tracks
+      // that have zero TPCNcls, don't store these!
+      if ((!track->GetFilterMap()) && (!track->GetTPCNcls())) continue;
+
+      // Imagine the other way around, the zero map zero clusters track
+      // is stored and the good one wants to be added. We ommit the warning
+      // and just overwrite the 'bad' track
+      if (fGlobalTrackReference[track->GetID()]->GetFilterMap() ||
+          fGlobalTrackReference[track->GetID()]->GetTPCNcls()) {
+        // If we come here, there's a problem
+        std::cout << "Warning! global track info already there! ";
+        std::cout << "TPCNcls track1 "
+                  << (fGlobalTrackReference[track->GetID()])->GetTPCNcls()
+                  << " track2 " << track->GetTPCNcls();
+        std::cout << " FilterMap track1 "
+                  << (fGlobalTrackReference[track->GetID()])->GetFilterMap()
+                  << " track 2" << track->GetFilterMap() << "\n";
+        fGlobalTrackReference[track->GetID()] = nullptr;
+      }
+    }  // Two tracks same id
+
+    // Assign the pointer
+    (fGlobalTrackReference.at(track->GetID())) = track;
+  }
+}
+
 //_____________________________________________________________________________
 void AliAnalysisTaskMyTask::Terminate(Option_t *) {
   // terminate
