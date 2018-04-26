@@ -52,6 +52,8 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH1F* fHist3SigSelectedPionP;      //!
   TH1F* fHistSigSelectedKaonP;       //!
   TH1F* fHist3SigSelectedKaonP;      //!
+  TH2F* fHistClsDistrPosTr;          //!
+  TH2F* fHistClsDistrNegTr;          //!
   TH2F* fHistPTPCPion;               //!
   TH2F* fHistPTOFPion;               //!
   TH2F* fHistPTPCKaon;               //!
