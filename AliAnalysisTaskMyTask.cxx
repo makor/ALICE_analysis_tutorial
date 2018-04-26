@@ -101,7 +101,10 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistPureKaon(nullptr),
       fHistAllPureKaon(nullptr),
       fHistPhotonPt(nullptr),
-      fHistArmenterosPodolandski(nullptr) {
+      fHistArmenterosPodolandski(nullptr),
+      fHistClsDistrPosTr (nullptr),
+      fHistClsDistrNegTr (nullptr)
+{
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -170,7 +173,9 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistPureKaon(nullptr),
       fHistAllPureKaon(nullptr),
       fHistPhotonPt(nullptr),
-      fHistArmenterosPodolandski(nullptr)
+      fHistArmenterosPodolandski(nullptr),
+      fHistClsDistrPosTr (nullptr),
+      fHistClsDistrNegTr (nullptr)
 
 {
   // constructor
@@ -253,6 +258,14 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistMCall = new TH1F("fHistMCall", "fHistMCall", 200, 0, 10);
   fHistMCall->SetTitle("Only Kaon momentum;momentum p;counts N");
   fOutputList->Add(fHistMCall);
+
+  fHistClsDistrPosTr = new TH2F("fHistClsDistrPosTr", "fHistClsDistrPosTr", 200, 0, 1.5, 200, 0, 200);
+  fHistClsDistrPosTr->SetTitle("Cluster-Distribution;pt;Clusters");
+  fOutputList->Add(fHistClsDistrPosTr);
+
+  fHistClsDistrNegTr = new TH2F("fHistClsDistrNegTr", "fHistClsDistrNegTr", 200, 0, 1.5, 200, 0, 200);
+  fHistClsDistrNegTr->SetTitle("Cluster-Distribution;pt;Clusters");
+  fOutputList->Add(fHistClsDistrNegTr);
 
   fHistAllSpeciesKaon =
       new TH1F("fHistAllSpeciesKaon", "fHistAllSpeciesKaon", 200, -321, 322);
@@ -592,27 +605,24 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     AliAODTrack *negTrack =
         static_cast<AliAODTrack *>(fGlobalTrackReference[v0->GetNegID()]);
     if (!posTrack || !negTrack) continue;
-
-    if (posTrack->Eta() < 0.8 ) {
-      const float nCls = posTrack->GetTPCNcls();
-      const short nFindable = posTrack->GetTPCNclsF();
-      const float ratioFindable = nCls / static_cast<float>(nFindable);
-      if (ratioFindable > 0.8) {
-        const float armAlpha = v0->AlphaV0();
-        const float armQt = v0->PtArmV0();
-        fHistArmenterosPodolandski->Fill(armAlpha, armQt);
-      }
-    }
-    if (negTrack->Eta() < 0.8) {
-      const float nCls = negTrack->GetTPCNcls();
-      const short nFindable = negTrack->GetTPCNclsF();
-      const float ratioFindable = nCls / static_cast<float>(nFindable);
-      if (ratioFindable > 0.8) {
-        const float armAlpha = v0->AlphaV0();
-        const float armQt = v0->PtArmV0();
-        fHistArmenterosPodolandski->Fill(armAlpha, armQt);
-      }
-    }
+    if (negTrack->Eta() > 0.8) continue;
+    if (posTrack->Eta() > 0.8) continue;
+    const float pnCls = posTrack->GetTPCNcls();
+    const short pnFindable = posTrack->GetTPCNclsF();
+    const float pratioFindable = pnCls / static_cast<float>(pnFindable);
+    if (pratioFindable < 0.8) continue;
+    //std::cout << pnCls << "\n";
+    //std::cout << posTrack->Pt() << "\n";
+    fHistClsDistrPosTr->Fill(posTrack->Pt(),pnCls);
+    const float nnCls = negTrack->GetTPCNcls();
+    const short nnFindable = negTrack->GetTPCNclsF();
+    const float nratioFindable = nnCls / static_cast<float>(nnFindable);
+    if (nratioFindable < 0.8) continue;
+    fHistClsDistrNegTr->Fill(negTrack->Pt(),nnCls);
+    const float armAlpha = v0->AlphaV0();
+    const float armQt = v0->PtArmV0();
+    fHistArmenterosPodolandski->Fill(armAlpha, armQt);
+  }
     /*const float nCls = track->GetTPCNcls();
     const short nFindable = track->GetTPCNclsF();
     const float ratioFindable = nCls / static_cast<float>(nFindable);
@@ -620,9 +630,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
-    fHistArmenterosPodolandski->Fill(armAlpha, armQt);
-  */
-}
+    fHistArmenterosPodolandski->Fill(armAlpha, armQt);*/
 
   Int_t iTracks(
       fAOD->GetNumberOfTracks());  // see how many tracks there are in the event
