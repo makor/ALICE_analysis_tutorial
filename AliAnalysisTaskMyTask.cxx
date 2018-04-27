@@ -659,11 +659,11 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     if (pratioFindable < 0.8) continue;
     // std::cout << pnCls << "\n";
     // std::cout << posTrack->Pt() << "\n";
-    fHistClsDistrPosTr->Fill(posTrack->Pt(), pnCls);
     const float nnCls = negTrack->GetTPCNcls();
     const short nnFindable = negTrack->GetTPCNclsF();
     const float nratioFindable = nnCls / static_cast<float>(nnFindable);
     if (nratioFindable < 0.8) continue;
+    fHistClsDistrPosTr->Fill(posTrack->Pt(), pnCls);
     fHistClsDistrNegTr->Fill(negTrack->Pt(), nnCls);
     fHistV0LambdaInvMass->Fill(v0->MassLambda());
     fHistV0LambdaInvMass->Sumw2();
@@ -698,6 +698,8 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
     // Check if daughters lie in acceptance
     AliMCParticle *mcDaug1 =static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
+    std::cout << mcParticle->GetDaughterLabel(1) << "\n";
+    std::cout << label << "\n";
     if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
     AliMCParticle *mcDaug2 =static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(2)));
     if (mcDaug2->Pt() < 0.4 || std::abs(mcDaug2->Eta()) > 0.8) continue;

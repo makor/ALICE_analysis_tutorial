@@ -6,7 +6,7 @@
 #include "AliAnalysisTaskMyTask.h"
 #endif
 
-AliAnalysisTaskMyTask* AddMyTask(TString name = "name", Bool_t IsMC = kTRUE) {
+AliAnalysisTaskMyTask* AddMyTask(TString name = "name", Bool_t IsMC = kFALSE) {
   // get the manager via the static access member. since it's static, you don't
   // need
   // an instance of the class to call the function
