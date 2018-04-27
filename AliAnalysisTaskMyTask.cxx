@@ -22,14 +22,15 @@
 #include "AliAnalysisTask.h"
 #include <iostream>
 #include "AliAODEvent.h"
-#include "AliAODTrack.h"
 #include "AliAODInputHandler.h"
+#include "AliAODTrack.h"
 #include "AliAnalysisManager.h"
 #include "AliAnalysisTaskMyTask.h"
 #include "AliMCParticle.h"
 #include "TChain.h"
 #include "TH1F.h"
 #include "TList.h"
+#include "AliAODMCParticle.h"
 
 class AliAnalysisTaskMyTask;  // your analysis class
 
@@ -83,7 +84,7 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistNSigAddKaon(nullptr),
       fHistSigSelectedKaonP(nullptr),
       fHist3SigSelectedKaonP(nullptr),
-      fismc(kFALSE),
+      fIsMC(kFALSE),
       fHistPBetaProton(nullptr),
       fHistPBetaElectron(nullptr),
       fHistPBetaKaon(nullptr),
@@ -102,8 +103,14 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistAllPureKaon(nullptr),
       fHistPhotonPt(nullptr),
       fHistArmenterosPodolandski(nullptr),
-      fHistClsDistrPosTr (nullptr),
-      fHistClsDistrNegTr (nullptr)
+      fHistClsDistrPosTr(nullptr),
+      fHistClsDistrNegTr(nullptr),
+      fHistV0LambdaInvMass(nullptr),
+      fHistV0AntiLambdaInvMass(nullptr),
+      fHistV0K0ShortInvMass(nullptr),
+      fHistV0mcPhotonPt(nullptr),
+      fHistArmenterosPodolandskiV0mcPhotons(nullptr),
+      fHistV0Pt(nullptr)
 {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
@@ -155,7 +162,7 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistNSigAddKaon(nullptr),
       fHistSigSelectedKaonP(nullptr),
       fHist3SigSelectedKaonP(nullptr),
-      fismc(kFALSE),
+      fIsMC(kFALSE),
       fHistPBetaProton(nullptr),
       fHistPBetaElectron(nullptr),
       fHistPBetaKaon(nullptr),
@@ -174,9 +181,14 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistAllPureKaon(nullptr),
       fHistPhotonPt(nullptr),
       fHistArmenterosPodolandski(nullptr),
-      fHistClsDistrPosTr (nullptr),
-      fHistClsDistrNegTr (nullptr)
-
+      fHistClsDistrPosTr(nullptr),
+      fHistClsDistrNegTr(nullptr),
+      fHistV0LambdaInvMass(nullptr),
+      fHistV0AntiLambdaInvMass(nullptr),
+      fHistV0K0ShortInvMass(nullptr),
+      fHistV0mcPhotonPt(nullptr),
+      fHistArmenterosPodolandskiV0mcPhotons(nullptr),
+      fHistV0Pt(nullptr)
 {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
@@ -259,13 +271,41 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistMCall->SetTitle("Only Kaon momentum;momentum p;counts N");
   fOutputList->Add(fHistMCall);
 
-  fHistClsDistrPosTr = new TH2F("fHistClsDistrPosTr", "fHistClsDistrPosTr", 200, 0, 1.5, 200, 0, 200);
+  fHistV0Pt = new TH1F("fHistV0Pt", "fHistV0Pt", 200, 0, 10);
+  fHistV0Pt->SetTitle("Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
+  fOutputList->Add(fHistV0Pt);
+
+  fHistV0mcPhotonPt = new TH1F("fHistV0mcPhotonPt", "fHistV0mcPhotonPt", 200, 0, 10);
+  fHistV0mcPhotonPt->SetTitle("MCTrueV0Photons;transverse momentum pt;counts N");
+  fOutputList->Add(fHistV0mcPhotonPt);
+
+  fHistClsDistrPosTr = new TH2F("fHistClsDistrPosTr", "fHistClsDistrPosTr", 200,
+                                0, 1.5, 200, 0, 200);
   fHistClsDistrPosTr->SetTitle("Cluster-Distribution;pt;Clusters");
   fOutputList->Add(fHistClsDistrPosTr);
 
-  fHistClsDistrNegTr = new TH2F("fHistClsDistrNegTr", "fHistClsDistrNegTr", 200, 0, 1.5, 200, 0, 200);
+  fHistClsDistrNegTr = new TH2F("fHistClsDistrNegTr", "fHistClsDistrNegTr", 200,
+                                0, 1.5, 200, 0, 200);
   fHistClsDistrNegTr->SetTitle("Cluster-Distribution;pt;Clusters");
   fOutputList->Add(fHistClsDistrNegTr);
+
+  fHistV0LambdaInvMass =
+      new TH1F("fHistV0LambdaInvMass", "fHistV0LambdaInvMass", 200, 0, 1.5);
+  fHistV0LambdaInvMass->SetTitle(
+      "Invariantmass-Distribution Lambda;m*m;Counts");
+  fOutputList->Add(fHistV0LambdaInvMass);
+
+  fHistV0AntiLambdaInvMass = new TH1F("fHistV0AntiLambdaInvMass",
+                                      "fHistV0AntiLambdaInvMass", 200, 0, 1.5);
+  fHistV0AntiLambdaInvMass->SetTitle(
+      "Invariantmass-Distribution AntiLambda;m*m;Counts");
+  fOutputList->Add(fHistV0AntiLambdaInvMass);
+
+  fHistV0K0ShortInvMass =
+      new TH1F("fHistV0K0ShortInvMass", "fHistV0K0ShortInvMass", 200, 0, 1.5);
+  fHistV0K0ShortInvMass->SetTitle(
+      "Invariantmass-Distribution K0Short;m*m;Counts");
+  fOutputList->Add(fHistV0K0ShortInvMass);
 
   fHistAllSpeciesKaon =
       new TH1F("fHistAllSpeciesKaon", "fHistAllSpeciesKaon", 200, -321, 322);
@@ -532,6 +572,12 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       500, -1, 1, 500, 0, 1);
   fOutputList->Add(fHistArmenterosPodolandski);
 
+  fHistArmenterosPodolandskiV0mcPhotons = new TH2F(
+      "fHistArmenterosPodolandskiV0mcPhotons", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
+      500, -1, 1, 500, 0, 1);
+  fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotons);
+
+
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
                              // changes / updates to the
   // fOutputList object. the manager will in the end take care of writing your
@@ -552,7 +598,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   // there's another event format (ESD) which works in a similar way
   // but is more cpu/memory unfriendly. for now, we'll stick with aod's
   AliMCEvent *fMC = nullptr;
-  if (fismc) {
+  if (fIsMC) {
     AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
         AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
     fMC = eventHandler->MCEvent();
@@ -597,9 +643,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   }
 
   for (auto v0obj : *(fAOD->GetV0s())) {
-    auto* v0 = static_cast<AliAODv0 *>(v0obj);
+    auto *v0 = static_cast<AliAODv0 *>(v0obj);
     if (!v0) continue;
-     //std::cout << v0->MassLambda() << "\n";
+    // std::cout << v0->MassLambda() << "\n";
     AliAODTrack *posTrack =
         static_cast<AliAODTrack *>(fGlobalTrackReference[v0->GetPosID()]);
     AliAODTrack *negTrack =
@@ -611,26 +657,55 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     const short pnFindable = posTrack->GetTPCNclsF();
     const float pratioFindable = pnCls / static_cast<float>(pnFindable);
     if (pratioFindable < 0.8) continue;
-    //std::cout << pnCls << "\n";
-    //std::cout << posTrack->Pt() << "\n";
-    fHistClsDistrPosTr->Fill(posTrack->Pt(),pnCls);
+    // std::cout << pnCls << "\n";
+    // std::cout << posTrack->Pt() << "\n";
+    fHistClsDistrPosTr->Fill(posTrack->Pt(), pnCls);
     const float nnCls = negTrack->GetTPCNcls();
     const short nnFindable = negTrack->GetTPCNclsF();
     const float nratioFindable = nnCls / static_cast<float>(nnFindable);
     if (nratioFindable < 0.8) continue;
-    fHistClsDistrNegTr->Fill(negTrack->Pt(),nnCls);
-    const float armAlpha = v0->AlphaV0();
-    const float armQt = v0->PtArmV0();
-    fHistArmenterosPodolandski->Fill(armAlpha, armQt);
-  }
-    /*const float nCls = track->GetTPCNcls();
-    const short nFindable = track->GetTPCNclsF();
-    const float ratioFindable = nCls / static_cast<float>(nFindable);
-    ratioFindable > 0.8
+    fHistClsDistrNegTr->Fill(negTrack->Pt(), nnCls);
+    fHistV0LambdaInvMass->Fill(v0->MassLambda());
+    fHistV0LambdaInvMass->Sumw2();
+    fHistV0AntiLambdaInvMass->Fill(v0->MassAntiLambda());
+    fHistV0AntiLambdaInvMass->Sumw2();
+    fHistV0K0ShortInvMass->Fill(v0->MassK0Short());
+    fHistV0K0ShortInvMass->Sumw2();
+
+    fHistV0Pt->Fill(v0->Pt2V0());
+
+    // std::cout << v0->MassLambda() << "\n";
+    // std::cout << v0->MassAntiLambda() << "\n";
+    // std::cout << v0->MassK0Short() << "\n";
 
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
-    fHistArmenterosPodolandski->Fill(armAlpha, armQt);*/
+    fHistArmenterosPodolandski->Fill(armAlpha, armQt);
+
+    // MC-Particles with check if MC-Particle is Photon
+    if (fIsMC){
+    TClonesArray *mcarray = dynamic_cast<TClonesArray *>(
+        fAOD->FindListObject(AliAODMCParticle::StdBranchName()));
+
+    if (!mcarray) continue;
+    int daugh[2] = {11, 11};  // we check whether the v0 is a photon, i.e. the
+                              // daughters should be electrons
+    int label = v0->MatchToMC(22, mcarray, 2, daugh);  // do the check
+    if (label < 0) continue;  // no mc info assigned to this track - don’t use it
+    AliMCParticle *mcParticle =
+        static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
+    if (!mcParticle) continue;
+
+    // Check if daughters lie in acceptance
+    AliMCParticle *mcDaug1 =static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
+    if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
+    AliMCParticle *mcDaug2 =static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(2)));
+    if (mcDaug2->Pt() < 0.4 || std::abs(mcDaug2->Eta()) > 0.8) continue;
+
+    fHistV0mcPhotonPt->Fill(v0->Pt2V0());
+    fHistArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(), v0->PtArmV0());
+    }
+  }
 
   Int_t iTracks(
       fAOD->GetNumberOfTracks());  // see how many tracks there are in the event
@@ -645,10 +720,10 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     if (!track || !track->TestFilterBit(1))
       continue;  // if we failed, skip this track
     AliMCParticle *mcParticle = nullptr;
-    if (fismc && fMC)
+    if (fIsMC && fMC)
       mcParticle =
           static_cast<AliMCParticle *>(fMC->GetTrack(track->GetLabel()));
-    if (fismc && !mcParticle) continue;
+    if (fIsMC && !mcParticle) continue;
 
     AliAnalysisManager *man = AliAnalysisManager::GetAnalysisManager();
     if (man) {
@@ -793,7 +868,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     if (track->P() > 0.1 && track->P() < 0.4 &&
         std::abs(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kKaon)) < 3) {
       fHistPKaon->Fill(track->P());
-      if (fismc) { /*st:cout << mcParticle->PdgCode() << "\n";*/
+      if (fIsMC) { /*st:cout << mcParticle->PdgCode() << "\n";*/
         fHistAllSpeciesKaon->Fill(mcParticle->PdgCode());
         if (mcParticle->PdgCode() == 321 || mcParticle->PdgCode() == -321) {
           fHistPureKaon->Fill(track->P());
@@ -803,7 +878,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     if (track->P() > 0.4 && track->P() < 2 &&
         std::abs(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kKaon)) < 3) {
       fHistPKaon->Fill(track->P());
-      if (fismc) { /*st:cout << mcParticle->PdgCode() << "\n";*/
+      if (fIsMC) { /*st:cout << mcParticle->PdgCode() << "\n";*/
         fHistAllSpeciesKaon->Fill(mcParticle->PdgCode());
         if (mcParticle->PdgCode() == 321 || mcParticle->PdgCode() == -321) {
           fHistPureKaon->Fill(track->P());

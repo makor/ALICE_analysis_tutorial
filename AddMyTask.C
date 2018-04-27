@@ -6,7 +6,7 @@
 #include "AliAnalysisTaskMyTask.h"
 #endif
 
-AliAnalysisTaskMyTask* AddMyTask(TString name = "name", Bool_t ismc = kFALSE) {
+AliAnalysisTaskMyTask* AddMyTask(TString name = "name", Bool_t IsMC = kTRUE) {
   // get the manager via the static access member. since it's static, you don't
   // need
   // an instance of the class to call the function
@@ -95,7 +95,7 @@ AliAnalysisTaskMyTask* AddMyTask(TString name = "name", Bool_t ismc = kFALSE) {
   if (!task) return 0x0;
   task->SelectCollisionCandidates(AliVEvent::kINT7); // select minimum bias trigger
   task->SetV0ReaderName(V0ReaderName.Data());
-  task->Setismc(ismc);
+  task->SetIsMC(IsMC);
   // add your task to the manager
   mgr->AddTask(task);
   // your task needs input: here we connect the manager to your task

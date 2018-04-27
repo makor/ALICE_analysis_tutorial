@@ -4,7 +4,7 @@
 #include "AliAnalysisManager.h"
 #include "AliAnalysisTaskMyTask.h"
 #endif
-void runAnalysis(Bool_t ismc = kFALSE) {
+void runAnalysis(Bool_t IsMC = kFALSE) {
   // set if you want to run the analysis locally (kTRUE), or on grid (kFALSE)
   Bool_t local = kFALSE;
   // if you run on grid, specify test mode (kTRUE) or full grid model (kFALSE)
@@ -28,7 +28,7 @@ void runAnalysis(Bool_t ismc = kFALSE) {
 // here we have to differentiate between using the just-in-time compiler
 // from root6, or the interpreter of root5
 #if !defined(__CINT__) || defined(__CLING__)
-  if (ismc) {
+  if (IsMC) {
     AliAnalysisTaskPIDResponse *pidResponse =
         reinterpret_cast<AliAnalysisTaskPIDResponse *>(
             gInterpreter->ExecuteMacro("$ALICE_ROOT/ANALYSIS/macros/"
@@ -42,13 +42,13 @@ void runAnalysis(Bool_t ismc = kFALSE) {
   }
   gInterpreter->LoadMacro("AliAnalysisTaskMyTask.cxx++g");
   AliAnalysisTaskMyTask *task = reinterpret_cast<AliAnalysisTaskMyTask *>(
-      gInterpreter->ExecuteMacro(Form("AddMyTask.C (\"name\", %i)", ismc)));
+      gInterpreter->ExecuteMacro(Form("AddMyTask.C (\"name\", %i)", IsMC)));
 #else
   // gROOT->LoadMacro("/home/mkor/alice/AliRoot/ANALYSIS/macros/AddTaskPIDResponse.C");
   // AddTaskPIDResponse();
   gROOT->LoadMacro("AliAnalysisTaskMyTask.cxx++g");
   gROOT->LoadMacro("AddMyTask.C");
-  AliAnalysisTaskMyTask *task = AddMyTask("name", ismc);
+  AliAnalysisTaskMyTask *task = AddMyTask("name", IsMC);
 #endif
 
   if (!mgr->InitAnalysis()) return;
@@ -87,7 +87,7 @@ void runAnalysis(Bool_t ismc = kFALSE) {
     alienHandler->SetFriendChainName("AliAODGammaConversion.root",
                                      "libPWGGAGammaConv.so");
     // select the input data
-    if (ismc) {
+    if (IsMC) {
       alienHandler->SetGridDataDir("/alice/sim/2017/LHC17d20a2");
       alienHandler->SetDataPattern("/*/AliAOD.root");
     } else {
@@ -125,8 +125,8 @@ void runAnalysis(Bool_t ismc = kFALSE) {
     // (see below) mode, set SetMergeViaJDL(kFALSE)
     // to collect final results
     alienHandler->SetMaxMergeStages(1);
-    // alienHandler->SetMergeViaJDL(kTRUE);    //normal run
-    alienHandler->SetMergeViaJDL(kFALSE);   //merging run
+    alienHandler->SetMergeViaJDL(kTRUE);    //normal run
+    //alienHandler->SetMergeViaJDL(kFALSE);   //merging run
 
     // define the output folders
     alienHandler->SetGridWorkingDir("myWorkingDir");
@@ -142,8 +142,8 @@ void runAnalysis(Bool_t ismc = kFALSE) {
       mgr->StartAnalysis("grid");
     } else {
       // else launch the full grid analysis
-      // alienHandler->SetRunMode("full");     //normal run
-      alienHandler->SetRunMode("terminate");  // merging run
+      alienHandler->SetRunMode("full");     //normal run
+      //alienHandler->SetRunMode("terminate");  // merging run
       mgr->StartAnalysis("grid");
     }
   }
