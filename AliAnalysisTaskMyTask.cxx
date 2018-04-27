@@ -23,6 +23,7 @@
 #include <iostream>
 #include "AliAODEvent.h"
 #include "AliAODInputHandler.h"
+#include "AliAODMCParticle.h"
 #include "AliAODTrack.h"
 #include "AliAnalysisManager.h"
 #include "AliAnalysisTaskMyTask.h"
@@ -30,7 +31,6 @@
 #include "TChain.h"
 #include "TH1F.h"
 #include "TList.h"
-#include "AliAODMCParticle.h"
 
 class AliAnalysisTaskMyTask;  // your analysis class
 
@@ -110,7 +110,13 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistV0K0ShortInvMass(nullptr),
       fHistV0mcPhotonPt(nullptr),
       fHistArmenterosPodolandskiV0mcPhotons(nullptr),
-      fHistV0Pt(nullptr)
+      fHistV0Pt(nullptr),
+      fHistmcDaug1Pt(nullptr),
+      f2HistmcDaug1Pt(nullptr),
+      fHistmcDaugPt(nullptr),
+      fHist2mcDaugPt(nullptr),
+      fHist2V0mcPhotonPt(nullptr),
+      fHist2ArmenterosPodolandskiV0mcPhotons(nullptr)
 {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
@@ -188,7 +194,13 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistV0K0ShortInvMass(nullptr),
       fHistV0mcPhotonPt(nullptr),
       fHistArmenterosPodolandskiV0mcPhotons(nullptr),
-      fHistV0Pt(nullptr)
+      fHistV0Pt(nullptr),
+      fHistmcDaug1Pt(nullptr),
+      f2HistmcDaug1Pt(nullptr),
+      fHistmcDaugPt(nullptr),
+      fHist2mcDaugPt(nullptr),
+      fHist2V0mcPhotonPt(nullptr),
+      fHist2ArmenterosPodolandskiV0mcPhotons(nullptr)
 {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
@@ -254,9 +266,33 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   // TEST = new TH2F("TEST", "TEST", 200, 0, 10, 200, 0, 10);
   // fOutputList->Add(TEST);
 
+  fHistmcDaugPt = new TH1F("fHistmcDaugPt", "fHistmcDaugPt", 200, 0, 10);
+  fHistmcDaugPt->SetTitle("fHistmcDaugPt;momentum p;counts N");
+  fOutputList->Add(fHistmcDaugPt);
+
+  fHist2mcDaugPt = new TH1F("fHist2mcDaugPt", "fHist2mcDaugPt", 200, 0, 10);
+  fHist2mcDaugPt->SetTitle("fHist2mcDaugPt;momentum p;counts N");
+  fOutputList->Add(fHist2mcDaugPt);
+
+  fHist2V0mcPhotonPt = new TH1F("fHist2V0mcPhotonPt", "fHist2V0mcPhotonPt", 200, 0, 10);
+  fHist2V0mcPhotonPt->SetTitle("fHist2V0mcPhotonPt;momentum p;counts N");
+  fOutputList->Add(fHist2V0mcPhotonPt);
+
+  fHist2ArmenterosPodolandskiV0mcPhotons = new TH1F("fHist2ArmenterosPodolandskiV0mcPhotons", "fHist2ArmenterosPodolandskiV0mcPhotons", 200, 0, 10);
+  fHist2ArmenterosPodolandskiV0mcPhotons->SetTitle("fHist2ArmenterosPodolandskiV0mcPhotons;momentum p;counts N");
+  fOutputList->Add(fHist2ArmenterosPodolandskiV0mcPhotons);
+
   fHistPKaon = new TH1F("fHistPKaon", "fHistPKaon", 200, 0, 10);
   fHistPKaon->SetTitle("Kaon momentum;momentum p;counts N");
   fOutputList->Add(fHistPKaon);
+
+  fHistmcDaug1Pt = new TH1F("fHistmcDaug1Pt", "fHistmcDaug1Pt", 200, 0, 10);
+  fHistmcDaug1Pt->SetTitle("fHistmcDaug1Pt;momentum p;counts N");
+  fOutputList->Add(fHistmcDaug1Pt);
+
+  f2HistmcDaug1Pt = new TH1F("f2HistmcDaug1Pt", "f2HistmcDaug1Pt", 200, 0, 10);
+  f2HistmcDaug1Pt->SetTitle("f2HistmcDaug1Pt;momentum p;counts N");
+  fOutputList->Add(f2HistmcDaug1Pt);
 
   fHistAllPureKaon =
       new TH1F("fHistAllPureKaon", "fHistAllPureKaon", 200, 0, 10);
@@ -272,11 +308,14 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fOutputList->Add(fHistMCall);
 
   fHistV0Pt = new TH1F("fHistV0Pt", "fHistV0Pt", 200, 0, 10);
-  fHistV0Pt->SetTitle("Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
+  fHistV0Pt->SetTitle(
+      "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
   fOutputList->Add(fHistV0Pt);
 
-  fHistV0mcPhotonPt = new TH1F("fHistV0mcPhotonPt", "fHistV0mcPhotonPt", 200, 0, 10);
-  fHistV0mcPhotonPt->SetTitle("MCTrueV0Photons;transverse momentum pt;counts N");
+  fHistV0mcPhotonPt =
+      new TH1F("fHistV0mcPhotonPt", "fHistV0mcPhotonPt", 200, 0, 10);
+  fHistV0mcPhotonPt->SetTitle(
+      "MCTrueV0Photons;transverse momentum pt;counts N");
   fOutputList->Add(fHistV0mcPhotonPt);
 
   fHistClsDistrPosTr = new TH2F("fHistClsDistrPosTr", "fHistClsDistrPosTr", 200,
@@ -573,10 +612,9 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fOutputList->Add(fHistArmenterosPodolandski);
 
   fHistArmenterosPodolandskiV0mcPhotons = new TH2F(
-      "fHistArmenterosPodolandskiV0mcPhotons", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
-      500, -1, 1, 500, 0, 1);
+      "fHistArmenterosPodolandskiV0mcPhotons",
+      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
   fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotons);
-
 
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
                              // changes / updates to the
@@ -682,30 +720,56 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     const float armQt = v0->PtArmV0();
     fHistArmenterosPodolandski->Fill(armAlpha, armQt);
 
+    // looking for proton and pion daughers
+    AliMCParticle *electr = nullptr;
+    AliMCParticle *positr = nullptr;
+    if (v0->GetNDaughters() >= 2) {
+      for (int daughterIndex = v0->GetFirstDaughter();
+           daughterIndex <= v0->GetLastDaughter(); ++daughterIndex) {
+        if (daughterIndex < 0) continue;
+        AliMCParticle *tmpDaughter =
+            static_cast<AliMCParticle *>(fMCEvent->GetTrack(daughterIndex));
+        const int pdgCode = tmpDaughter->PdgCode();
+        //std::cout << tmpDaughter->Pt() << "\n";
+        fHistmcDaugPt->Fill(tmpDaughter->Pt());
+        if (tmpDaughter->Pt() < 0.4 || std::abs(tmpDaughter->Eta()) > 0.8) continue;
+        fHist2mcDaugPt->Fill(tmpDaughter->Pt());
+        fHist2V0mcPhotonPt->Fill(v0->Pt2V0());
+        fHist2ArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(), v0->PtArmV0());
+      }
+    }
+
     // MC-Particles with check if MC-Particle is Photon
-    if (fIsMC){
-    TClonesArray *mcarray = dynamic_cast<TClonesArray *>(
-        fAOD->FindListObject(AliAODMCParticle::StdBranchName()));
+    if (fIsMC) {
+      TClonesArray *mcarray = dynamic_cast<TClonesArray *>(
+          fAOD->FindListObject(AliAODMCParticle::StdBranchName()));
 
-    if (!mcarray) continue;
-    int daugh[2] = {11, 11};  // we check whether the v0 is a photon, i.e. the
-                              // daughters should be electrons
-    int label = v0->MatchToMC(22, mcarray, 2, daugh);  // do the check
-    if (label < 0) continue;  // no mc info assigned to this track - don’t use it
-    AliMCParticle *mcParticle =
-        static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
-    if (!mcParticle) continue;
+      if (!mcarray) continue;
+      int daugh[2] = {11, 11};  // we check whether the v0 is a photon, i.e. the
+                                // daughters should be electrons
+      int label = v0->MatchToMC(22, mcarray, 2, daugh);  // do the check
+      if (label < 0)
+        continue;  // no mc info assigned to this track - don’t use it
+      AliMCParticle *mcParticle =
+          static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
+      if (!mcParticle) continue;
 
-    // Check if daughters lie in acceptance
-    AliMCParticle *mcDaug1 =static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
-    std::cout << mcParticle->GetDaughterLabel(1) << "\n";
-    std::cout << label << "\n";
-    if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
-    AliMCParticle *mcDaug2 =static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(2)));
-    if (mcDaug2->Pt() < 0.4 || std::abs(mcDaug2->Eta()) > 0.8) continue;
+      // Check if daughters lie in acceptance
+      AliMCParticle *mcDaug1 = static_cast<AliMCParticle *>(
+          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
+      //std::cout << mcParticle->GetDaughterLabel(1) << "\n";
+      //std::cout << label << "\n";
+      if (!mcDaug1) continue;
+      fHistmcDaug1Pt->Fill(mcDaug1->Pt());
+      if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
+      f2HistmcDaug1Pt->Fill(mcDaug1->Pt());
+      AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
+          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(2)));
+      if (!mcDaug2) continue;
+      if (mcDaug2->Pt() < 0.4 || std::abs(mcDaug2->Eta()) > 0.8) continue;
 
-    fHistV0mcPhotonPt->Fill(v0->Pt2V0());
-    fHistArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(), v0->PtArmV0());
+      fHistV0mcPhotonPt->Fill(v0->Pt2V0());
+      fHistArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(), v0->PtArmV0());
     }
   }
 
