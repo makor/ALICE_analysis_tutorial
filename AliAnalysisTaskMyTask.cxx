@@ -767,18 +767,18 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       // Check if daughters lie in acceptance
       AliMCParticle *mcDaug1 = static_cast<AliMCParticle *>(
           fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
-      std::cout << mcParticle->GetFirstDaughter() << "\n";
-      std::cout << mcParticle->GetDaughterLabel(1) << "\n";
-      std::cout << mcParticle->GetLastDaughter() << "\n";
-      //std::cout << mcParticle->GetDaughterLabel(2) << "\n";
-      //std::cout << label << "\n";
       if (!mcDaug1) continue;
-      fHistmcDaug1Pt->Fill(mcDaug1->Pt());
-      if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
-      fHist2mcDaug1Pt->Fill(mcDaug1->Pt());
       AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
           fMCEvent->GetTrack(mcParticle->GetDaughterLabel(2)));
       if (!mcDaug2) continue;
+      std::cout << mcParticle->GetFirstDaughter() << "\n";
+      std::cout << mcParticle->GetDaughterLabel(1) << "\n";
+      std::cout << mcParticle->GetLastDaughter() << "\n";
+      std::cout << mcParticle->GetDaughterLabel(2) << "\n";
+      //std::cout << label << "\n";
+      fHistmcDaug1Pt->Fill(mcDaug1->Pt());
+      if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
+      fHist2mcDaug1Pt->Fill(mcDaug1->Pt());
       fHistmcDaug2Pt->Fill(mcDaug2->Pt());
       if (mcDaug2->Pt() < 0.4 || std::abs(mcDaug2->Eta()) > 0.8) continue;
       fHist2mcDaug2Pt->Fill(mcDaug2->Pt());
