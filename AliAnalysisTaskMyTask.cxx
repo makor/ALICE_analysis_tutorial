@@ -760,21 +760,21 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       int daugh[2] = {11, 11};  // we check whether the v0 is a photon, i.e. the
                                 // daughters should be electrons
       int label = v0->MatchToMC(22, mcarray, 2, daugh);  // do the check
-      if (label == -1) continue;  // no mc info assigned to this track - don’t use it
+      if (label < 0) continue;  // no mc info assigned to this track - don’t use it
       AliMCParticle *mcParticle =
           static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
       if (!mcParticle) continue;
       // Check if daughters lie in acceptance
       AliMCParticle *mcDaug1 = static_cast<AliMCParticle *>(
-          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
+          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
       if (!mcDaug1) continue;
       AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
-          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(2)));
+          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
       if (!mcDaug2) continue;
       std::cout << mcParticle->GetFirstDaughter() << "\n";
-      std::cout << mcParticle->GetDaughterLabel(1) << "\n";
+      std::cout << mcParticle->GetDaughterLabel(0) << "\n";
       std::cout << mcParticle->GetLastDaughter() << "\n";
-      std::cout << mcParticle->GetDaughterLabel(2) << "\n";
+      std::cout << mcParticle->GetDaughterLabel(1) << "\n";
       //std::cout << label << "\n";
       fHistmcDaug1Pt->Fill(mcDaug1->Pt());
       if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
