@@ -54,13 +54,15 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH1F* fHist3SigSelectedKaonP;                     //!
   TH1F* fHistV0mcPhotonPt;                          //!
   TH1F* fHistmcDaug1Pt;                             //!
-  TH1F* f2HistmcDaug1Pt;                            //!
+  TH1F* fHist2mcDaug1Pt;                            //!
+  TH1F* fHistmcDaug2Pt;                             //!
+  TH1F* fHist2mcDaug2Pt;                            //!
   TH1F* fHistV0LambdaInvMass;                       //!
   TH1F* fHistV0AntiLambdaInvMass;                   //!
-  TH1F* fHistmcDaugPt;                   //!
-  TH1F* fHist2mcDaugPt;                   //!
-  TH1F* fHist2V0mcPhotonPt;                   //!
-  TH1F* fHist2ArmenterosPodolandskiV0mcPhotons;                   //!
+  TH1F* fHistmcDaugPt;                              //!
+  TH1F* fHist2mcDaugPt;                             //!
+  TH1F* fHist2V0mcPhotonPt;                         //!
+  TH1F* fHist2ArmenterosPodolandskiV0mcPhotons;     //!
   TH1F* fHistV0Pt;                                  //!
   TH1F* fHistV0K0ShortInvMass;                      //!
   TH2F* fHistClsDistrPosTr;                         //!
