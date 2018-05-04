@@ -118,7 +118,12 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHist2V0mcPhotonPt(nullptr),
       fHist2ArmenterosPodolandskiV0mcPhotons(nullptr),
       fHistmcDaug2Pt(nullptr),
-      fHist2mcDaug2Pt(nullptr)
+      fHist2mcDaug2Pt(nullptr),
+      fHistAllPhotons(nullptr),
+      fHistArmenterosPodolandskiPtCut(nullptr),
+      fHistV0PhotonPt(nullptr),
+      fHistV0mcPhotonPtCut(nullptr),
+      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr)
 {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
@@ -204,7 +209,12 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHist2V0mcPhotonPt(nullptr),
       fHist2ArmenterosPodolandskiV0mcPhotons(nullptr),
       fHistmcDaug2Pt(nullptr),
-      fHist2mcDaug2Pt(nullptr)
+      fHist2mcDaug2Pt(nullptr),
+      fHistAllPhotons(nullptr),
+      fHistArmenterosPodolandskiPtCut(nullptr),
+      fHistV0PhotonPt(nullptr),
+      fHistV0mcPhotonPtCut(nullptr),
+      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr)
 {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
@@ -282,8 +292,22 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHist2V0mcPhotonPt->SetTitle("fHist2V0mcPhotonPt;momentum p;counts N");
   fOutputList->Add(fHist2V0mcPhotonPt);
 
-  fHist2ArmenterosPodolandskiV0mcPhotons = new TH1F("fHist2ArmenterosPodolandskiV0mcPhotons", "fHist2ArmenterosPodolandskiV0mcPhotons", 200, 0, 10);
-  fHist2ArmenterosPodolandskiV0mcPhotons->SetTitle("fHist2ArmenterosPodolandskiV0mcPhotons;momentum p;counts N");
+  fHistV0PhotonPt = new TH1F("fHistV0PhotonPt", "fHistV0PhotonPt", 200, 0, 10);
+  fHistV0PhotonPt->SetTitle("fHistV0PhotonPt;momentum p;counts N");
+  fOutputList->Add(fHistV0PhotonPt);
+
+  fHistV0mcPhotonPtCut = new TH1F("fHistV0mcPhotonPtCut", "fHistV0mcPhotonPtCut", 200, 0, 10);
+  fHistV0mcPhotonPtCut->SetTitle("fHistV0mcPhotonPtCut;momentum p;counts N");
+  fOutputList->Add(fHistV0mcPhotonPtCut);
+
+  fHistArmenterosPodolandskiV0mcPhotonsCut = new TH2F(
+      "fHistArmenterosPodolandskiV0mcPhotonsCut",
+      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
+  fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotonsCut);
+
+  fHist2ArmenterosPodolandskiV0mcPhotons = new TH2F(
+      "fHist2ArmenterosPodolandskiV0mcPhotons",
+      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
   fOutputList->Add(fHist2ArmenterosPodolandskiV0mcPhotons);
 
   fHistPKaon = new TH1F("fHistPKaon", "fHistPKaon", 200, 0, 10);
@@ -618,6 +642,10 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
                            "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
   fOutputList->Add(fHistPhotonPt);
 
+  fHistAllPhotons = new TH1F("fHistAllPhotons",
+                           "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
+  fOutputList->Add(fHistAllPhotons);
+
   fHistArmenterosPodolandski = new TH2F(
       "fHistArmenterosPodolandski", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
       500, -1, 1, 500, 0, 1);
@@ -627,6 +655,11 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       "fHistArmenterosPodolandskiV0mcPhotons",
       " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
   fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotons);
+
+  fHistArmenterosPodolandskiPtCut = new TH2F(
+      "fHistArmenterosPodolandskiPtCut", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
+      500, -1, 1, 500, 0, 1);
+  fOutputList->Add(fHistArmenterosPodolandskiPtCut);
 
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
                              // changes / updates to the
@@ -661,6 +694,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         if (mcParticle->PdgCode() == 321 || mcParticle->PdgCode() == -321) {
           fHistAllPureKaon->Fill(mcParticle->P());
         }
+        if (mcParticle->PdgCode() == 22) {
+          fHistAllPhotons->Fill(mcParticle->P());
+        }
       }
     }
   }
@@ -690,6 +726,11 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
     if (!PhotonCandidate) continue;
     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
+    /*if(fIsMC) {
+        AliMCParticle *ReconmcParticle =
+            static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
+
+    }*/
   }
 
   for (auto v0obj : *(fAOD->GetV0s())) {
@@ -716,11 +757,11 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     fHistClsDistrPosTr->Fill(posTrack->Pt(), pnCls);
     fHistClsDistrNegTr->Fill(negTrack->Pt(), nnCls);
     fHistV0LambdaInvMass->Fill(v0->MassLambda());
-    fHistV0LambdaInvMass->Sumw2();
+    //fHistV0LambdaInvMass->Sumw2();
     fHistV0AntiLambdaInvMass->Fill(v0->MassAntiLambda());
-    fHistV0AntiLambdaInvMass->Sumw2();
+    //fHistV0AntiLambdaInvMass->Sumw2();
     fHistV0K0ShortInvMass->Fill(v0->MassK0Short());
-    fHistV0K0ShortInvMass->Sumw2();
+    //fHistV0K0ShortInvMass->Sumw2();
 
     fHistV0Pt->Fill(v0->Pt2V0());
 
@@ -731,11 +772,15 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
     fHistArmenterosPodolandski->Fill(armAlpha, armQt);
+    //Pt-Cut in order to select Gammas
+    if (v0->PtArmV0() > 0.02) continue;
+    fHistArmenterosPodolandskiPtCut->Fill(armAlpha, armQt);
+    fHistV0PhotonPt->Fill(v0->PtArmV0());
 
-    // looking for proton and pion daughers
+    /*// looking for proton and pion daughers
     AliMCParticle *electr = nullptr;
     AliMCParticle *positr = nullptr;
-    if (v0->GetNDaughters() >= 2) {
+    if (v0->GetNDaughters() = 2) {
       for (int daughterIndex = v0->GetFirstDaughter();
            daughterIndex <= v0->GetLastDaughter(); ++daughterIndex) {
         if (daughterIndex < 0) continue;
@@ -749,7 +794,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         fHist2V0mcPhotonPt->Fill(v0->Pt2V0());
         fHist2ArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(), v0->PtArmV0());
       }
-    }
+    }*/
 
     // MC-Particles with check if MC-Particle is Photon
     if (fIsMC) {
@@ -771,10 +816,10 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
           fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
       if (!mcDaug2) continue;
-      std::cout << mcParticle->GetFirstDaughter() << "\n";
-      std::cout << mcParticle->GetDaughterLabel(0) << "\n";
-      std::cout << mcParticle->GetLastDaughter() << "\n";
-      std::cout << mcParticle->GetDaughterLabel(1) << "\n";
+      //std::cout << mcParticle->GetFirstDaughter() << "\n";
+      //std::cout << mcParticle->GetDaughterLabel(0) << "\n";
+      //std::cout << mcParticle->GetLastDaughter() << "\n";
+      //std::cout << mcParticle->GetDaughterLabel(1) << "\n";
       //std::cout << label << "\n";
       fHistmcDaug1Pt->Fill(mcDaug1->Pt());
       if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
@@ -782,9 +827,12 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       fHistmcDaug2Pt->Fill(mcDaug2->Pt());
       if (mcDaug2->Pt() < 0.4 || std::abs(mcDaug2->Eta()) > 0.8) continue;
       fHist2mcDaug2Pt->Fill(mcDaug2->Pt());
-
       fHistV0mcPhotonPt->Fill(v0->Pt2V0());
       fHistArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(), v0->PtArmV0());
+       if (v0->PtArmV0() > 0.02) continue;
+       fHistV0mcPhotonPtCut->Fill(v0->Pt2V0());
+       fHistArmenterosPodolandskiV0mcPhotonsCut->Fill(v0->AlphaV0(), v0->PtArmV0());
+
     }
   }
 
