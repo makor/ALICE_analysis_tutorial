@@ -123,8 +123,7 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistArmenterosPodolandskiPtCut(nullptr),
       fHistV0PhotonPt(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
-      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr)
-{
+      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -214,8 +213,7 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistArmenterosPodolandskiPtCut(nullptr),
       fHistV0PhotonPt(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
-      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr)
-{
+      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr) {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
                                     // case we take a 'chain' of events
@@ -288,7 +286,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHist2mcDaugPt->SetTitle("fHist2mcDaugPt;momentum p;counts N");
   fOutputList->Add(fHist2mcDaugPt);
 
-  fHist2V0mcPhotonPt = new TH1F("fHist2V0mcPhotonPt", "fHist2V0mcPhotonPt", 200, 0, 10);
+  fHist2V0mcPhotonPt =
+      new TH1F("fHist2V0mcPhotonPt", "fHist2V0mcPhotonPt", 200, 0, 10);
   fHist2V0mcPhotonPt->SetTitle("fHist2V0mcPhotonPt;momentum p;counts N");
   fOutputList->Add(fHist2V0mcPhotonPt);
 
@@ -296,7 +295,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistV0PhotonPt->SetTitle("fHistV0PhotonPt;momentum p;counts N");
   fOutputList->Add(fHistV0PhotonPt);
 
-  fHistV0mcPhotonPtCut = new TH1F("fHistV0mcPhotonPtCut", "fHistV0mcPhotonPtCut", 200, 0, 10);
+  fHistV0mcPhotonPtCut =
+      new TH1F("fHistV0mcPhotonPtCut", "fHistV0mcPhotonPtCut", 200, 0, 10);
   fHistV0mcPhotonPtCut->SetTitle("fHistV0mcPhotonPtCut;momentum p;counts N");
   fOutputList->Add(fHistV0mcPhotonPtCut);
 
@@ -643,7 +643,7 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fOutputList->Add(fHistPhotonPt);
 
   fHistAllPhotons = new TH1F("fHistAllPhotons",
-                           "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
+                             "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
   fOutputList->Add(fHistAllPhotons);
 
   fHistArmenterosPodolandski = new TH2F(
@@ -657,8 +657,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotons);
 
   fHistArmenterosPodolandskiPtCut = new TH2F(
-      "fHistArmenterosPodolandskiPtCut", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
-      500, -1, 1, 500, 0, 1);
+      "fHistArmenterosPodolandskiPtCut",
+      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
   fOutputList->Add(fHistArmenterosPodolandskiPtCut);
 
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
@@ -736,6 +736,23 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   for (auto v0obj : *(fAOD->GetV0s())) {
     auto *v0 = static_cast<AliAODv0 *>(v0obj);
     if (!v0) continue;
+    //Cuts to the V0 selection in order to avoid false pairings
+    if (v0->GetNProngs() > 2) continue;
+    if (v0->GetNDaughters() > 2) continue;
+    if (v0->GetCharge() != 0) continue;
+    if (v0->GetOnFlyStatus()) continue;  // offline v0
+    // Get the coordinates of the primary vertex
+    Double_t xPV = fAOD->GetPrimaryVertex()->GetX();
+    Double_t yPV = fAOD->GetPrimaryVertex()->GetY();
+    Double_t zPV = fAOD->GetPrimaryVertex()->GetZ();
+    Double_t PV[3] = {xPV, yPV, zPV};
+    // Calculate decay vertex variables:
+    const float point = v0->CosPointingAngle(PV);
+    const float dcaV0Dau = v0->DcaV0Daughters();
+    // Cut on angle between V0 vector and direct connection to primary vertex
+    if (point < 0.99) continue;
+    // DCA of the daughter tracks at the decay vertex
+    if (dcaV0Dau > 1.5) continue;
     // std::cout << v0->MassLambda() << "\n";
     AliAODTrack *posTrack =
         static_cast<AliAODTrack *>(fGlobalTrackReference[v0->GetPosID()]);
@@ -757,13 +774,14 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     fHistClsDistrPosTr->Fill(posTrack->Pt(), pnCls);
     fHistClsDistrNegTr->Fill(negTrack->Pt(), nnCls);
     fHistV0LambdaInvMass->Fill(v0->MassLambda());
-    //fHistV0LambdaInvMass->Sumw2();
+    // fHistV0LambdaInvMass->Sumw2();
     fHistV0AntiLambdaInvMass->Fill(v0->MassAntiLambda());
-    //fHistV0AntiLambdaInvMass->Sumw2();
+    // fHistV0AntiLambdaInvMass->Sumw2();
     fHistV0K0ShortInvMass->Fill(v0->MassK0Short());
-    //fHistV0K0ShortInvMass->Sumw2();
+    // fHistV0K0ShortInvMass->Sumw2();
+    const float v0pt = v0->Pt2V0();
 
-    fHistV0Pt->Fill(v0->Pt2V0());
+    fHistV0Pt->Fill(v0pt);
 
     // std::cout << v0->MassLambda() << "\n";
     // std::cout << v0->MassAntiLambda() << "\n";
@@ -771,14 +789,14 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
-    //std::cout << armQt << "\n";
+    // std::cout << armQt << "\n";
     fHistArmenterosPodolandski->Fill(armAlpha, armQt);
-    //Pt-Cut in order to select Gammas
-    if (v0->PtArmV0() > 0.02) continue;
-    //std::cout << 'After Cut' << "\n";
-    std::cout << armQt << "\n";
+    // Pt-Cut in order to select Gammas
+    if (armQt > 0.02) continue;
+    // std::cout << 'After Cut' << "\n";
+    // std::cout << armQt << "\n";
     fHistArmenterosPodolandskiPtCut->Fill(armAlpha, armQt);
-    fHistV0PhotonPt->Fill(v0->PtArmV0());
+    fHistV0PhotonPt->Fill(armQt);
 
     /*// looking for proton and pion daughers
     AliMCParticle *electr = nullptr;
@@ -792,10 +810,12 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         const int pdgCode = tmpDaughter->PdgCode();
         //std::cout << tmpDaughter->Pt() << "\n";
         fHistmcDaugPt->Fill(tmpDaughter->Pt());
-        if (tmpDaughter->Pt() < 0.4 || std::abs(tmpDaughter->Eta()) > 0.8) continue;
+        if (tmpDaughter->Pt() < 0.4 || std::abs(tmpDaughter->Eta()) > 0.8)
+    continue;
         fHist2mcDaugPt->Fill(tmpDaughter->Pt());
         fHist2V0mcPhotonPt->Fill(v0->Pt2V0());
-        fHist2ArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(), v0->PtArmV0());
+        fHist2ArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(),
+    v0->PtArmV0());
       }
     }*/
 
@@ -808,7 +828,8 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       int daugh[2] = {11, 11};  // we check whether the v0 is a photon, i.e. the
                                 // daughters should be electrons
       int label = v0->MatchToMC(22, mcarray, 2, daugh);  // do the check
-      if (label < 0) continue;  // no mc info assigned to this track - don’t use it
+      if (label < 0)
+        continue;  // no mc info assigned to this track - don’t use it
       AliMCParticle *mcParticle =
           static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
       if (!mcParticle) continue;
@@ -819,23 +840,25 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
           fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
       if (!mcDaug2) continue;
-      //std::cout << mcParticle->GetFirstDaughter() << "\n";
-      //std::cout << mcParticle->GetDaughterLabel(0) << "\n";
-      //std::cout << mcParticle->GetLastDaughter() << "\n";
-      //std::cout << mcParticle->GetDaughterLabel(1) << "\n";
-      //std::cout << label << "\n";
-      fHistmcDaug1Pt->Fill(mcDaug1->Pt());
-      if (mcDaug1->Pt() < 0.4 || std::abs(mcDaug1->Eta()) > 0.8) continue;
-      fHist2mcDaug1Pt->Fill(mcDaug1->Pt());
-      fHistmcDaug2Pt->Fill(mcDaug2->Pt());
-      if (mcDaug2->Pt() < 0.4 || std::abs(mcDaug2->Eta()) > 0.8) continue;
-      fHist2mcDaug2Pt->Fill(mcDaug2->Pt());
-      fHistV0mcPhotonPt->Fill(v0->Pt2V0());
-      fHistArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(), v0->PtArmV0());
-       if (v0->PtArmV0() > 0.02) continue;
-       fHistV0mcPhotonPtCut->Fill(v0->Pt2V0());
-       fHistArmenterosPodolandskiV0mcPhotonsCut->Fill(v0->AlphaV0(), v0->PtArmV0());
-
+      // std::cout << mcParticle->GetFirstDaughter() << "\n";
+      // std::cout << mcParticle->GetDaughterLabel(0) << "\n";
+      // std::cout << mcParticle->GetLastDaughter() << "\n";
+      // std::cout << mcParticle->GetDaughterLabel(1) << "\n";
+      // std::cout << label << "\n";
+      const float mcDaug1Pt = mcDaug1->Pt();
+      const float mcDaug2Pt = mcDaug2->Pt();
+      fHistV0K0ShortInvMass->Fill(v0->MassK0Short());
+      fHistmcDaug1Pt->Fill(mcDaug1Pt);
+      if (mcDaug1Pt < 0.1 || std::abs(mcDaug1->Eta()) > 0.8) continue;
+      fHist2mcDaug1Pt->Fill(mcDaug1Pt);
+      fHistmcDaug2Pt->Fill(mcDaug2Pt);
+      if (mcDaug2Pt < 0.1 || std::abs(mcDaug2->Eta()) > 0.8) continue;
+      fHist2mcDaug2Pt->Fill(mcDaug2Pt);
+      fHistV0mcPhotonPt->Fill(v0pt);
+      fHistArmenterosPodolandskiV0mcPhotons->Fill(armAlpha, armQt);
+      if (armAlpha > 0.02) continue;
+      fHistV0mcPhotonPtCut->Fill(v0pt);
+      fHistArmenterosPodolandskiV0mcPhotonsCut->Fill(armAlpha, armQt);
     }
   }
 

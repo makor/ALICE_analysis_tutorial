@@ -104,6 +104,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH2F* fHistNSigAddKaon;                           //!
   // TH2F*			TEST;
   Bool_t fIsMC;
+  float fpTCut;
   TH1F* fHistPKaon;  //!
   // TH1F*			fHistSum_PKaon;
   TH1F* fHistMCall;                  //!
