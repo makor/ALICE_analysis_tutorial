@@ -31,6 +31,7 @@
 #include "TChain.h"
 #include "TH1F.h"
 #include "TList.h"
+#include "AliConversionPhotonBase.h"
 
 class AliAnalysisTaskMyTask;  // your analysis class
 
@@ -41,66 +42,14 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
     AliAnalysisTaskMyTask::AliAnalysisTaskMyTask()
     : AliAnalysisTaskSE(),
       fAOD(nullptr),
+      fMCEvent(nullptr),
       fV0Reader(nullptr),
       fV0ReaderName("NoInit"),
       fReaderGammas(nullptr),
       fGlobalTrackReference(),
       fOutputList(nullptr),
-      fHistPTPCKaon(nullptr),
-      fHistPTOFKaon(nullptr),
-      fHistPTPCElectron(nullptr),
-      fHistPTOFElectron(nullptr),
-      fHistPBetaPion(nullptr),
-      fHistNSigAddElectron(nullptr),
-      fHistPt(nullptr),
-      fHistPtvertexZ(nullptr),
-      fHistPtcentrality(nullptr),
-      fHistPt2D(nullptr),
       fPIDResponse(nullptr),
-      fHistTPC(nullptr),
-      fHistPionPt(nullptr),
-      fHistPionPsdRap(nullptr),
-      fHistPionAzi(nullptr),
-      fHistPTPCPion(nullptr),
-      fHistPTOFPion(nullptr),
-      fHistPBetaTOFPion(nullptr),
-      fHistPBetaTPCPion(nullptr),
-      fHistNSigTOFPion(nullptr),
-      fHistNSigTPCPion(nullptr),
-      fHistNSigTOFKaon(nullptr),
-      fHistNSigTPCKaon(nullptr),
-      fHistNSigTOFProton(nullptr),
-      fHistNSigTPCProton(nullptr),
-      fHistNSigTOFElectron(nullptr),
-      fHistNSigTPCElectron(nullptr),
-      fHistNSigAddProton(nullptr),
-      fHistSigSelectedProtonP(nullptr),
-      fHist3SigSelectedProtonP(nullptr),
-      fHistSigSelectedElectronP(nullptr),
-      fHist3SigSelectedElectronP(nullptr),
-      fHistNSigAddPion(nullptr),
-      fHistSigSelectedPionP(nullptr),
-      fHist3SigSelectedPionP(nullptr),
-      fHistNSigAddKaon(nullptr),
-      fHistSigSelectedKaonP(nullptr),
-      fHist3SigSelectedKaonP(nullptr),
       fIsMC(kFALSE),
-      fHistPBetaProton(nullptr),
-      fHistPBetaElectron(nullptr),
-      fHistPBetaKaon(nullptr),
-      fHistPTPCPion2(nullptr),
-      fHistPTOFPion2(nullptr),
-      fHistPTPCProton(nullptr),
-      fHistPTOFProton(nullptr),
-      /*TEST(nullptr),*/ fHistPTOF3SigKaon(nullptr),
-      fHistPTPC3SigKaon(nullptr),
-      fHistPKaon(nullptr),
-      /*fHistSum_PKaon(nullptr),*/ fHistTOF(nullptr),
-      fHistBeta(nullptr),
-      fHistMCall(nullptr),
-      fHistAllSpeciesKaon(nullptr),
-      fHistPureKaon(nullptr),
-      fHistAllPureKaon(nullptr),
       fHistPhotonPt(nullptr),
       fHistArmenterosPodolandski(nullptr),
       fHistClsDistrPosTr(nullptr),
@@ -108,20 +57,21 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistV0LambdaInvMass(nullptr),
       fHistV0AntiLambdaInvMass(nullptr),
       fHistV0K0ShortInvMass(nullptr),
-      fHistV0mcPhotonPt(nullptr),
+      fHistReconstrmcPhotonPt(nullptr),
       fHistArmenterosPodolandskiV0mcPhotons(nullptr),
+      fHistV0PhotonCandPt(nullptr),
       fHistV0Pt(nullptr),
       fHistmcDaug1Pt(nullptr),
-      fHist2mcDaug1Pt(nullptr),
+      fHistDetAccmcDaug1Pt(nullptr),
       fHistmcDaugPt(nullptr),
       fHist2mcDaugPt(nullptr),
       fHist2V0mcPhotonPt(nullptr),
       fHist2ArmenterosPodolandskiV0mcPhotons(nullptr),
       fHistmcDaug2Pt(nullptr),
-      fHist2mcDaug2Pt(nullptr),
+      fHistDetAccmcDaug2Pt(nullptr),
       fHistAllPhotons(nullptr),
-      fHistArmenterosPodolandskiPtCut(nullptr),
-      fHistV0PhotonPt(nullptr),
+      fHistArmenterosPodolandskiArmCut(nullptr),
+      fHistV0mcPhotonPtandArmCut(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
       fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr) {
   // default constructor, don't allocate memory here!
@@ -131,66 +81,14 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
 AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
     : AliAnalysisTaskSE(name),
       fAOD(nullptr),
+      fMCEvent(nullptr),
       fV0Reader(nullptr),
       fV0ReaderName("NoInit"),
       fReaderGammas(nullptr),
       fGlobalTrackReference(),
       fOutputList(nullptr),
-      fHistPTPCKaon(nullptr),
-      fHistPTOFKaon(nullptr),
-      fHistPTPCElectron(nullptr),
-      fHistPTOFElectron(nullptr),
-      fHistPBetaPion(nullptr),
-      fHistNSigAddElectron(nullptr),
-      fHistPt(nullptr),
-      fHistPtvertexZ(nullptr),
-      fHistPtcentrality(nullptr),
-      fHistPt2D(nullptr),
       fPIDResponse(nullptr),
-      fHistTPC(nullptr),
-      fHistPionPt(nullptr),
-      fHistPionPsdRap(nullptr),
-      fHistPionAzi(nullptr),
-      fHistPTPCPion(nullptr),
-      fHistPTOFPion(nullptr),
-      fHistPBetaTOFPion(nullptr),
-      fHistPBetaTPCPion(nullptr),
-      fHistNSigTOFPion(nullptr),
-      fHistNSigTPCPion(nullptr),
-      fHistNSigTOFKaon(nullptr),
-      fHistNSigTPCKaon(nullptr),
-      fHistNSigTOFProton(nullptr),
-      fHistNSigTPCProton(nullptr),
-      fHistNSigTOFElectron(nullptr),
-      fHistNSigTPCElectron(nullptr),
-      fHistNSigAddProton(nullptr),
-      fHistSigSelectedProtonP(nullptr),
-      fHist3SigSelectedProtonP(nullptr),
-      fHistSigSelectedElectronP(nullptr),
-      fHist3SigSelectedElectronP(nullptr),
-      fHistNSigAddPion(nullptr),
-      fHistSigSelectedPionP(nullptr),
-      fHist3SigSelectedPionP(nullptr),
-      fHistNSigAddKaon(nullptr),
-      fHistSigSelectedKaonP(nullptr),
-      fHist3SigSelectedKaonP(nullptr),
       fIsMC(kFALSE),
-      fHistPBetaProton(nullptr),
-      fHistPBetaElectron(nullptr),
-      fHistPBetaKaon(nullptr),
-      fHistPTPCPion2(nullptr),
-      fHistPTOFPion2(nullptr),
-      fHistPTPCProton(nullptr),
-      fHistPTOFProton(nullptr),
-      /*TEST(nullptr),*/ fHistPTOF3SigKaon(nullptr),
-      fHistPTPC3SigKaon(nullptr),
-      fHistPKaon(nullptr),
-      /*fHistSum_PKaon(nullptr),*/ fHistTOF(nullptr),
-      fHistBeta(nullptr),
-      fHistMCall(nullptr),
-      fHistAllSpeciesKaon(nullptr),
-      fHistPureKaon(nullptr),
-      fHistAllPureKaon(nullptr),
       fHistPhotonPt(nullptr),
       fHistArmenterosPodolandski(nullptr),
       fHistClsDistrPosTr(nullptr),
@@ -198,20 +96,21 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistV0LambdaInvMass(nullptr),
       fHistV0AntiLambdaInvMass(nullptr),
       fHistV0K0ShortInvMass(nullptr),
-      fHistV0mcPhotonPt(nullptr),
+      fHistReconstrmcPhotonPt(nullptr),
       fHistArmenterosPodolandskiV0mcPhotons(nullptr),
+      fHistV0PhotonCandPt(nullptr),
       fHistV0Pt(nullptr),
       fHistmcDaug1Pt(nullptr),
-      fHist2mcDaug1Pt(nullptr),
+      fHistDetAccmcDaug1Pt(nullptr),
       fHistmcDaugPt(nullptr),
       fHist2mcDaugPt(nullptr),
       fHist2V0mcPhotonPt(nullptr),
       fHist2ArmenterosPodolandskiV0mcPhotons(nullptr),
       fHistmcDaug2Pt(nullptr),
-      fHist2mcDaug2Pt(nullptr),
+      fHistDetAccmcDaug2Pt(nullptr),
       fHistAllPhotons(nullptr),
-      fHistArmenterosPodolandskiPtCut(nullptr),
-      fHistV0PhotonPt(nullptr),
+      fHistArmenterosPodolandskiArmCut(nullptr),
+      fHistV0mcPhotonPtandArmCut(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
       fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr) {
   // constructor
@@ -247,8 +146,7 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   // saved
   // to an output file
   //
-  fOutputList =
-      new TList();  // this is a list which will contain all of your histograms
+  fOutputList =new TList();  // this is a list which will contain all of your histograms
   // at the end of the analysis, the contents of this list are written
   // to the output file
   fOutputList->SetOwner(kTRUE);  // memory stuff: the list is owner of all
@@ -256,28 +154,12 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
                                  // if requested (dont worry about this now)
 
   fEventCuts.AddQAplotsToList(fOutputList);
-
-  // example of a histogram
-  fHistPt =
-      new TH1F("fHistPt", "fHistPt", 200, 0, 10);  // create your histogram
-  fHistPt->SetTitle(
-      "Transversemomentum;transversmomentum p;counts N");  // Lableing of the
-                                                           // Graph ("Title; X
-                                                           // Var; Y Var")
-  fOutputList->Add(fHistPt);  // don't forget to add it to the list! the list
-                              // will be written to file, so if you want
+  // Lableing of the
+  // Graph ("Title; X
+  // Var; Y Var")
+  // don't forget to add it to the list! the list
+  // will be written to file, so if you want
   // your histogram in the output file, add it to the list!
-  fHistPtvertexZ = new TH1F("fHistPtvertexZ", "fHistPtvertexZ", 200, -10, 10);
-  fHistPtvertexZ->SetTitle("Transversemomentum;transversmomentum p;counts N");
-  fOutputList->Add(fHistPtvertexZ);
-
-  // fHistPtcentrality = new TH1F("fHistPtcentrality", "fHistPtcentrality", 200,
-  // 0, 10);
-  // fOutputList->Add(fHistPtcentrality);
-
-  // TEST = new TH2F("TEST", "TEST", 200, 0, 10, 200, 0, 10);
-  // fOutputList->Add(TEST);
-
   fHistmcDaugPt = new TH1F("fHistmcDaugPt", "fHistmcDaugPt", 200, 0, 10);
   fHistmcDaugPt->SetTitle("fHistmcDaugPt;momentum p;counts N");
   fOutputList->Add(fHistmcDaugPt);
@@ -291,9 +173,9 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHist2V0mcPhotonPt->SetTitle("fHist2V0mcPhotonPt;momentum p;counts N");
   fOutputList->Add(fHist2V0mcPhotonPt);
 
-  fHistV0PhotonPt = new TH1F("fHistV0PhotonPt", "fHistV0PhotonPt", 200, 0, 10);
-  fHistV0PhotonPt->SetTitle("fHistV0PhotonPt;momentum p;counts N");
-  fOutputList->Add(fHistV0PhotonPt);
+  fHistV0PhotonCandPt = new TH1F("fHistV0PhotonCandPt", "fHistV0PhotonCandPt", 200, 0, 10);
+  fHistV0PhotonCandPt->SetTitle("fHistV0PhotonCandPt;momentum p;counts N");
+  fOutputList->Add(fHistV0PhotonCandPt);
 
   fHistV0mcPhotonPtCut =
       new TH1F("fHistV0mcPhotonPtCut", "fHistV0mcPhotonPtCut", 200, 0, 10);
@@ -310,49 +192,37 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
   fOutputList->Add(fHist2ArmenterosPodolandskiV0mcPhotons);
 
-  fHistPKaon = new TH1F("fHistPKaon", "fHistPKaon", 200, 0, 10);
-  fHistPKaon->SetTitle("Kaon momentum;momentum p;counts N");
-  fOutputList->Add(fHistPKaon);
-
   fHistmcDaug2Pt = new TH1F("fHistmcDaug2Pt", "fHistmcDaug2Pt", 200, 0, 10);
   fHistmcDaug2Pt->SetTitle("fHistmcDaug2Pt;momentum p;counts N");
   fOutputList->Add(fHistmcDaug2Pt);
 
-  fHist2mcDaug2Pt = new TH1F("fHist2mcDaug2Pt", "fHist2mcDaug2Pt", 200, 0, 10);
-  fHist2mcDaug2Pt->SetTitle("fHist2mcDaug2Pt;momentum p;counts N");
-  fOutputList->Add(fHist2mcDaug2Pt);
+  fHistDetAccmcDaug2Pt = new TH1F("fHistDetAccmcDaug2Pt", "fHistDetAccmcDaug2Pt", 200, 0, 10);
+  fHistDetAccmcDaug2Pt->SetTitle("fHistDetAccmcDaug2Pt;momentum p;counts N");
+  fOutputList->Add(fHistDetAccmcDaug2Pt);
 
   fHistmcDaug1Pt = new TH1F("fHistmcDaug1Pt", "fHistmcDaug1Pt", 200, 0, 10);
   fHistmcDaug1Pt->SetTitle("fHistmcDaug1Pt;momentum p;counts N");
   fOutputList->Add(fHistmcDaug1Pt);
 
-  fHist2mcDaug1Pt = new TH1F("fHist2mcDaug1Pt", "fHist2mcDaug1Pt", 200, 0, 10);
-  fHist2mcDaug1Pt->SetTitle("fHist2mcDaug1Pt;momentum p;counts N");
-  fOutputList->Add(fHist2mcDaug1Pt);
-
-  fHistAllPureKaon =
-      new TH1F("fHistAllPureKaon", "fHistAllPureKaon", 200, 0, 10);
-  fHistAllPureKaon->SetTitle("TrueKaon momentum;momentum p;counts N");
-  fOutputList->Add(fHistAllPureKaon);
-
-  fHistPureKaon = new TH1F("fHistPureKaon", "fHistPureKaon", 200, 0, 10);
-  fHistPureKaon->SetTitle("Only Kaon momentum;momentum p;counts N");
-  fOutputList->Add(fHistPureKaon);
-
-  fHistMCall = new TH1F("fHistMCall", "fHistMCall", 200, 0, 10);
-  fHistMCall->SetTitle("Only Kaon momentum;momentum p;counts N");
-  fOutputList->Add(fHistMCall);
+  fHistDetAccmcDaug1Pt = new TH1F("fHistDetAccmcDaug1Pt", "fHistDetAccmcDaug1Pt", 200, 0, 10);
+  fHistDetAccmcDaug1Pt->SetTitle("fHistDetAccmcDaug1Pt;momentum p;counts N");
+  fOutputList->Add(fHistDetAccmcDaug1Pt);
 
   fHistV0Pt = new TH1F("fHistV0Pt", "fHistV0Pt", 200, 0, 10);
   fHistV0Pt->SetTitle(
       "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
   fOutputList->Add(fHistV0Pt);
 
-  fHistV0mcPhotonPt =
-      new TH1F("fHistV0mcPhotonPt", "fHistV0mcPhotonPt", 200, 0, 10);
-  fHistV0mcPhotonPt->SetTitle(
+  fHistReconstrmcPhotonPt = new TH1F("fHistReconstrmcPhotonPt", "fHistReconstrmcPhotonPt", 200, 0, 10);
+  fHistReconstrmcPhotonPt->SetTitle(
+      "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
+  fOutputList->Add(fHistReconstrmcPhotonPt);
+
+  fHistV0mcPhotonPtandArmCut =
+      new TH1F("fHistV0mcPhotonPtandArmCut", "fHistV0mcPhotonPtandArmCut", 200, 0, 10);
+  fHistV0mcPhotonPtandArmCut->SetTitle(
       "MCTrueV0Photons;transverse momentum pt;counts N");
-  fOutputList->Add(fHistV0mcPhotonPt);
+  fOutputList->Add(fHistV0mcPhotonPtandArmCut);
 
   fHistClsDistrPosTr = new TH2F("fHistClsDistrPosTr", "fHistClsDistrPosTr", 200,
                                 0, 1.5, 200, 0, 200);
@@ -382,262 +252,6 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       "Invariantmass-Distribution K0Short;m*m;Counts");
   fOutputList->Add(fHistV0K0ShortInvMass);
 
-  fHistAllSpeciesKaon =
-      new TH1F("fHistAllSpeciesKaon", "fHistAllSpeciesKaon", 200, -321, 322);
-  fHistAllSpeciesKaon->SetTitle("Particle species;PDG-Code;counts N");
-  fOutputList->Add(fHistAllSpeciesKaon);
-
-  fHistSigSelectedProtonP = new TH1F("fHistSigSelectedProtonP",
-                                     "fHistSigSelectedProtonP", 200, 0, 10);
-  fHistSigSelectedProtonP->SetTitle("3-Sig. Protonevents;momentum p;counts N");
-  fOutputList->Add(fHistSigSelectedProtonP);
-
-  fHist3SigSelectedProtonP = new TH1F("fHist3SigSelectedProtonP",
-                                      "fHist3SigSelectedProtonP", 200, 0, 10);
-  fHist3SigSelectedProtonP->SetTitle(
-      "3-Sig.(combined) Protonevents;momentum p;counts N");
-  fOutputList->Add(fHist3SigSelectedProtonP);
-
-  fHistSigSelectedElectronP = new TH1F("fHistSigSelectedElectronP",
-                                       "fHistSigSelectedElectronP", 200, 0, 10);
-  fHistSigSelectedElectronP->SetTitle(
-      "3-Sig. Electronevents;momentum p;counts N");
-  fOutputList->Add(fHistSigSelectedElectronP);
-
-  fHist3SigSelectedElectronP = new TH1F(
-      "fHist3SigSelectedElectronP", "fHist3SigSelectedElectronP", 200, 0, 10);
-  fHist3SigSelectedElectronP->SetTitle(
-      "3-Sig.(combined) Electronevents;momentum p;counts N");
-  fOutputList->Add(fHist3SigSelectedElectronP);
-
-  fHistSigSelectedPionP =
-      new TH1F("fHistSigSelectedPionP", "fHistSigSelectedPionP", 200, 0, 10);
-  fHistSigSelectedPionP->SetTitle("3-Sig. Pionevents;momentum p;counts N");
-  fOutputList->Add(fHistSigSelectedPionP);
-
-  fHist3SigSelectedPionP =
-      new TH1F("fHist3SigSelectedPionP", "fHist3SigSelectedPionP", 200, 0, 10);
-  fHist3SigSelectedPionP->SetTitle(
-      "3-Sig.(combined) Pionevents;momentum p;counts N");
-  fOutputList->Add(fHist3SigSelectedPionP);
-
-  fHistSigSelectedKaonP =
-      new TH1F("fHistSigSelectedKaonP", "fHistSigSelectedKaonP", 200, 0, 10);
-  fHistSigSelectedKaonP->SetTitle("3-Sig. Kaonevents;momentum p;counts N");
-  fOutputList->Add(fHistSigSelectedKaonP);
-
-  fHist3SigSelectedKaonP =
-      new TH1F("fHist3SigSelectedKaonP", "fHist3SigSelectedKaonP", 200, 0, 10);
-  fHist3SigSelectedKaonP->SetTitle(
-      "3-Sig.(combined) Kaonevents;momentum p;counts N");
-  fOutputList->Add(fHist3SigSelectedKaonP);
-
-  fHistPt2D = new TH2F("fHistPt2D", "fHistPt2D", 200, 0, 10, 200, 0, 10);
-  fHistPt2D->SetTitle("transverse momentum;transversemomentum pt;counts N");
-  fOutputList->Add(fHistPt2D);
-
-  fHistTPC = new TH2F("fHistTPC", "fHistTPC", 200, 0, 10, 200, 0, 500);
-  fHistTPC->SetTitle("TPC signals;TPC signals;counts N");
-  fOutputList->Add(fHistTPC);
-
-  fHistTOF = new TH2F("fHistTOF", "fHistTOF", 200, 0, 10, 200, 0, 25000);
-  fHistTOF->SetTitle("TOF signals;TOF signals;counts N");
-  fOutputList->Add(fHistTOF);
-
-  fHistBeta = new TH2F("fHistBeta", "fHistBeta", 200, 0, 10, 200, 0, 1);
-  fHistBeta->SetTitle("$/Beta$ distribution;momentum p;Beta $/Beta$");
-  fOutputList->Add(fHistBeta);
-
-  fHistPTPCPion =
-      new TH2F("fHistPTPCPion", "fHistPTPCPion", 200, 0, 10, 200, 0, 500);
-  fHistPTPCPion->SetTitle("Pionsignal TPC and momentum;momentum p;TPC signals");
-  fOutputList->Add(fHistPTPCPion);
-
-  fHistPTOFPion =
-      new TH2F("fHistPTOFPion", "fHistPTOFPion", 200, 0, 10, 200, 0, 25000);
-  fHistPTOFPion->SetTitle("Pionsignal TOF and momentum;momentum p;TOF signals");
-  fOutputList->Add(fHistPTOFPion);
-
-  fHistPTPCProton =
-      new TH2F("fHistPTPCProton", "fHistPTPCProton", 200, 0, 10, 200, 0, 500);
-  fHistPTPCProton->SetTitle(
-      "Protonsignal TPC and momentum;momentum p;TPC signals");
-  fOutputList->Add(fHistPTPCProton);
-
-  fHistPTOFProton =
-      new TH2F("fHistPTOFProton", "fHistPTOFProton", 200, 0, 10, 200, 0, 25000);
-  fHistPTOFProton->SetTitle(
-      "Pionsignal TOF and momentum;momentum p;TOF signals");
-  fOutputList->Add(fHistPTOFProton);
-
-  fHistPTPCKaon =
-      new TH2F("fHistPTPCKaon", "fHistPTPCKaon", 200, 0, 10, 200, 0, 500);
-  fHistPTPCKaon->SetTitle("Kaonsignal TPC and momentum;momentum p;TPC signals");
-  fOutputList->Add(fHistPTPCKaon);
-
-  fHistPTOFKaon =
-      new TH2F("fHistPTOFKaon", "fHistPTOFKaon", 200, 0, 10, 200, 0, 25000);
-  fHistPTOFKaon->SetTitle("Kaonsignal TOF and momentum;momentum p;TOF signals");
-  fOutputList->Add(fHistPTOFKaon);
-
-  fHistPTPC3SigKaon = new TH2F("fHistPTPC3SigKaon", "fHistPTPC3SigKaon", 200, 0,
-                               10, 200, 0, 500);
-  fHistPTPC3SigKaon->SetTitle(
-      "Kaonsignal within 3-Sig. TPC and momentum;momentum p;TPC signals");
-  fOutputList->Add(fHistPTPC3SigKaon);
-
-  fHistPTOF3SigKaon = new TH2F("fHistPTOF3SigKaon", "fHistPTOF3SigKaon", 200, 0,
-                               10, 200, 0, 25000);
-  fHistPTOF3SigKaon->SetTitle(
-      "Kaonsignal within 3-Sig. TOF and momentum;momentum p;TOF signals");
-  fOutputList->Add(fHistPTOF3SigKaon);
-
-  fHistPTPCElectron = new TH2F("fHistPTPCElectron", "fHistPTPCElectron", 200, 0,
-                               10, 200, 0, 500);
-  fHistPTPCElectron->SetTitle(
-      "Electronsignal TPC and momentum;momentum p;TPC signals");
-  fOutputList->Add(fHistPTPCElectron);
-
-  fHistPTOFElectron = new TH2F("fHistPTOFElectron", "fHistPTOFElectron", 200, 0,
-                               10, 200, 0, 25000);
-  fHistPTOFElectron->SetTitle(
-      "Electronsignal TPC and momentum;momentum p;TPC signals");
-  fOutputList->Add(fHistPTOFElectron);
-
-  fHistPTPCPion2 =
-      new TH2F("fHistPTPCPion2", "fHistPTPCPion2", 200, 0, 10, 200, 0, 500);
-  fHistPTPCPion2->SetTitle(
-      "Pionsignal TPC and momentum;momentum p;TPC signals");
-  fOutputList->Add(fHistPTPCPion2);
-
-  fHistPTOFPion2 =
-      new TH2F("fHistPTOFPion2", "fHistPTOFPion2", 200, 0, 10, 200, 0, 25000);
-  fHistPTOFPion2->SetTitle(
-      "Pionsignal TOF and momentum;momentum p;TOF signals");
-  fOutputList->Add(fHistPTOFPion2);
-
-  fHistPBetaTPCPion = new TH2F("fHistPBetaTPCPion", "fHistPBetaTPCPion", 200, 0,
-                               10, 200, 0, 1.1);
-  fHistPBetaTPCPion->SetTitle(
-      "Pionsignal TPC and momentum;momentum p;Beta $/Beta$");
-  fOutputList->Add(fHistPBetaTPCPion);
-
-  fHistPBetaTOFPion = new TH2F("fHistPBetaTOFPion", "fHistPBetaTOFPion", 200, 0,
-                               10, 200, 0, 1.1);
-  fHistPBetaTOFPion->SetTitle(
-      "Pionsignal TOF and momentum;momentum p;Beta $/Beta$");
-  fOutputList->Add(fHistPBetaTOFPion);
-
-  fHistPBetaPion =
-      new TH2F("fHistPBetaPion", "fHistPBetaPion", 200, 0, 10, 200, 0, 1.1);
-  fHistPBetaPion->SetTitle(
-      "Pionsignal Beta and momentum;momentum p;Beta $/Beta$");
-  fOutputList->Add(fHistPBetaPion);
-
-  fHistPBetaProton =
-      new TH2F("fHistPBetaProton", "fHistPBetaProton", 200, 0, 10, 200, 0, 1.1);
-  fHistPBetaProton->SetTitle(
-      "Protonsignal Beta and momentum;momentum p;Beta $/Beta$");
-  fOutputList->Add(fHistPBetaProton);
-
-  fHistPBetaKaon =
-      new TH2F("fHistPBetaKaon", "fHistPBetaKaon", 200, 0, 10, 200, 0, 1.1);
-  fHistPBetaKaon->SetTitle(
-      "Kaonsignal Beta and momentum;momentum p;Beta $/Beta$");
-  fOutputList->Add(fHistPBetaKaon);
-
-  fHistPBetaElectron = new TH2F("fHistPBetaElectron", "fHistPBetaElectron", 200,
-                                0, 10, 200, 0, 1.1);
-  fHistPBetaElectron->SetTitle(
-      "Electronsignal Beta and momentum;momentum p;Beta $/Beta$");
-  fOutputList->Add(fHistPBetaElectron);
-
-  fHistPionPt = new TH1F("fHistPionPt", "fHistPionPt", 200, 0, 10);
-  fHistPionPt->SetTitle(
-      "Pion transversalmomentum;transversemomentum p;counts N");
-  fOutputList->Add(fHistPtcentrality);
-
-  fHistPionPsdRap = new TH1F("fHistPionPsdRap", "fHistPionPsdRap", 200, 0, 10);
-  fHistPionPsdRap->SetTitle(
-      "Pion Pseudorapidity;Pseudorapidity $/Eta$;counts N");
-  fOutputList->Add(fHistPionPsdRap);
-
-  fHistPionAzi = new TH1F("fHistPionAzi", "fHistPionAzi", 200, 0, 10);
-  fHistPionAzi->SetTitle("Pion Azimuthal;Pseudorapidity $/Eta$;counts N");
-  fOutputList->Add(fHistPionAzi);
-
-  fHistNSigTOFPion = new TH2F("fHistNSigTOFPion", "fHistNSigTOFPion", 200, 0,
-                              10, 200, -10, 10);
-  fHistNSigTOFPion->SetTitle(
-      "Electron Sig. distribution of TOF;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigTOFPion);
-
-  fHistNSigTPCPion = new TH2F("fHistNSigTPCPion", "fHistNSigTPCPion", 200, 0,
-                              10, 200, -10, 10);
-  fHistNSigTPCPion->SetTitle(
-      "Electron Sig. distribution of TPC;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigTPCPion);
-
-  fHistNSigTOFKaon = new TH2F("fHistNSigTOFKaon", "fHistNSigTOFKaon", 200, 0,
-                              10, 200, -10, 10);
-  fHistNSigTOFKaon->SetTitle(
-      "Kaon Sig. distribution of TOF;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigTOFKaon);
-
-  fHistNSigTPCKaon = new TH2F("fHistNSigTPCKaon", "fHistNSigTPCKaon", 200, 0,
-                              10, 200, -10, 10);
-  fHistNSigTPCKaon->SetTitle(
-      "Kaon Sig. distribution of TPC;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigTPCKaon);
-
-  fHistNSigTOFProton = new TH2F("fHistNSigTOFProton", "fHistNSigTOFProton", 200,
-                                0, 10, 200, -10, 10);
-  fHistNSigTOFProton->SetTitle(
-      "Proton Sig. distribution of TOF;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigTOFProton);
-
-  fHistNSigTPCProton = new TH2F("fHistNSigTPCProton", "fHistNSigTPCProton", 200,
-                                0, 10, 200, -10, 10);
-  fHistNSigTPCProton->SetTitle(
-      "Proton Sig. distribution of TPC;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigTPCProton);
-
-  fHistNSigTOFElectron = new TH2F(
-      "fHistNSigTOFElectron", "fHistNSigTOFElectron", 200, 0, 10, 200, -10, 10);
-  fHistNSigTOFElectron->SetTitle(
-      "Electron Sig. distribution of TOF;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigTOFElectron);
-
-  fHistNSigTPCElectron = new TH2F(
-      "fHistNSigTPCElectron", "fHistNSigTPCElectron", 200, 0, 10, 200, -10, 10);
-  fHistNSigTPCElectron->SetTitle(
-      "Electron Sig. distribution of TPC;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigTPCElectron);
-
-  fHistNSigAddProton = new TH2F("fHistNSigAddProton", "fHistNSigAddProton", 200,
-                                0, 10, 200, -10, 10);
-  fHistNSigAddProton->SetTitle(
-      "Proton Sig. (combined) distribution;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigAddProton);
-
-  fHistNSigAddElectron = new TH2F(
-      "fHistNSigAddElectron", "fHistNSigAddElectron", 200, 0, 10, 200, -10, 10);
-  fHistNSigAddElectron->SetTitle(
-      "Electron Sig. (combined) distribution;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigAddElectron);
-
-  fHistNSigAddPion = new TH2F("fHistNSigAddPion", "fHistNSigAddPion", 200, 0,
-                              10, 200, -10, 10);
-  fHistNSigAddPion->SetTitle(
-      "Pion Sig. (combined) distribution;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigAddPion);
-
-  fHistNSigAddKaon = new TH2F("fHistNSigAddKaon", "fHistNSigAddKaon", 200, 0,
-                              10, 200, -10, 10);
-  fHistNSigAddKaon->SetTitle(
-      "Kaon Sig. (combined) distribution;momentum p;Sig. $/Sigma$");
-  fOutputList->Add(fHistNSigAddKaon);
-
   fHistPhotonPt = new TH1F("fHistPhotonPt",
                            "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
   fOutputList->Add(fHistPhotonPt);
@@ -656,10 +270,10 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
   fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotons);
 
-  fHistArmenterosPodolandskiPtCut = new TH2F(
-      "fHistArmenterosPodolandskiPtCut",
+  fHistArmenterosPodolandskiArmCut = new TH2F(
+      "fHistArmenterosPodolandskiArmCut",
       " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
-  fOutputList->Add(fHistArmenterosPodolandskiPtCut);
+  fOutputList->Add(fHistArmenterosPodolandskiArmCut);
 
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
                              // changes / updates to the
@@ -688,12 +302,8 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     for (int iPart = 1; iPart < (fMC->GetNumberOfTracks()); iPart++) {
       AliMCParticle *mcParticle =
           static_cast<AliMCParticle *>(fMC->GetTrack(iPart));
-      if (0.1 < mcParticle->Pt() && -0.8 < mcParticle->Eta() &&
+      if (-0.8 < mcParticle->Eta() &&
           mcParticle->Eta() < 0.8) {
-        fHistMCall->Fill(mcParticle->P());
-        if (mcParticle->PdgCode() == 321 || mcParticle->PdgCode() == -321) {
-          fHistAllPureKaon->Fill(mcParticle->P());
-        }
         if (mcParticle->PdgCode() == 22) {
           fHistAllPhotons->Fill(mcParticle->P());
         }
@@ -726,17 +336,31 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
     if (!PhotonCandidate) continue;
     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
-    /*if(fIsMC) {
-        AliMCParticle *ReconmcParticle =
-            static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
-
-    }*/
+    if(fIsMC) {
+        AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
+            AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
+        //Check wether real converted Photon was seen
+        fMCEvent = eventHandler->MCEvent();
+        if(!PhotonCandidate ->IsTruePhoton(fMCEvent)) continue;
+        //Check if the Daughters are electron and positron and fit the detecting param
+        TParticle *fPositiveMCDaugh=PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
+        TParticle *fNegativeMCDaugh=PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
+        //Check if pointers aren't null
+        if (!fPositiveMCDaugh) continue;
+        if (!fNegativeMCDaugh) continue;
+        //Check PDG-Codes
+        if (fPositiveMCDaugh->GetPdgCode() != -11 || fNegativeMCDaugh->GetPdgCode() != 11) continue;
+        //Check if daughters lie within the detector acceptance
+        if (fPositiveMCDaugh->Pt() < 0.1 || std::abs(fPositiveMCDaugh->Eta()) > 0.8) continue;
+        if (fNegativeMCDaugh->Pt() < 0.1 || std::abs(fNegativeMCDaugh->Eta()) > 0.8) continue;
+        fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
+    }
   }
 
   for (auto v0obj : *(fAOD->GetV0s())) {
     auto *v0 = static_cast<AliAODv0 *>(v0obj);
     if (!v0) continue;
-    //Cuts to the V0 selection in order to avoid false pairings
+    //Cuts to the V0 selection in order to avoid false pairing
     if (v0->GetNProngs() > 2) continue;
     if (v0->GetNDaughters() > 2) continue;
     if (v0->GetCharge() != 0) continue;
@@ -753,7 +377,6 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     if (point < 0.99) continue;
     // DCA of the daughter tracks at the decay vertex
     if (dcaV0Dau > 1.5) continue;
-    // std::cout << v0->MassLambda() << "\n";
     AliAODTrack *posTrack =
         static_cast<AliAODTrack *>(fGlobalTrackReference[v0->GetPosID()]);
     AliAODTrack *negTrack =
@@ -765,8 +388,6 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     const short pnFindable = posTrack->GetTPCNclsF();
     const float pratioFindable = pnCls / static_cast<float>(pnFindable);
     if (pratioFindable < 0.8) continue;
-    // std::cout << pnCls << "\n";
-    // std::cout << posTrack->Pt() << "\n";
     const float nnCls = negTrack->GetTPCNcls();
     const short nnFindable = negTrack->GetTPCNclsF();
     const float nratioFindable = nnCls / static_cast<float>(nnFindable);
@@ -774,316 +395,69 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     fHistClsDistrPosTr->Fill(posTrack->Pt(), pnCls);
     fHistClsDistrNegTr->Fill(negTrack->Pt(), nnCls);
     fHistV0LambdaInvMass->Fill(v0->MassLambda());
-    // fHistV0LambdaInvMass->Sumw2();
     fHistV0AntiLambdaInvMass->Fill(v0->MassAntiLambda());
-    // fHistV0AntiLambdaInvMass->Sumw2();
     fHistV0K0ShortInvMass->Fill(v0->MassK0Short());
-    // fHistV0K0ShortInvMass->Sumw2();
-    const float v0pt = v0->Pt2V0();
-
+    const float v0pt = v0->Pt();
     fHistV0Pt->Fill(v0pt);
-
-    // std::cout << v0->MassLambda() << "\n";
-    // std::cout << v0->MassAntiLambda() << "\n";
-    // std::cout << v0->MassK0Short() << "\n";
-
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
-    // std::cout << armQt << "\n";
     fHistArmenterosPodolandski->Fill(armAlpha, armQt);
     // Pt-Cut in order to select Gammas
     if (armQt > 0.02) continue;
-    // std::cout << 'After Cut' << "\n";
-    // std::cout << armQt << "\n";
-    fHistArmenterosPodolandskiPtCut->Fill(armAlpha, armQt);
-    fHistV0PhotonPt->Fill(armQt);
-
-    /*// looking for proton and pion daughers
-    AliMCParticle *electr = nullptr;
-    AliMCParticle *positr = nullptr;
-    if (v0->GetNDaughters() = 2) {
-      for (int daughterIndex = v0->GetFirstDaughter();
-           daughterIndex <= v0->GetLastDaughter(); ++daughterIndex) {
-        if (daughterIndex < 0) continue;
-        AliMCParticle *tmpDaughter =
-            static_cast<AliMCParticle *>(fMCEvent->GetTrack(daughterIndex));
-        const int pdgCode = tmpDaughter->PdgCode();
-        //std::cout << tmpDaughter->Pt() << "\n";
-        fHistmcDaugPt->Fill(tmpDaughter->Pt());
-        if (tmpDaughter->Pt() < 0.4 || std::abs(tmpDaughter->Eta()) > 0.8)
-    continue;
-        fHist2mcDaugPt->Fill(tmpDaughter->Pt());
-        fHist2V0mcPhotonPt->Fill(v0->Pt2V0());
-        fHist2ArmenterosPodolandskiV0mcPhotons->Fill(v0->AlphaV0(),
-    v0->PtArmV0());
-      }
-    }*/
+    fHistArmenterosPodolandskiArmCut->Fill(armAlpha, armQt);
+    fHistV0PhotonCandPt->Fill(v0pt);
 
     // MC-Particles with check if MC-Particle is Photon
     if (fIsMC) {
-      TClonesArray *mcarray = dynamic_cast<TClonesArray *>(
-          fAOD->FindListObject(AliAODMCParticle::StdBranchName()));
-
+      AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
+          AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
+      fMCEvent = eventHandler->MCEvent();
+      TClonesArray *mcarray = dynamic_cast<TClonesArray *>(fAOD->FindListObject(AliAODMCParticle::StdBranchName()));
       if (!mcarray) continue;
       int daugh[2] = {11, 11};  // we check whether the v0 is a photon, i.e. the
                                 // daughters should be electrons
       int label = v0->MatchToMC(22, mcarray, 2, daugh);  // do the check
-      if (label < 0)
-        continue;  // no mc info assigned to this track - don’t use it
+      if (label < 0) continue;  // no mc info assigned to this track - don’t use it
       AliMCParticle *mcParticle =
           static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
       if (!mcParticle) continue;
       // Check if daughters lie in acceptance
-      AliMCParticle *mcDaug1 = static_cast<AliMCParticle *>(
-          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
+      AliMCParticle *mcDaug1 = static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
       if (!mcDaug1) continue;
-      AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
-          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
+      AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
       if (!mcDaug2) continue;
-      // std::cout << mcParticle->GetFirstDaughter() << "\n";
-      // std::cout << mcParticle->GetDaughterLabel(0) << "\n";
-      // std::cout << mcParticle->GetLastDaughter() << "\n";
-      // std::cout << mcParticle->GetDaughterLabel(1) << "\n";
-      // std::cout << label << "\n";
       const float mcDaug1Pt = mcDaug1->Pt();
       const float mcDaug2Pt = mcDaug2->Pt();
-      fHistV0K0ShortInvMass->Fill(v0->MassK0Short());
       fHistmcDaug1Pt->Fill(mcDaug1Pt);
       if (mcDaug1Pt < 0.1 || std::abs(mcDaug1->Eta()) > 0.8) continue;
-      fHist2mcDaug1Pt->Fill(mcDaug1Pt);
+      fHistDetAccmcDaug1Pt->Fill(mcDaug1Pt);
       fHistmcDaug2Pt->Fill(mcDaug2Pt);
       if (mcDaug2Pt < 0.1 || std::abs(mcDaug2->Eta()) > 0.8) continue;
-      fHist2mcDaug2Pt->Fill(mcDaug2Pt);
-      fHistV0mcPhotonPt->Fill(v0pt);
+      fHistDetAccmcDaug2Pt->Fill(mcDaug2Pt);
+      fHistV0mcPhotonPtCut->Fill(v0pt);
       fHistArmenterosPodolandskiV0mcPhotons->Fill(armAlpha, armQt);
       if (armAlpha > 0.02) continue;
-      fHistV0mcPhotonPtCut->Fill(v0pt);
+      fHistV0mcPhotonPtandArmCut->Fill(v0pt);
       fHistArmenterosPodolandskiV0mcPhotonsCut->Fill(armAlpha, armQt);
     }
   }
 
   Int_t iTracks(
       fAOD->GetNumberOfTracks());  // see how many tracks there are in the event
-  float vertexZ = fAOD->GetPrimaryVertex()->GetZ();
-  fHistPtvertexZ->Fill(vertexZ);
-  // float centrality = fAOD->GetCentrality()->GetCentralityPercentile("V0M");
-  // fHistPtcentrality->Fill(centrality);
-
   for (Int_t i(0); i < iTracks; i++) {  // loop over all these tracks
-    AliAODTrack *track = static_cast<AliAODTrack *>(
-        fAOD->GetTrack(i));  // get a track (type AliAODTrack) from the event
-    if (!track || !track->TestFilterBit(1))
-      continue;  // if we failed, skip this track
+    AliAODTrack *track = static_cast<AliAODTrack *>(fAOD->GetTrack(i));  // get a track (type AliAODTrack) from the event
+    if (!track || !track->TestFilterBit(1)) continue;  // if we failed, skip this track
     AliMCParticle *mcParticle = nullptr;
     if (fIsMC && fMC)
-      mcParticle =
-          static_cast<AliMCParticle *>(fMC->GetTrack(track->GetLabel()));
+      mcParticle = static_cast<AliMCParticle *>(fMC->GetTrack(track->GetLabel()));
     if (fIsMC && !mcParticle) continue;
-
     AliAnalysisManager *man = AliAnalysisManager::GetAnalysisManager();
     if (man) {
-      AliInputEventHandler *inputHandler =
-          (AliInputEventHandler *)(man->GetInputEventHandler());
+      AliInputEventHandler *inputHandler = (AliInputEventHandler *)(man->GetInputEventHandler());
       if (inputHandler) fPIDResponse = inputHandler->GetPIDResponse();
     }
 
-    fHistNSigTOFPion->Fill(
-        track->P(), fPIDResponse->NumberOfSigmasTOF(track, AliPID::kPion));
-    fHistNSigTOFKaon->Fill(
-        track->P(), fPIDResponse->NumberOfSigmasTOF(track, AliPID::kKaon));
-    fHistNSigTOFProton->Fill(
-        track->P(), fPIDResponse->NumberOfSigmasTOF(track, AliPID::kProton));
-    fHistNSigTOFElectron->Fill(
-        track->P(), fPIDResponse->NumberOfSigmasTOF(track, AliPID::kElectron));
-
-    fHistNSigTPCPion->Fill(
-        track->P(), fPIDResponse->NumberOfSigmasTPC(track, AliPID::kPion));
-    fHistNSigTPCKaon->Fill(
-        track->P(), fPIDResponse->NumberOfSigmasTPC(track, AliPID::kKaon));
-    fHistNSigTPCProton->Fill(
-        track->P(), fPIDResponse->NumberOfSigmasTPC(track, AliPID::kProton));
-    fHistNSigTPCElectron->Fill(
-        track->P(), fPIDResponse->NumberOfSigmasTPC(track, AliPID::kElectron));
-
-    // TEST->Fill(track->P(),track->P());
-
-    // Selected events
-
-    // Preselects protons and returns the quadratic sum of TOF and TPC nSigmas
-    if (track->P() > 0.4 &&
-        std::abs(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kProton)) < 3 &&
-        std::abs(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kProton)) < 3) {
-      fHistNSigAddProton->Fill(
-          track->P(),
-          std::sqrt(
-              std::pow(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kProton),
-                       2) +
-              std::pow(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kProton),
-                       2)));
-      fHistPTPCProton->Fill(track->P(), track->GetTOFsignal());
-      fHistPTOFProton->Fill(track->P(), track->GetTOFsignal());
-      if ((0 < GetBeta(track)) && (1 > GetBeta(track))) {
-        fHistPBetaProton->Fill(track->P(), GetBeta(track));
-      }
-      fHistSigSelectedProtonP->Fill(track->P());  // Neglects combined Sigmas
-      if (std::sqrt(
-              std::pow(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kProton),
-                       2) +
-              std::pow(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kProton),
-                       2)) < 3) {
-        fHist3SigSelectedProtonP->Fill(track->P());
-      }
-    }
-
-    // Preselects electrons and returns the quadratic sum of TOF and TPC nSigmas
-    if (track->P() > 0.2 &&
-        std::abs(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kElectron)) <
-            3 &&
-        std::abs(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kElectron)) <
-            3) {
-      fHistNSigAddElectron->Fill(
-          track->P(), std::sqrt(std::pow(fPIDResponse->NumberOfSigmasTOF(
-                                             track, AliPID::kElectron),
-                                         2) +
-                                std::pow(fPIDResponse->NumberOfSigmasTPC(
-                                             track, AliPID::kElectron),
-                                         2)));
-      fHistPTPCElectron->Fill(track->P(), track->GetTPCsignal());
-      fHistPTOFElectron->Fill(track->P(), track->GetTOFsignal());
-      if ((0 < GetBeta(track)) && (1 > GetBeta(track))) {
-        fHistPBetaElectron->Fill(track->P(), GetBeta(track));
-      }
-      fHistSigSelectedElectronP->Fill(track->P());  // Neglects combined Sigmas
-      if (std::sqrt(std::pow(fPIDResponse->NumberOfSigmasTOF(track,
-                                                             AliPID::kElectron),
-                             2) +
-                    std::pow(fPIDResponse->NumberOfSigmasTPC(track,
-                                                             AliPID::kElectron),
-                             2)) < 3) {
-        fHist3SigSelectedElectronP->Fill(track->P());
-      }
-    }
-
-    // Preselects pions and returns the quadratic sum of TOF and TPC nSigmas
-    if (track->P() > 0.1 &&
-        std::abs(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kPion)) < 3 &&
-        std::abs(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kPion)) < 3) {
-      fHistNSigAddPion->Fill(
-          track->P(),
-          std::sqrt(
-              std::pow(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kPion),
-                       2) +
-              std::pow(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kPion),
-                       2)));
-      fHistPTPCPion->Fill(track->P(), track->GetTPCsignal());
-      fHistPTOFPion->Fill(track->P(), track->GetTOFsignal());
-      if ((0 < GetBeta(track)) && (1 > GetBeta(track))) {
-        fHistPBetaPion->Fill(track->P(), GetBeta(track));
-      }
-      fHistSigSelectedPionP->Fill(track->P());  // Neglects combined Sigmas
-      if (std::sqrt(
-              std::pow(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kPion),
-                       2) +
-              std::pow(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kPion),
-                       2)) < 3) {
-        fHist3SigSelectedPionP->Fill(track->P());
-      }
-    }
-
-    // Preselects kaons and returns the quadratic sum of TOF and TPC nSigmas
-    if (track->P() > 0.2 &&
-        std::abs(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kKaon)) < 3 &&
-        std::abs(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kKaon)) < 3) {
-      fHistNSigAddKaon->Fill(
-          track->P(),
-          std::sqrt(
-              std::pow(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kKaon),
-                       2) +
-              std::pow(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kKaon),
-                       2)));
-      fHistPTPCKaon->Fill(track->P(), track->GetTPCsignal());
-      fHistPTOFKaon->Fill(track->P(), track->GetTOFsignal());
-      if ((0 < GetBeta(track)) && (1 > GetBeta(track))) {
-        fHistPBetaKaon->Fill(track->P(), GetBeta(track));
-      }
-      fHistSigSelectedKaonP->Fill(track->P());  // Neglects combined Sigmas
-      if (std::sqrt(
-              std::pow(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kKaon),
-                       2) +
-              std::pow(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kKaon),
-                       2)) < 3) {
-        fHist3SigSelectedKaonP->Fill(track->P());
-        fHistPTPC3SigKaon->Fill(track->P(), track->GetTPCsignal());
-        fHistPTOF3SigKaon->Fill(track->P(), track->GetTOFsignal());
-      }
-    }
-
-    // Refined selection of plausible Kaon-Events through impuls selections
-    // WITHOUT combined Sigma constraint!!!
-    if (track->P() > 0.1 && track->P() < 0.4 &&
-        std::abs(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kKaon)) < 3) {
-      fHistPKaon->Fill(track->P());
-      if (fIsMC) { /*st:cout << mcParticle->PdgCode() << "\n";*/
-        fHistAllSpeciesKaon->Fill(mcParticle->PdgCode());
-        if (mcParticle->PdgCode() == 321 || mcParticle->PdgCode() == -321) {
-          fHistPureKaon->Fill(track->P());
-        }
-      }
-    }
-    if (track->P() > 0.4 && track->P() < 2 &&
-        std::abs(fPIDResponse->NumberOfSigmasTOF(track, AliPID::kKaon)) < 3) {
-      fHistPKaon->Fill(track->P());
-      if (fIsMC) { /*st:cout << mcParticle->PdgCode() << "\n";*/
-        fHistAllSpeciesKaon->Fill(mcParticle->PdgCode());
-        if (mcParticle->PdgCode() == 321 || mcParticle->PdgCode() == -321) {
-          fHistPureKaon->Fill(track->P());
-        }
-      }
-    }
-    // if(track->P()>2.1 && track->P()<4 &&
-    // std::abs(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kPion)) < 3){
-    // fHistPKaon->Fill(track->P());
-    //}
-
-    // pure electrons
-
-    if (fPIDResponse->NumberOfSigmasTOF(track, AliPID::kPion) < 3) {
-      // pion
-      // plot histograms
-      fHistPTOFPion2->Fill(track->P(), track->GetTOFsignal());
-      if ((0 < GetBeta(track)) && (1 > GetBeta(track))) {
-        fHistPBetaTOFPion->Fill(track->P(), GetBeta(track));
-      }
-    }
-
-    if (std::abs(fPIDResponse->NumberOfSigmasTPC(track, AliPID::kPion)) < 3) {
-      // jippy, i'm a pion
-      // fHistPionPt->Fill(track->Pt());
-      // fHistPionPsdRap->Fill(track->Eta());
-      // fHistPionAzi->Fill(track->Phi());
-      fHistPTPCPion2->Fill(track->P(), track->GetTPCsignal());
-      if ((0 < GetBeta(track)) && (1 > GetBeta(track))) {
-        fHistPBetaTPCPion->Fill(track->P(), GetBeta(track));
-      }
-    }
-
-    fHistPt->Fill(
-        track->Pt());  // plot the pt value of the track in a histogram
-    fHistPt2D->Fill(track->Eta(), track->Phi());
-    fHistTPC->Fill(track->P(), track->GetTPCsignal());
-    fHistTOF->Fill(track->P(), track->GetTOFsignal());
-    fHistBeta->Fill(track->P(), GetBeta(track));
-    // cout << track->GetTOFsignal() << "\n";
-
-    // cout << GetBeta(track)<< "\n";
-    // for (Int_t j(0);j<v.size();j++) {
-    // cout << v[j]<<"/n"
-    //}
   }
-  // Summe von P1 und P2
-  // fHistSum_PKaon=new TH1F(*fHistP1Kaon);
-  // fHistSum_PKaon->Add(fHistP2Kaon,1.);
-  // fOutputList->Add(fHistSum_PKaon);
 
   // continue until all the tracks are processed
   PostData(1, fOutputList);  // stream the results the analysis of this event to
