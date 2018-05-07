@@ -771,9 +771,12 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
     const float armAlpha = v0->AlphaV0();
     const float armQt = v0->PtArmV0();
+    //std::cout << armQt << "\n";
     fHistArmenterosPodolandski->Fill(armAlpha, armQt);
     //Pt-Cut in order to select Gammas
     if (v0->PtArmV0() > 0.02) continue;
+    //std::cout << 'After Cut' << "\n";
+    std::cout << armQt << "\n";
     fHistArmenterosPodolandskiPtCut->Fill(armAlpha, armQt);
     fHistV0PhotonPt->Fill(v0->PtArmV0());
 
