@@ -35,7 +35,6 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   std::vector<AliAODTrack*> fGlobalTrackReference;  //!
   TList* fOutputList;                               //! output list
   AliPIDResponse* fPIDResponse;                     //!
-  TH1F* fHistPionPt;                                //!
   TH1F* fHistAllPhotons;                            //!
   TH1F* fHistV0mcPhotonPtandArmCut;                          //!
   TH1F* fHistmcDaug1Pt;                             //!
@@ -58,7 +57,11 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH2F* fHistClsDistrPosTr;                         //!
   TH2F* fHistClsDistrNegTr;                         //!
   Bool_t fIsMC;
-  float fpTCut;
+  const float fpTCut = 0.1;
+  const float fECut = 1;
+  const float fEtaCut = 0.8;
+  const float farmQtCut = 0.2;
+  const float fCluFindRatCut = 0.8;
   TH1F* fHistPhotonPt;               //!
   TH2F* fHistArmenterosPodolandski;  //!
   TH2F* fHistArmenterosPodolandskiV0mcPhotons;  //!

@@ -27,11 +27,11 @@
 #include "AliAODTrack.h"
 #include "AliAnalysisManager.h"
 #include "AliAnalysisTaskMyTask.h"
+#include "AliConversionPhotonBase.h"
 #include "AliMCParticle.h"
 #include "TChain.h"
 #include "TH1F.h"
 #include "TList.h"
-#include "AliConversionPhotonBase.h"
 
 class AliAnalysisTaskMyTask;  // your analysis class
 
@@ -146,7 +146,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   // saved
   // to an output file
   //
-  fOutputList =new TList();  // this is a list which will contain all of your histograms
+  fOutputList =
+      new TList();  // this is a list which will contain all of your histograms
   // at the end of the analysis, the contents of this list are written
   // to the output file
   fOutputList->SetOwner(kTRUE);  // memory stuff: the list is owner of all
@@ -173,7 +174,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHist2V0mcPhotonPt->SetTitle("fHist2V0mcPhotonPt;momentum p;counts N");
   fOutputList->Add(fHist2V0mcPhotonPt);
 
-  fHistV0PhotonCandPt = new TH1F("fHistV0PhotonCandPt", "fHistV0PhotonCandPt", 200, 0, 10);
+  fHistV0PhotonCandPt =
+      new TH1F("fHistV0PhotonCandPt", "fHistV0PhotonCandPt", 200, 0, 10);
   fHistV0PhotonCandPt->SetTitle("fHistV0PhotonCandPt;momentum p;counts N");
   fOutputList->Add(fHistV0PhotonCandPt);
 
@@ -196,7 +198,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistmcDaug2Pt->SetTitle("fHistmcDaug2Pt;momentum p;counts N");
   fOutputList->Add(fHistmcDaug2Pt);
 
-  fHistDetAccmcDaug2Pt = new TH1F("fHistDetAccmcDaug2Pt", "fHistDetAccmcDaug2Pt", 200, 0, 10);
+  fHistDetAccmcDaug2Pt =
+      new TH1F("fHistDetAccmcDaug2Pt", "fHistDetAccmcDaug2Pt", 200, 0, 10);
   fHistDetAccmcDaug2Pt->SetTitle("fHistDetAccmcDaug2Pt;momentum p;counts N");
   fOutputList->Add(fHistDetAccmcDaug2Pt);
 
@@ -204,7 +207,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistmcDaug1Pt->SetTitle("fHistmcDaug1Pt;momentum p;counts N");
   fOutputList->Add(fHistmcDaug1Pt);
 
-  fHistDetAccmcDaug1Pt = new TH1F("fHistDetAccmcDaug1Pt", "fHistDetAccmcDaug1Pt", 200, 0, 10);
+  fHistDetAccmcDaug1Pt =
+      new TH1F("fHistDetAccmcDaug1Pt", "fHistDetAccmcDaug1Pt", 200, 0, 10);
   fHistDetAccmcDaug1Pt->SetTitle("fHistDetAccmcDaug1Pt;momentum p;counts N");
   fOutputList->Add(fHistDetAccmcDaug1Pt);
 
@@ -213,13 +217,14 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
   fOutputList->Add(fHistV0Pt);
 
-  fHistReconstrmcPhotonPt = new TH1F("fHistReconstrmcPhotonPt", "fHistReconstrmcPhotonPt", 200, 0, 10);
+  fHistReconstrmcPhotonPt = new TH1F("fHistReconstrmcPhotonPt",
+                                     "fHistReconstrmcPhotonPt", 200, 0, 10);
   fHistReconstrmcPhotonPt->SetTitle(
       "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
   fOutputList->Add(fHistReconstrmcPhotonPt);
 
-  fHistV0mcPhotonPtandArmCut =
-      new TH1F("fHistV0mcPhotonPtandArmCut", "fHistV0mcPhotonPtandArmCut", 200, 0, 10);
+  fHistV0mcPhotonPtandArmCut = new TH1F(
+      "fHistV0mcPhotonPtandArmCut", "fHistV0mcPhotonPtandArmCut", 200, 0, 10);
   fHistV0mcPhotonPtandArmCut->SetTitle(
       "MCTrueV0Photons;transverse momentum pt;counts N");
   fOutputList->Add(fHistV0mcPhotonPtandArmCut);
@@ -294,6 +299,8 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       InputEvent());  // get an event (called fAOD) from the input file
   // there's another event format (ESD) which works in a similar way
   // but is more cpu/memory unfriendly. for now, we'll stick with aod's
+
+  //Get all Photons
   AliMCEvent *fMC = nullptr;
   if (fIsMC) {
     AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
@@ -302,12 +309,10 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     for (int iPart = 1; iPart < (fMC->GetNumberOfTracks()); iPart++) {
       AliMCParticle *mcParticle =
           static_cast<AliMCParticle *>(fMC->GetTrack(iPart));
-      if (-0.8 < mcParticle->Eta() &&
-          mcParticle->Eta() < 0.8) {
-        if (mcParticle->PdgCode() == 22) {
-          fHistAllPhotons->Fill(mcParticle->P());
-        }
-      }
+      if (mcParticle->PdgCode() != 22) continue;
+      if (std::abs(mcParticle->Eta()) > fEtaCut) continue;
+      if (mcParticle->E() < fECut) continue;
+      fHistAllPhotons->Fill(mcParticle->P());
     }
   }
   if (!fAOD) return;
@@ -336,31 +341,40 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
     if (!PhotonCandidate) continue;
     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
-    if(fIsMC) {
-        AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
-            AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
-        //Check wether real converted Photon was seen
-        fMCEvent = eventHandler->MCEvent();
-        if(!PhotonCandidate ->IsTruePhoton(fMCEvent)) continue;
-        //Check if the Daughters are electron and positron and fit the detecting param
-        TParticle *fPositiveMCDaugh=PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
-        TParticle *fNegativeMCDaugh=PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
-        //Check if pointers aren't null
-        if (!fPositiveMCDaugh) continue;
-        if (!fNegativeMCDaugh) continue;
-        //Check PDG-Codes
-        if (fPositiveMCDaugh->GetPdgCode() != -11 || fNegativeMCDaugh->GetPdgCode() != 11) continue;
-        //Check if daughters lie within the detector acceptance
-        if (fPositiveMCDaugh->Pt() < 0.1 || std::abs(fPositiveMCDaugh->Eta()) > 0.8) continue;
-        if (fNegativeMCDaugh->Pt() < 0.1 || std::abs(fNegativeMCDaugh->Eta()) > 0.8) continue;
-        fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
+    if (fIsMC) {
+      AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
+          AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
+      // Check wether real converted Photon was seen
+      fMCEvent = eventHandler->MCEvent();
+      if (!PhotonCandidate->IsTruePhoton(fMCEvent)) continue;
+      // Check if the Daughters are electron and positron and fit the detecting
+      // param
+      TParticle *fPositiveMCDaugh =
+          PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
+      TParticle *fNegativeMCDaugh =
+          PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
+      // Check if pointers aren't null
+      if (!fPositiveMCDaugh) continue;
+      if (!fNegativeMCDaugh) continue;
+      // Check PDG-Codes
+      if (fPositiveMCDaugh->GetPdgCode() != -11 ||
+          fNegativeMCDaugh->GetPdgCode() != 11)
+        continue;
+      // Check if daughters lie within the detector acceptance
+      if (fPositiveMCDaugh->Pt() < fpTCut ||
+          std::abs(fPositiveMCDaugh->Eta()) > fEtaCut)
+        continue;
+      if (fNegativeMCDaugh->Pt() < fpTCut ||
+          std::abs(fNegativeMCDaugh->Eta()) > fEtaCut)
+        continue;
+      fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
     }
   }
 
   for (auto v0obj : *(fAOD->GetV0s())) {
     auto *v0 = static_cast<AliAODv0 *>(v0obj);
     if (!v0) continue;
-    //Cuts to the V0 selection in order to avoid false pairing
+    // Cuts to the V0 selection in order to avoid false pairing
     if (v0->GetNProngs() > 2) continue;
     if (v0->GetNDaughters() > 2) continue;
     if (v0->GetCharge() != 0) continue;
@@ -382,16 +396,16 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     AliAODTrack *negTrack =
         static_cast<AliAODTrack *>(fGlobalTrackReference[v0->GetNegID()]);
     if (!posTrack || !negTrack) continue;
-    if (negTrack->Eta() > 0.8) continue;
-    if (posTrack->Eta() > 0.8) continue;
+    if (negTrack->Eta() > fEtaCut) continue;
+    if (posTrack->Eta() > fEtaCut) continue;
     const float pnCls = posTrack->GetTPCNcls();
     const short pnFindable = posTrack->GetTPCNclsF();
     const float pratioFindable = pnCls / static_cast<float>(pnFindable);
-    if (pratioFindable < 0.8) continue;
+    if (pratioFindable < fCluFindRatCut) continue;
     const float nnCls = negTrack->GetTPCNcls();
     const short nnFindable = negTrack->GetTPCNclsF();
     const float nratioFindable = nnCls / static_cast<float>(nnFindable);
-    if (nratioFindable < 0.8) continue;
+    if (nratioFindable < fCluFindRatCut) continue;
     fHistClsDistrPosTr->Fill(posTrack->Pt(), pnCls);
     fHistClsDistrNegTr->Fill(negTrack->Pt(), nnCls);
     fHistV0LambdaInvMass->Fill(v0->MassLambda());
@@ -403,7 +417,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     const float armQt = v0->PtArmV0();
     fHistArmenterosPodolandski->Fill(armAlpha, armQt);
     // Pt-Cut in order to select Gammas
-    if (armQt > 0.02) continue;
+    if (armQt > farmQtCut) continue;
     fHistArmenterosPodolandskiArmCut->Fill(armAlpha, armQt);
     fHistV0PhotonCandPt->Fill(v0pt);
 
@@ -412,31 +426,35 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
           AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
       fMCEvent = eventHandler->MCEvent();
-      TClonesArray *mcarray = dynamic_cast<TClonesArray *>(fAOD->FindListObject(AliAODMCParticle::StdBranchName()));
+      TClonesArray *mcarray = dynamic_cast<TClonesArray *>(
+          fAOD->FindListObject(AliAODMCParticle::StdBranchName()));
       if (!mcarray) continue;
       int daugh[2] = {11, 11};  // we check whether the v0 is a photon, i.e. the
                                 // daughters should be electrons
       int label = v0->MatchToMC(22, mcarray, 2, daugh);  // do the check
-      if (label < 0) continue;  // no mc info assigned to this track - don’t use it
+      if (label < 0)
+        continue;  // no mc info assigned to this track - don’t use it
       AliMCParticle *mcParticle =
           static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
       if (!mcParticle) continue;
       // Check if daughters lie in acceptance
-      AliMCParticle *mcDaug1 = static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
+      AliMCParticle *mcDaug1 = static_cast<AliMCParticle *>(
+          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
       if (!mcDaug1) continue;
-      AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
+      AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
+          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
       if (!mcDaug2) continue;
       const float mcDaug1Pt = mcDaug1->Pt();
       const float mcDaug2Pt = mcDaug2->Pt();
       fHistmcDaug1Pt->Fill(mcDaug1Pt);
-      if (mcDaug1Pt < 0.1 || std::abs(mcDaug1->Eta()) > 0.8) continue;
+      if (mcDaug1Pt < fpTCut || std::abs(mcDaug1->Eta()) > fEtaCut) continue;
       fHistDetAccmcDaug1Pt->Fill(mcDaug1Pt);
       fHistmcDaug2Pt->Fill(mcDaug2Pt);
-      if (mcDaug2Pt < 0.1 || std::abs(mcDaug2->Eta()) > 0.8) continue;
+      if (mcDaug2Pt < fpTCut || std::abs(mcDaug2->Eta()) > fEtaCut) continue;
       fHistDetAccmcDaug2Pt->Fill(mcDaug2Pt);
       fHistV0mcPhotonPtCut->Fill(v0pt);
       fHistArmenterosPodolandskiV0mcPhotons->Fill(armAlpha, armQt);
-      if (armAlpha > 0.02) continue;
+      if (armAlpha > farmQtCut) continue;
       fHistV0mcPhotonPtandArmCut->Fill(v0pt);
       fHistArmenterosPodolandskiV0mcPhotonsCut->Fill(armAlpha, armQt);
     }
@@ -445,18 +463,21 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   Int_t iTracks(
       fAOD->GetNumberOfTracks());  // see how many tracks there are in the event
   for (Int_t i(0); i < iTracks; i++) {  // loop over all these tracks
-    AliAODTrack *track = static_cast<AliAODTrack *>(fAOD->GetTrack(i));  // get a track (type AliAODTrack) from the event
-    if (!track || !track->TestFilterBit(1)) continue;  // if we failed, skip this track
+    AliAODTrack *track = static_cast<AliAODTrack *>(
+        fAOD->GetTrack(i));  // get a track (type AliAODTrack) from the event
+    if (!track || !track->TestFilterBit(1))
+      continue;  // if we failed, skip this track
     AliMCParticle *mcParticle = nullptr;
     if (fIsMC && fMC)
-      mcParticle = static_cast<AliMCParticle *>(fMC->GetTrack(track->GetLabel()));
+      mcParticle =
+          static_cast<AliMCParticle *>(fMC->GetTrack(track->GetLabel()));
     if (fIsMC && !mcParticle) continue;
     AliAnalysisManager *man = AliAnalysisManager::GetAnalysisManager();
     if (man) {
-      AliInputEventHandler *inputHandler = (AliInputEventHandler *)(man->GetInputEventHandler());
+      AliInputEventHandler *inputHandler =
+          (AliInputEventHandler *)(man->GetInputEventHandler());
       if (inputHandler) fPIDResponse = inputHandler->GetPIDResponse();
     }
-
   }
 
   // continue until all the tracks are processed
