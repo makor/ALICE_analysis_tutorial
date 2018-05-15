@@ -312,7 +312,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       if (mcParticle->PdgCode() != 22) continue;
       if (std::abs(mcParticle->Eta()) > fEtaCut) continue;
       if (mcParticle->E() < fECut) continue;
-      fHistAllPhotons->Fill(mcParticle->P());
+      fHistAllPhotons->Fill(mcParticle->Pt());
     }
   }
   if (!fAOD) return;
@@ -454,7 +454,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       fHistDetAccmcDaug2Pt->Fill(mcDaug2Pt);
       fHistV0mcPhotonPtCut->Fill(v0pt);
       fHistArmenterosPodolandskiV0mcPhotons->Fill(armAlpha, armQt);
-      if (armAlpha > farmQtCut) continue;
+      if (armQt > farmQtCut) continue;
       fHistV0mcPhotonPtandArmCut->Fill(v0pt);
       fHistArmenterosPodolandskiV0mcPhotonsCut->Fill(armAlpha, armQt);
     }

@@ -58,7 +58,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH2F* fHistClsDistrNegTr;                         //!
   Bool_t fIsMC;
   const float fpTCut = 0.1;
-  const float fECut = 1;
+  const float fECut = 0.001;
   const float fEtaCut = 0.8;
   const float farmQtCut = 0.2;
   const float fCluFindRatCut = 0.8;
