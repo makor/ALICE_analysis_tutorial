@@ -73,7 +73,8 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistArmenterosPodolandskiArmCut(nullptr),
       fHistV0mcPhotonPtandArmCut(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
-      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr) {
+      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr),
+      fHistTest(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -112,7 +113,8 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistArmenterosPodolandskiArmCut(nullptr),
       fHistV0mcPhotonPtandArmCut(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
-      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr) {
+      fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr),
+      fHistTest(nullptr) {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
                                     // case we take a 'chain' of events
@@ -168,6 +170,10 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHist2mcDaugPt = new TH1F("fHist2mcDaugPt", "fHist2mcDaugPt", 200, 0, 10);
   fHist2mcDaugPt->SetTitle("fHist2mcDaugPt;momentum p;counts N");
   fOutputList->Add(fHist2mcDaugPt);
+
+  fHistTest = new TH1F("fHistTest", "fHistTest", 200, 0, 10);
+  fHistTest->SetTitle("fHistTest;momentum p;counts N");
+  fOutputList->Add(fHistTest);
 
   fHist2V0mcPhotonPt =
       new TH1F("fHist2V0mcPhotonPt", "fHist2V0mcPhotonPt", 200, 0, 10);
@@ -336,16 +342,21 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   // Get the reconstructed photons
   fReaderGammas = fV0Reader->GetReconstructedGammas();
 
+
+
   for (int iGamma = 0; iGamma < fReaderGammas->GetEntriesFast(); ++iGamma) {
     auto *PhotonCandidate =
         dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
     if (!PhotonCandidate) continue;
+    // mcEvent
     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
     if (fIsMC) {
-      AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
-          AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
+        AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
+            AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
       // Check wether real converted Photon was seen
       fMCEvent = eventHandler->MCEvent();
+            std::cout << "Test"<< "\n";
+            //hier passiert der Fehler
       if (!PhotonCandidate->IsTruePhoton(fMCEvent)) continue;
       // Check if the Daughters are electron and positron and fit the detecting
       // param
@@ -353,21 +364,34 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
       TParticle *fNegativeMCDaugh =
           PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
+      fHistTest->Fill(1);
       // Check if pointers aren't null
       if (!fPositiveMCDaugh) continue;
       if (!fNegativeMCDaugh) continue;
+
       // Check PDG-Codes
       if (fPositiveMCDaugh->GetPdgCode() != -11 ||
           fNegativeMCDaugh->GetPdgCode() != 11)
         continue;
+      // PDG Code Pt und Eta ausgeben lassen! Cuts nochmals genauer ueberpruefen.
       // Check if daughters lie within the detector acceptance
-      if (fPositiveMCDaugh->Pt() < fpTCut ||
+      std::cout << "fPositiveMCDaugh"<< "\n";
+      std::cout << fPositiveMCDaugh->GetPdgCode()<< "\n";
+      std::cout << fPositiveMCDaugh->Pt()<< "\n";
+      std::cout << fPositiveMCDaugh->Eta()<< "\n";
+      std::cout << "fNegativeMCDaugh"<< "\n";
+      std::cout << fNegativeMCDaugh->GetPdgCode()<< "\n";
+      std::cout << fNegativeMCDaugh->Pt()<< "\n";
+      std::cout << fNegativeMCDaugh->Eta()<< "\n";
+      std::cout << "PhotonCandidate"<< "\n";
+      std::cout << PhotonCandidate->Pt()<< "\n";
+      /*if (fPositiveMCDaugh->Pt() < fpTCut ||
           std::abs(fPositiveMCDaugh->Eta()) > fEtaCut)
         continue;
       if (fNegativeMCDaugh->Pt() < fpTCut ||
           std::abs(fNegativeMCDaugh->Eta()) > fEtaCut)
-        continue;
-      fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
+        continue;*/
+    fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
     }
   }
 
@@ -447,10 +471,10 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       const float mcDaug1Pt = mcDaug1->Pt();
       const float mcDaug2Pt = mcDaug2->Pt();
       fHistmcDaug1Pt->Fill(mcDaug1Pt);
-      if (mcDaug1Pt < fpTCut || std::abs(mcDaug1->Eta()) > fEtaCut) continue;
-      fHistDetAccmcDaug1Pt->Fill(mcDaug1Pt);
       fHistmcDaug2Pt->Fill(mcDaug2Pt);
+      if (mcDaug1Pt < fpTCut || std::abs(mcDaug1->Eta()) > fEtaCut) continue;
       if (mcDaug2Pt < fpTCut || std::abs(mcDaug2->Eta()) > fEtaCut) continue;
+      fHistDetAccmcDaug1Pt->Fill(mcDaug1Pt);
       fHistDetAccmcDaug2Pt->Fill(mcDaug2Pt);
       fHistV0mcPhotonPtCut->Fill(v0pt);
       fHistArmenterosPodolandskiV0mcPhotons->Fill(armAlpha, armQt);
