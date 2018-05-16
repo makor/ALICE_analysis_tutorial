@@ -306,7 +306,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   // there's another event format (ESD) which works in a similar way
   // but is more cpu/memory unfriendly. for now, we'll stick with aod's
 
-  //Get all Photons
+  // Get all Photons
   AliMCEvent *fMC = nullptr;
   if (fIsMC) {
     AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
@@ -342,8 +342,6 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   // Get the reconstructed photons
   fReaderGammas = fV0Reader->GetReconstructedGammas();
 
-
-
   for (int iGamma = 0; iGamma < fReaderGammas->GetEntriesFast(); ++iGamma) {
     auto *PhotonCandidate =
         dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
@@ -351,49 +349,102 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     // mcEvent
     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
     if (fIsMC) {
-        AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
-            AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
+      AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
+          AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
       // Check wether real converted Photon was seen
       fMCEvent = eventHandler->MCEvent();
-            std::cout << "Test"<< "\n";
-            //hier passiert der Fehler
-      if (!PhotonCandidate->IsTruePhoton(fMCEvent)) continue;
+      AliMCParticle *fPositiveMCDaugh = static_cast<AliMCParticle *>(
+          fMCEvent->GetTrack(PhotonCandidate->GetMCLabelPositive()));
+      AliMCParticle *fNegativeMCDaugh = static_cast<AliMCParticle *>(
+          fMCEvent->GetTrack(PhotonCandidate->GetMCLabelNegative()));
+      /*TParticle *mcgamma=PhotonCandidate->GetMCParticle(fMCEvent);
+      if(!mcgamma) continue;
+      // Check if it is a true photon
+      if(mcgamma->GetPdgCode()!=22) continue;
+      std::cout << "Test"<< "\n";
+      fHistTest->Fill(mcgamma->GetPdgCode());*/
+      // Check if pointers aren't null
+      if (!fPositiveMCDaugh || !fNegativeMCDaugh) continue;
       // Check if the Daughters are electron and positron and fit the detecting
       // param
-      TParticle *fPositiveMCDaugh =
-          PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
-      TParticle *fNegativeMCDaugh =
-          PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
-      fHistTest->Fill(1);
-      // Check if pointers aren't null
-      if (!fPositiveMCDaugh) continue;
-      if (!fNegativeMCDaugh) continue;
-
-      // Check PDG-Codes
-      if (fPositiveMCDaugh->GetPdgCode() != -11 ||
-          fNegativeMCDaugh->GetPdgCode() != 11)
-        continue;
-      // PDG Code Pt und Eta ausgeben lassen! Cuts nochmals genauer ueberpruefen.
-      // Check if daughters lie within the detector acceptance
-      std::cout << "fPositiveMCDaugh"<< "\n";
-      std::cout << fPositiveMCDaugh->GetPdgCode()<< "\n";
-      std::cout << fPositiveMCDaugh->Pt()<< "\n";
-      std::cout << fPositiveMCDaugh->Eta()<< "\n";
-      std::cout << "fNegativeMCDaugh"<< "\n";
-      std::cout << fNegativeMCDaugh->GetPdgCode()<< "\n";
-      std::cout << fNegativeMCDaugh->Pt()<< "\n";
-      std::cout << fNegativeMCDaugh->Eta()<< "\n";
-      std::cout << "PhotonCandidate"<< "\n";
-      std::cout << PhotonCandidate->Pt()<< "\n";
       /*if (fPositiveMCDaugh->Pt() < fpTCut ||
           std::abs(fPositiveMCDaugh->Eta()) > fEtaCut)
         continue;
       if (fNegativeMCDaugh->Pt() < fpTCut ||
           std::abs(fNegativeMCDaugh->Eta()) > fEtaCut)
-        continue;*/
-    fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
+        continue;
+      // Check PDG-Codes
+      if (fPositiveMCDaugh->PdgCode() != -11 ||
+          fNegativeMCDaugh->PdgCode() != 11)
+        continue;
+      // Check if Daughters are really created by conversion
+      if (((fPositiveMCDaugh->GetUniqueID())) != 5 ||
+          ((fNegativeMCDaugh->GetUniqueID())) != 5)
+        continue;
+      // Check if Mother was really photon*/
+      AliMCParticle *gamma = static_cast<AliMCParticle *>(
+          fMCEvent->GetTrack(fPositiveMCDaugh->GetMother()));
+      if (!gamma) continue;
+      if (gamma->PdgCode() != 22) continue;  // Mother is no Photon
+      // Check if Grandmother isn't a photon
+      AliMCParticle *grandgamma =
+          static_cast<AliMCParticle *>(fMCEvent->GetTrack(gamma->GetMother()));
+      if (!grandgamma) continue;
+      if (grandgamma->PdgCode() == 22) continue;
+      fHistTest->Fill(gamma->Pt());
+      fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
     }
   }
+
+  /*for (int iGamma = 0; iGamma < fReaderGammas->GetEntriesFast(); ++iGamma) {
+     auto *PhotonCandidate =
+         dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
+     if (!PhotonCandidate) continue;
+     // mcEvent
+     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
+     if (fIsMC) {
+         AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
+             AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
+       // Check wether real converted Photon was seen
+       fMCEvent = eventHandler->MCEvent();
+             std::cout << "Test"<< "\n";
+             //hier passiert der Fehler
+       if (!PhotonCandidate->IsTruePhoton(fMCEvent)) continue;
+       // Check if the Daughters are electron and positron and fit the detecting
+       // param
+       TParticle *fPositiveMCDaugh =
+           PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
+       TParticle *fNegativeMCDaugh =
+           PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
+       fHistTest->Fill(1);
+       // Check if pointers aren't null
+       if (!fPositiveMCDaugh) continue;
+       if (!fNegativeMCDaugh) continue;
+
+       // Check PDG-Codes
+       if (fPositiveMCDaugh->GetPdgCode() != -11 ||
+           fNegativeMCDaugh->GetPdgCode() != 11)
+         continue;
+       // PDG Code Pt und Eta ausgeben lassen! Cuts nochmals genauer
+     ueberpruefen.
+       // Check if daughters lie within the detector acceptance
+       std::cout << "fPositiveMCDaugh"<< "\n";
+       std::cout << fPositiveMCDaugh->GetPdgCode()<< "\n";
+       std::cout << fPositiveMCDaugh->Pt()<< "\n";
+       std::cout << fPositiveMCDaugh->Eta()<< "\n";
+       std::cout << "fNegativeMCDaugh"<< "\n";
+       std::cout << fNegativeMCDaugh->GetPdgCode()<< "\n";
+       std::cout << fNegativeMCDaugh->Pt()<< "\n";
+       std::cout << fNegativeMCDaugh->Eta()<< "\n";
+       std::cout << "PhotonCandidate"<< "\n";
+       std::cout << PhotonCandidate->Pt()<< "\n";
+       if (fPositiveMCDaugh->Pt() < fpTCut ||
+           std::abs(fPositiveMCDaugh->Eta()) > fEtaCut)
+         continue;
+       if (fNegativeMCDaugh->Pt() < fpTCut ||
+           std::abs(fNegativeMCDaugh->Eta()) > fEtaCut)
+         continue;
+     fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());*/
 
   for (auto v0obj : *(fAOD->GetV0s())) {
     auto *v0 = static_cast<AliAODv0 *>(v0obj);

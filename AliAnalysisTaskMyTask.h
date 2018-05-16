@@ -52,6 +52,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH2F* fHist2ArmenterosPodolandskiV0mcPhotons;     //!
   TH2F* fHistArmenterosPodolandskiArmCut;            //!
   TH1F* fHistV0Pt;                                  //!
+  TH1F* fHistTest;                                  //!
   TH1F* fHistReconstrmcPhotonPt;                     //!
   TH1F* fHistV0K0ShortInvMass;                      //!
   TH2F* fHistClsDistrPosTr;                         //!
