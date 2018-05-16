@@ -357,17 +357,13 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           fMCEvent->GetTrack(PhotonCandidate->GetMCLabelPositive()));
       AliMCParticle *fNegativeMCDaugh = static_cast<AliMCParticle *>(
           fMCEvent->GetTrack(PhotonCandidate->GetMCLabelNegative()));
-      /*TParticle *mcgamma=PhotonCandidate->GetMCParticle(fMCEvent);
-      if(!mcgamma) continue;
-      // Check if it is a true photon
-      if(mcgamma->GetPdgCode()!=22) continue;
-      std::cout << "Test"<< "\n";
-      fHistTest->Fill(mcgamma->GetPdgCode());*/
       // Check if pointers aren't null
       if (!fPositiveMCDaugh || !fNegativeMCDaugh) continue;
+      //Check if daughters have the same mother
+      if (fPositiveMCDaugh->GetMother() != fNegativeMCDaugh()->GetMother()) continue;
       // Check if the Daughters are electron and positron and fit the detecting
       // param
-      /*if (fPositiveMCDaugh->Pt() < fpTCut ||
+      if (fPositiveMCDaugh->Pt() < fpTCut ||
           std::abs(fPositiveMCDaugh->Eta()) > fEtaCut)
         continue;
       if (fNegativeMCDaugh->Pt() < fpTCut ||
@@ -381,7 +377,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       if (((fPositiveMCDaugh->GetUniqueID())) != 5 ||
           ((fNegativeMCDaugh->GetUniqueID())) != 5)
         continue;
-      // Check if Mother was really photon*/
+      // Check if Mother was really photon
       AliMCParticle *gamma = static_cast<AliMCParticle *>(
           fMCEvent->GetTrack(fPositiveMCDaugh->GetMother()));
       if (!gamma) continue;
@@ -391,7 +387,6 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           static_cast<AliMCParticle *>(fMCEvent->GetTrack(gamma->GetMother()));
       if (!grandgamma) continue;
       if (grandgamma->PdgCode() == 22) continue;
-      fHistTest->Fill(gamma->Pt());
       fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
     }
   }
