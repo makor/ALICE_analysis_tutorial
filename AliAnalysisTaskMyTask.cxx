@@ -74,7 +74,7 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistV0mcPhotonPtandArmCut(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
       fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr),
-      fHistTest(nullptr) {
+      fHistfHistReconstrmcPhotonPtMoCh(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -114,7 +114,7 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistV0mcPhotonPtandArmCut(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
       fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr),
-      fHistTest(nullptr) {
+      fHistfHistReconstrmcPhotonPtMoCh(nullptr) {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
                                     // case we take a 'chain' of events
@@ -171,9 +171,9 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHist2mcDaugPt->SetTitle("fHist2mcDaugPt;momentum p;counts N");
   fOutputList->Add(fHist2mcDaugPt);
 
-  fHistTest = new TH1F("fHistTest", "fHistTest", 200, 0, 10);
-  fHistTest->SetTitle("fHistTest;momentum p;counts N");
-  fOutputList->Add(fHistTest);
+  fHistfHistReconstrmcPhotonPtMoCh = new TH1F("fHistfHistReconstrmcPhotonPtMoCh", "fHistfHistReconstrmcPhotonPtMoCh", 200, 0, 10);
+  fHistfHistReconstrmcPhotonPtMoCh->SetTitle("fHistfHistReconstrmcPhotonPtMoCh;momentum p;counts N");
+  fOutputList->Add(fHistfHistReconstrmcPhotonPtMoCh);
 
   fHist2V0mcPhotonPt =
       new TH1F("fHist2V0mcPhotonPt", "fHist2V0mcPhotonPt", 200, 0, 10);
@@ -359,10 +359,10 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           fMCEvent->GetTrack(PhotonCandidate->GetMCLabelNegative()));
       // Check if pointers aren't null
       if (!fPositiveMCDaugh || !fNegativeMCDaugh) continue;
-      //Check if daughters have the same mother
-      if (fPositiveMCDaugh->GetMother() != fNegativeMCDaugh()->GetMother()) continue;
       // Check if the Daughters are electron and positron and fit the detecting
-      // param
+      // param Hier fliegt einiges an Statistik raus.
+      std::cout << fPositiveMCDaugh->Pt()<< "\n";
+      std::cout << fPositiveMCDaugh->Eta()<< "\n";
       if (fPositiveMCDaugh->Pt() < fpTCut ||
           std::abs(fPositiveMCDaugh->Eta()) > fEtaCut)
         continue;
@@ -388,6 +388,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       if (!grandgamma) continue;
       if (grandgamma->PdgCode() == 22) continue;
       fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
+      //Check if daughters have the same mother
+      if (fPositiveMCDaugh->GetMother() != fNegativeMCDaugh->GetMother()) continue;
+      fHistfHistReconstrmcPhotonPtMoCh->Fill(PhotonCandidate->Pt());
     }
   }
 

@@ -52,7 +52,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH2F* fHist2ArmenterosPodolandskiV0mcPhotons;     //!
   TH2F* fHistArmenterosPodolandskiArmCut;            //!
   TH1F* fHistV0Pt;                                  //!
-  TH1F* fHistTest;                                  //!
+  TH1F* fHistfHistReconstrmcPhotonPtMoCh;                                  //!
   TH1F* fHistReconstrmcPhotonPt;                     //!
   TH1F* fHistV0K0ShortInvMass;                      //!
   TH2F* fHistClsDistrPosTr;                         //!
@@ -61,7 +61,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   const float fpTCut = 0.1;
   const float fECut = 0.001;
   const float fEtaCut = 0.8;
-  const float farmQtCut = 0.2;
+  const float farmQtCut = 0.02;
   const float fCluFindRatCut = 0.8;
   TH1F* fHistPhotonPt;               //!
   TH2F* fHistArmenterosPodolandski;  //!
