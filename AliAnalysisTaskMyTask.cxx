@@ -58,6 +58,8 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistV0AntiLambdaInvMass(nullptr),
       fHistV0K0ShortInvMass(nullptr),
       fHistReconstrmcPhotonPt(nullptr),
+      fHistReconstrmcPhotonPtCutPt(nullptr),
+      fHistReconstrmcPhotonPtNoDetCut(nullptr),
       fHistArmenterosPodolandskiV0mcPhotons(nullptr),
       fHistV0PhotonCandPt(nullptr),
       fHistV0Pt(nullptr),
@@ -74,7 +76,7 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistV0mcPhotonPtandArmCut(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
       fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr),
-      fHistfHistReconstrmcPhotonPtMoCh(nullptr) {
+      fHistReconstrmcPhotonPtMoCh(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -98,6 +100,8 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistV0AntiLambdaInvMass(nullptr),
       fHistV0K0ShortInvMass(nullptr),
       fHistReconstrmcPhotonPt(nullptr),
+      fHistReconstrmcPhotonPtCutPt(nullptr),
+      fHistReconstrmcPhotonPtNoDetCut(nullptr),
       fHistArmenterosPodolandskiV0mcPhotons(nullptr),
       fHistV0PhotonCandPt(nullptr),
       fHistV0Pt(nullptr),
@@ -114,7 +118,7 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistV0mcPhotonPtandArmCut(nullptr),
       fHistV0mcPhotonPtCut(nullptr),
       fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr),
-      fHistfHistReconstrmcPhotonPtMoCh(nullptr) {
+      fHistReconstrmcPhotonPtMoCh(nullptr) {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
                                     // case we take a 'chain' of events
@@ -171,9 +175,12 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHist2mcDaugPt->SetTitle("fHist2mcDaugPt;momentum p;counts N");
   fOutputList->Add(fHist2mcDaugPt);
 
-  fHistfHistReconstrmcPhotonPtMoCh = new TH1F("fHistfHistReconstrmcPhotonPtMoCh", "fHistfHistReconstrmcPhotonPtMoCh", 200, 0, 10);
-  fHistfHistReconstrmcPhotonPtMoCh->SetTitle("fHistfHistReconstrmcPhotonPtMoCh;momentum p;counts N");
-  fOutputList->Add(fHistfHistReconstrmcPhotonPtMoCh);
+  fHistReconstrmcPhotonPtMoCh =
+      new TH1F("fHistReconstrmcPhotonPtMoCh",
+               "fHistReconstrmcPhotonPtMoCh", 200, 0, 10);
+  fHistReconstrmcPhotonPtMoCh->SetTitle(
+      "fHistReconstrmcPhotonPtMoCh;momentum p;counts N");
+  fOutputList->Add(fHistReconstrmcPhotonPtMoCh);
 
   fHist2V0mcPhotonPt =
       new TH1F("fHist2V0mcPhotonPt", "fHist2V0mcPhotonPt", 200, 0, 10);
@@ -192,7 +199,7 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
 
   fHistArmenterosPodolandskiV0mcPhotonsCut = new TH2F(
       "fHistArmenterosPodolandskiV0mcPhotonsCut",
-      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
+      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, farmQtCut);
   fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotonsCut);
 
   fHist2ArmenterosPodolandskiV0mcPhotons = new TH2F(
@@ -222,6 +229,20 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistV0Pt->SetTitle(
       "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
   fOutputList->Add(fHistV0Pt);
+
+  fHistReconstrmcPhotonPtCutPt =
+      new TH1F("fHistReconstrmcPhotonPtCutPt", "fHistReconstrmcPhotonPtCutPt",
+               200, 0, 10);
+  fHistReconstrmcPhotonPtCutPt->SetTitle(
+      "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
+  fOutputList->Add(fHistReconstrmcPhotonPtCutPt);
+
+  fHistReconstrmcPhotonPtNoDetCut =
+      new TH1F("fHistReconstrmcPhotonPtNoDetCut",
+               "fHistReconstrmcPhotonPtNoDetCut", 200, 0, 10);
+  fHistReconstrmcPhotonPtNoDetCut->SetTitle(
+      "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
+  fOutputList->Add(fHistReconstrmcPhotonPtNoDetCut);
 
   fHistReconstrmcPhotonPt = new TH1F("fHistReconstrmcPhotonPt",
                                      "fHistReconstrmcPhotonPt", 200, 0, 10);
@@ -273,17 +294,17 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
 
   fHistArmenterosPodolandski = new TH2F(
       "fHistArmenterosPodolandski", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
-      500, -1, 1, 500, 0, 1);
+      500, -1, 1, 500, 0, 0.4);
   fOutputList->Add(fHistArmenterosPodolandski);
 
   fHistArmenterosPodolandskiV0mcPhotons = new TH2F(
       "fHistArmenterosPodolandskiV0mcPhotons",
-      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
+      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 0.2);
   fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotons);
 
   fHistArmenterosPodolandskiArmCut = new TH2F(
       "fHistArmenterosPodolandskiArmCut",
-      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, 1);
+      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, farmQtCut);
   fOutputList->Add(fHistArmenterosPodolandskiArmCut);
 
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
@@ -359,16 +380,6 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           fMCEvent->GetTrack(PhotonCandidate->GetMCLabelNegative()));
       // Check if pointers aren't null
       if (!fPositiveMCDaugh || !fNegativeMCDaugh) continue;
-      // Check if the Daughters are electron and positron and fit the detecting
-      // param Hier fliegt einiges an Statistik raus.
-      std::cout << fPositiveMCDaugh->Pt()<< "\n";
-      std::cout << fPositiveMCDaugh->Eta()<< "\n";
-      if (fPositiveMCDaugh->Pt() < fpTCut ||
-          std::abs(fPositiveMCDaugh->Eta()) > fEtaCut)
-        continue;
-      if (fNegativeMCDaugh->Pt() < fpTCut ||
-          std::abs(fNegativeMCDaugh->Eta()) > fEtaCut)
-        continue;
       // Check PDG-Codes
       if (fPositiveMCDaugh->PdgCode() != -11 ||
           fNegativeMCDaugh->PdgCode() != 11)
@@ -381,16 +392,25 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       AliMCParticle *gamma = static_cast<AliMCParticle *>(
           fMCEvent->GetTrack(fPositiveMCDaugh->GetMother()));
       if (!gamma) continue;
-      if (gamma->PdgCode() != 22) continue;  // Mother is no Photon
+      if (gamma->PdgCode() != 22) continue;
       // Check if Grandmother isn't a photon
       AliMCParticle *grandgamma =
           static_cast<AliMCParticle *>(fMCEvent->GetTrack(gamma->GetMother()));
       if (!grandgamma) continue;
       if (grandgamma->PdgCode() == 22) continue;
+      fHistReconstrmcPhotonPtNoDetCut->Fill(PhotonCandidate->Pt());
+      // Check if the Daughters are electron and positron and fit the detecting
+      // param Hier fliegt einiges/alles an Statistik raus.
+      if (fPositiveMCDaugh->Pt() < fpTCut) continue;
+      if (fNegativeMCDaugh->Pt() < fpTCut) continue;
+      fHistReconstrmcPhotonPtCutPt->Fill(PhotonCandidate->Pt());
+      if (std::abs(fPositiveMCDaugh->Eta()) > fEtaCut) continue;
+      if (std::abs(fNegativeMCDaugh->Eta()) > fEtaCut) continue;
       fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
-      //Check if daughters have the same mother
-      if (fPositiveMCDaugh->GetMother() != fNegativeMCDaugh->GetMother()) continue;
-      fHistfHistReconstrmcPhotonPtMoCh->Fill(PhotonCandidate->Pt());
+      // Check if daughters have the same mother
+      if (fPositiveMCDaugh->GetMother() != fNegativeMCDaugh->GetMother())
+        continue;
+      fHistReconstrmcPhotonPtMoCh->Fill(PhotonCandidate->Pt());
     }
   }
 

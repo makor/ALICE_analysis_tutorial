@@ -36,24 +36,26 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TList* fOutputList;                               //! output list
   AliPIDResponse* fPIDResponse;                     //!
   TH1F* fHistAllPhotons;                            //!
-  TH1F* fHistV0mcPhotonPtandArmCut;                          //!
+  TH1F* fHistV0mcPhotonPtandArmCut;                 //!
   TH1F* fHistmcDaug1Pt;                             //!
-  TH1F* fHistDetAccmcDaug1Pt;                            //!
+  TH1F* fHistDetAccmcDaug1Pt;                       //!
   TH1F* fHistmcDaug2Pt;                             //!
-  TH1F* fHistDetAccmcDaug2Pt;                            //!
+  TH1F* fHistDetAccmcDaug2Pt;                       //!
   TH1F* fHistV0LambdaInvMass;                       //!
   TH1F* fHistV0AntiLambdaInvMass;                   //!
   TH1F* fHistmcDaugPt;                              //!
   TH1F* fHist2mcDaugPt;                             //!
-  TH1F* fHistV0PhotonCandPt;                            //!
+  TH1F* fHistV0PhotonCandPt;                        //!
   TH1F* fHistV0mcPhotonPtCut;                       //!
   TH2F* fHistArmenterosPodolandskiV0mcPhotonsCut;   //!
   TH1F* fHist2V0mcPhotonPt;                         //!
   TH2F* fHist2ArmenterosPodolandskiV0mcPhotons;     //!
-  TH2F* fHistArmenterosPodolandskiArmCut;            //!
+  TH2F* fHistArmenterosPodolandskiArmCut;           //!
   TH1F* fHistV0Pt;                                  //!
-  TH1F* fHistfHistReconstrmcPhotonPtMoCh;                                  //!
-  TH1F* fHistReconstrmcPhotonPt;                     //!
+  TH1F* fHistReconstrmcPhotonPtMoCh;           //!
+  TH1F* fHistReconstrmcPhotonPtCutPt;               //!
+  TH1F* fHistReconstrmcPhotonPtNoDetCut;            //!
+  TH1F* fHistReconstrmcPhotonPt;                    //!
   TH1F* fHistV0K0ShortInvMass;                      //!
   TH2F* fHistClsDistrPosTr;                         //!
   TH2F* fHistClsDistrNegTr;                         //!
@@ -63,8 +65,8 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   const float fEtaCut = 0.8;
   const float farmQtCut = 0.02;
   const float fCluFindRatCut = 0.8;
-  TH1F* fHistPhotonPt;               //!
-  TH2F* fHistArmenterosPodolandski;  //!
+  TH1F* fHistPhotonPt;                          //!
+  TH2F* fHistArmenterosPodolandski;             //!
   TH2F* fHistArmenterosPodolandskiV0mcPhotons;  //!
 
   AliAnalysisTaskMyTask(const AliAnalysisTaskMyTask&);  // not implemented
