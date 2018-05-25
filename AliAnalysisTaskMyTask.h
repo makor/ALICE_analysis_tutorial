@@ -24,7 +24,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   void SetIsMC(Bool_t IsMC) { fIsMC = IsMC; };
   void SetV0ReaderName(TString name) { fV0ReaderName = name; }
 
-  AliEventCuts fEventCuts;
+  AliEventCuts fEventCuts2;
 
  private:
   AliAODEvent* fAOD;            //! input event
@@ -48,6 +48,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH2F* fHistArmenterosPodolandskiV0mcPhotonsCut;   //!
   TH2F* fHistArmenterosPodolandskiArmCut;           //!
   TH1F* fHistV0Pt;                                  //!
+  TH1F* fKind;                                      //!
   TH1F* fHistReconstrmcPhotonPtMoCh;                //!
   TH1F* fHistReconstrmcPhotonPtCutPt;               //!
   TH1F* fHistReconstrmcPhotonPtNoDetCut;            //!
@@ -55,6 +56,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH1F* fHistV0K0ShortInvMass;                      //!
   TH2F* fHistClsDistrPosTr;                         //!
   TH2F* fHistClsDistrNegTr;                         //!
+  AliConvEventCuts* fEventCuts;                     //!
   Bool_t fIsMC;
   const float fpTCut = 0.1;
   const float fECut = 0.001;
@@ -74,11 +76,14 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
 
 #endif
 
-
 /*   Merging collection <259788.xml> into masterjob input...
 Exporting merged collection <259842_259788.xml> and copying to AliEn
-180524 11:17:33 23731 Xrd: CheckErrorStatus: Server [clralicexrd.in2p3.fr:1094] declared: Unable to create /00/50582/3bc68222-5f33-11e8-b907-001f29eb8d2a; too many open files in system(error code: 3005)
-180524 11:17:33 23731 Xrd: Open: Error opening the file /00/50582/3bc68222-5f33-11e8-b907-001f29eb8d2a?&authz=-----BEGIN SEALED CIPHER-----
+180524 11:17:33 23731 Xrd: CheckErrorStatus: Server [clralicexrd.in2p3.fr:1094]
+declared: Unable to create /00/50582/3bc68222-5f33-11e8-b907-001f29eb8d2a; too
+many open files in system(error code: 3005)
+180524 11:17:33 23731 Xrd: Open: Error opening the file
+/00/50582/3bc68222-5f33-11e8-b907-001f29eb8d2a?&authz=-----BEGIN SEALED
+CIPHER-----
 X6xf+wnmjA5QlYVzvIuoZ9700USs325WSs0-8YgYqxYA8ShCf9-FUkNPjrnjelvGg7JZNSYD-BAj
 RXik+dmhQ-05jOBhLJhl22MG2v50msECJWMwSfzt2Xn-dpwKCaNzA9JY14mDQleJy0HO51Q8OM7I
 ep6lUcAuC4sg3ncv3pM=
@@ -101,5 +106,6 @@ Bn4tN54b7gxclYdZM4IZfP8yeKPD4LOURNpC+5SxvtHJq+6dYAOpGw80EemwzDM1oAzgoamBfTsf
 b7sB7xx6Qe083Y8N+Hbs6zvP-3xuMw==
 -----END SEALED ENVELOPE-----
 &filetype=raw&source=259842_259788.xml on host clralicexrd.in2p3.fr:1094
-root [1] 180524 11:22:48 23805 Xrd: XrdClientMessage::ReadRaw: Failed to read header (8 bytes).
+root [1] 180524 11:22:48 23805 Xrd: XrdClientMessage::ReadRaw: Failed to read
+header (8 bytes).
 */
