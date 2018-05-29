@@ -61,8 +61,13 @@ void runAnalysis(Bool_t IsMC = kTRUE) {
     TChain *chain = new TChain("aodTree");
     // add a few files to the chain (change this so that your local files are
     // added)
-    chain->Add("~/Downloads/AliAOD.root");
-    // chain->Add("~/Downloads/full.root");
+    if(IsMC)
+    {chain->Add("~/Downloads/MC-259888-121.root");}
+    else {
+        chain->Add("~/Downloads/AliAOD.root");
+        // chain->Add("~/Downloads/full.root");
+    }
+
 
     // start the analysis locally, reading the events from the tchain
     mgr->StartAnalysis("local", chain);
@@ -126,10 +131,10 @@ void runAnalysis(Bool_t IsMC = kTRUE) {
     // to collect final results
     alienHandler->SetMaxMergeStages(1);
     alienHandler->SetMergeViaJDL(kTRUE);    //normal run
-    //alienHandler->SetMergeViaJDL(kFALSE);   //merging run
+    //alienHandler->SetMergeViaJDL(kFALSE);   //merging run 2.step
 
     // define the output folders
-    alienHandler->SetGridWorkingDir("myWorkingDir");
+    alienHandler->SetGridWorkingDir("myWorkingDir7"); //Change Number every run on fullgrid
     alienHandler->SetGridOutputDir("output");
 
     // connect the alien plugin to the manager
@@ -143,7 +148,7 @@ void runAnalysis(Bool_t IsMC = kTRUE) {
     } else {
       // else launch the full grid analysis
       alienHandler->SetRunMode("full");     //normal run
-      //alienHandler->SetRunMode("terminate");  // merging run
+      //alienHandler->SetRunMode("terminate");  // merging run 1.step
       mgr->StartAnalysis("grid");
     }
   }

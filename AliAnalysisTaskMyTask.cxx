@@ -114,7 +114,8 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr),
       fHistReconstrmcPhotonPtMoCh(nullptr),
       fEventCuts(nullptr),
-      fKind(nullptr) {
+      fKind(nullptr),
+      FillMCHistograms(nullptr){
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
                                     // case we take a 'chain' of events
@@ -169,6 +170,12 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistReconstrmcPhotonPtMoCh->SetTitle(
       "fHistReconstrmcPhotonPtMoCh;momentum p;counts N");
   fOutputList->Add(fHistReconstrmcPhotonPtMoCh);
+
+  //fFillMCHistograms = new TH1F(
+  //            "fFillMCHistograms", "fFillMCHistograms", 200, 0, 10);
+  //        fFillMCHistograms->SetTitle(
+  //            "fFillMCHistograms;momentum p;counts N");
+  //        fOutputList->Add(fFillMCHistograms);
 
   fHistV0PhotonCandPt =
       new TH1F("fHistV0PhotonCandPt", "fHistV0PhotonCandPt", 200, 0, 10);
@@ -314,11 +321,14 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
         AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
     fMC = eventHandler->MCEvent();
+    fHistAllPhotons->Fill(0);
     for (Int_t i = 0; i < fMC->GetNumberOfPrimaries(); i++) {
       TParticle *particle = (TParticle *)fMC->Particle(i);
       if (!particle) continue;
       if (std::abs(particle->Eta()) > fEtaCut) continue;
       if (particle->Energy() < fECut) continue;
+      std::cout << "Hat geklappt"   << "\n";
+      fHistAllPhotons->Fill(particle-> Pt());
 
       // if(fMCEvent &&
       // ((AliConvEventCuts*)fEventCutArray->At(fiCut))->GetSignalRejection() !=
@@ -337,7 +347,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         // cout << "Undecayed pi0 found with mother: " << particle->GetMother(0)
         // << endl;
         for (Int_t j = 0; j < 2; j++) {
-          // FillMCHistograms(particle->GetDaughter(j));
+          //fFillMCHistograms(particle->GetDaughter(j));
         }
       } else {
         if (particle->GetPdgCode() != 22) continue;
@@ -388,8 +398,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
             fMCEvent->GetTrack(PhotonCandidate->GetMCLabelPositive()));
         AliAODMCParticle *negDaughter = static_cast<AliAODMCParticle *>(
             fMCEvent->GetTrack(PhotonCandidate->GetMCLabelNegative()));
-        std::cout << "Hat geklappt"
-                  << "\n";
+
         // TParticle *posDaughter =
         // PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
         // TParticle *negDaughter =
@@ -709,6 +718,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
           fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
       if (!mcDaug2) continue;
+      //Funktion rein druecken!
       const float mcDaug1Pt = mcDaug1->Pt();
       const float mcDaug2Pt = mcDaug2->Pt();
       fHistmcDaug1Pt->Fill(mcDaug1Pt);
