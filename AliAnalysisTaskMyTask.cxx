@@ -74,7 +74,9 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistArmenterosPodolandskiV0mcPhotonsCut(nullptr),
       fHistReconstrmcPhotonPtMoCh(nullptr),
       fEventCuts(nullptr),
-      fKind(nullptr) {
+      fKind(nullptr),
+      FillMCHistograms(nullptr),
+      fHistAllPhotons2(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -115,7 +117,8 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistReconstrmcPhotonPtMoCh(nullptr),
       fEventCuts(nullptr),
       fKind(nullptr),
-      FillMCHistograms(nullptr){
+      FillMCHistograms(nullptr),
+      fHistAllPhotons2(nullptr) {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
                                     // case we take a 'chain' of events
@@ -171,7 +174,7 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       "fHistReconstrmcPhotonPtMoCh;momentum p;counts N");
   fOutputList->Add(fHistReconstrmcPhotonPtMoCh);
 
-  //fFillMCHistograms = new TH1F(
+  // fFillMCHistograms = new TH1F(
   //            "fFillMCHistograms", "fFillMCHistograms", 200, 0, 10);
   //        fFillMCHistograms->SetTitle(
   //            "fFillMCHistograms;momentum p;counts N");
@@ -280,6 +283,10 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
                              "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
   fOutputList->Add(fHistAllPhotons);
 
+  fHistAllPhotons2 = new TH1F("fHistAllPhotons2",
+                              "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
+  fOutputList->Add(fHistAllPhotons2);
+
   fHistArmenterosPodolandski = new TH2F(
       "fHistArmenterosPodolandski", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
       500, -1, 1, 500, 0, 0.4);
@@ -321,15 +328,11 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
         AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
     fMC = eventHandler->MCEvent();
-    fHistAllPhotons->Fill(0);
     for (Int_t i = 0; i < fMC->GetNumberOfPrimaries(); i++) {
       TParticle *particle = (TParticle *)fMC->Particle(i);
       if (!particle) continue;
       if (std::abs(particle->Eta()) > fEtaCut) continue;
       if (particle->Energy() < fECut) continue;
-      std::cout << "Hat geklappt"   << "\n";
-      fHistAllPhotons->Fill(particle-> Pt());
-
       // if(fMCEvent &&
       // ((AliConvEventCuts*)fEventCutArray->At(fiCut))->GetSignalRejection() !=
       // 0){
@@ -346,8 +349,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           particle->GetFirstDaughter() >= fMC->GetNumberOfPrimaries()) {
         // cout << "Undecayed pi0 found with mother: " << particle->GetMother(0)
         // << endl;
+        fHistAllPhotons2->Fill(particle->Pt());
         for (Int_t j = 0; j < 2; j++) {
-          //fFillMCHistograms(particle->GetDaughter(j));
+          // fFillMCHistograms(particle->GetDaughter(j));
         }
       } else {
         if (particle->GetPdgCode() != 22) continue;
@@ -389,15 +393,18 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       if (fMCEvent) {
         // 			cout << "generating MC stack"<< endl;
 
-        const AliVVertex *primVtxMC = fMCEvent->GetPrimaryVertex();
-        Double_t mcProdVtxX = primVtxMC->GetX();
-        Double_t mcProdVtxY = primVtxMC->GetY();
-        Double_t mcProdVtxZ = primVtxMC->GetZ();
-
         AliAODMCParticle *posDaughter = static_cast<AliAODMCParticle *>(
             fMCEvent->GetTrack(PhotonCandidate->GetMCLabelPositive()));
         AliAODMCParticle *negDaughter = static_cast<AliAODMCParticle *>(
             fMCEvent->GetTrack(PhotonCandidate->GetMCLabelNegative()));
+        auto *photon = dynamic_cast<AliAODMCParticle *>(
+            PhotonCandidate->GetMCParticle(fMCEvent));
+        if (posDaughter == NULL || negDaughter == NULL) continue;
+        if (!photon) continue;
+        if (!IsConvertedPhoton(posDaughter, negDaughter, fMCEvent, photon,
+                               fEventCuts))
+          continue;
+        fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
 
         // TParticle *posDaughter =
         // PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
@@ -412,11 +419,12 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           Int_t isNegFromMBHeader = fEventCuts->IsParticleFromBGEvent(
               PhotonCandidate->GetMCLabelNegative(), fMCEvent, fAOD);
           if ((isNegFromMBHeader < 1) || (isPosFromMBHeader < 1)) continue;
-        }*/
+        }
 
         if (posDaughter == NULL || negDaughter == NULL) {
           fKind->Fill(1);  // garbage
-                           // 				cout << "one of the daughters not
+                           // 				cout << "one of the daughters
+        not
                            // available"
                            // <<
                            // endl;
@@ -464,23 +472,22 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           Int_t pdgCodePos;
           if (posDaughter->GetPdgCode()) {
             pdgCodePos = posDaughter->GetPdgCode();
-          }
-          else
+          } else
             continue;
           Int_t pdgCodeNeg;
           if (negDaughter->GetPdgCode()) {
             pdgCodeNeg = negDaughter->GetPdgCode();
-          }
-          else
+          } else
             continue;
           // 				cout << "PDG codes daughters: " <<
           // pdgCodePos
           // <<
           // "\t" << pdgCodeNeg << endl;
           Int_t pdgCode = 0;
-          auto* gamma = PhotonCandidate->GetMCParticle(fMCEvent);
+          auto *gamma = dynamic_cast<AliAODMCParticle *>(
+              PhotonCandidate->GetMCParticle(fMCEvent));
           if (!gamma) continue;
-             pdgCode = gamma->GetPdgCode();
+          pdgCode = gamma->GetPdgCode();
           // 				cout << "PDG code: " << pdgCode << endl;
           if (TMath::Abs(pdgCodePos) != 11 || TMath::Abs(pdgCodeNeg) != 11)
             fKind->Fill(9);  // combinatorics from hadronic decays
@@ -503,7 +510,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
               fKind->Fill(13);  // garbage
           } else
             fKind->Fill(14);  // garbage
-        }
+        }*/
       }
     }
   }
@@ -708,17 +715,21 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       int label = v0->MatchToMC(22, mcarray, 2, daugh);  // do the check
       if (label < 0)
         continue;  // no mc info assigned to this track - don’t use it
-      AliMCParticle *mcParticle =
-          static_cast<AliMCParticle *>(fMCEvent->GetTrack(label));
+      AliAODMCParticle *mcParticle =
+          static_cast<AliAODMCParticle *>(fMCEvent->GetTrack(label));
       if (!mcParticle) continue;
       // Check if daughters lie in acceptance
-      AliMCParticle *mcDaug1 = static_cast<AliMCParticle *>(
+      AliAODMCParticle *mcDaug1 = static_cast<AliAODMCParticle *>(
+          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
+      AliAODMCParticle *mcDaug2 = static_cast<AliAODMCParticle *>(
           fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
       if (!mcDaug1) continue;
-      AliMCParticle *mcDaug2 = static_cast<AliMCParticle *>(
-          fMCEvent->GetTrack(mcParticle->GetDaughterLabel(1)));
       if (!mcDaug2) continue;
-      //Funktion rein druecken!
+      if (!IsConvertedPhoton(mcDaug1, mcDaug2, fMCEvent, mcParticle,
+                             fEventCuts))
+        continue;
+      // Funktion rein druecken!
+      // if(!IsConvertedPhoton(mcDaug1, mcDaug2)) continue;
       const float mcDaug1Pt = mcDaug1->Pt();
       const float mcDaug2Pt = mcDaug2->Pt();
       fHistmcDaug1Pt->Fill(mcDaug1Pt);
@@ -775,6 +786,119 @@ float AliAnalysisTaskMyTask::GetBeta(AliAODTrack *track) {
     beta = l / timeTOF / c;
   }
   return beta;
+}
+
+// Neue Funktion! zur Photonen erkennen die Konversion unterlaufen haben
+
+Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
+                                                AliAODMCParticle *negDaughter,
+                                                AliMCEvent *fMCEvent,
+                                                AliAODMCParticle *mcMother,
+                                                AliConvEventCuts *fEventCuts) {
+  const AliVVertex *primVtxMC = fMCEvent->GetPrimaryVertex();
+  Double_t mcProdVtxX = primVtxMC->GetX();
+  Double_t mcProdVtxY = primVtxMC->GetY();
+  Double_t mcProdVtxZ = primVtxMC->GetZ();
+
+  if (posDaughter == NULL || negDaughter == NULL) {
+    // fKind->Fill(1);  // garbage
+    // 				cout << "one of the daughters not
+    // available"
+    // <<
+    // endl;
+    return false;
+  } else if (posDaughter->GetMother() != negDaughter->GetMother() ||
+             (posDaughter->GetMother() == negDaughter->GetMother() &&
+              posDaughter->GetMother() == -1)) {
+    // Not Same Mother == Combinatorial Bck
+    return false;
+    // fKind->Fill(2);
+    // 				cout << "not the same mother" << endl;
+    Int_t pdgCodePos = 0;
+    if (posDaughter->PdgCode()) {
+      pdgCodePos = posDaughter->PdgCode();
+    } else {
+      return false;
+    }
+    Int_t pdgCodeNeg = 0;
+    if (negDaughter->PdgCode()) {
+      pdgCodeNeg = negDaughter->PdgCode();
+    } else {
+      return false;
+    }
+    // 				cout << "PDG codes daughters: " <<
+    // pdgCodePos
+    // <<
+    // "\t" << pdgCodeNeg << endl;
+    if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11)
+      // fKind->Fill(3);  // Electron Combinatorial
+      return false;
+    if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11 &&
+        (posDaughter->GetMother() == negDaughter->GetMother() &&
+         posDaughter->GetMother() == -1))
+      // fKind->Fill(4);  // direct Electron Combinatorial
+      return false;
+
+    if (TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 211)
+      // fKind->Fill(5);  // Pion Combinatorial
+      return false;
+    if ((TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 2212) ||
+        (TMath::Abs(pdgCodePos) == 2212 && TMath::Abs(pdgCodeNeg) == 211))
+      // fKind->Fill(6);  // Pion, Proton Combinatorics
+      return false;
+    if ((TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 11) ||
+        (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 211))
+      // fKind->Fill(7);  // Pion, Electron Combinatorics
+      return false;
+    if (TMath::Abs(pdgCodePos) == 321 || TMath::Abs(pdgCodeNeg) == 321)
+      // fKind->Fill(8);  // Kaon combinatorics
+      return false;
+
+  } else {
+    // 				cout << "same mother" << endl;
+    Int_t pdgCodePos = 0;
+    if (posDaughter->GetPdgCode()) {
+      pdgCodePos = posDaughter->GetPdgCode();
+    } else {
+      return false;
+    }
+    Int_t pdgCodeNeg = 0;
+    if (negDaughter->GetPdgCode()) {
+      pdgCodeNeg = negDaughter->GetPdgCode();
+    } else {
+      return false;
+    }
+    // 				cout << "PDG codes daughters: " <<
+    // pdgCodePos
+    // <<
+    // "\t" << pdgCodeNeg << endl;
+    Int_t pdgCode = 0;
+    pdgCode = mcMother->GetPdgCode();
+    // 				cout << "PDG code: " << pdgCode << endl;
+    if (TMath::Abs(pdgCodePos) != 11 || TMath::Abs(pdgCodeNeg) != 11) {
+      // fKind->Fill(9);  // combinatorics from hadronic decays
+      return false;
+    } else if (!(pdgCodeNeg == pdgCodePos)) {
+      Bool_t gammaIsPrimary = fEventCuts->IsConversionPrimaryAOD(
+          fMCEvent, mcMother, mcProdVtxX, mcProdVtxY, mcProdVtxZ);
+      if (pdgCode == 111)  // fKind->Fill(10);  // pi0 Dalitz
+        return false;
+      else if (pdgCode == 221)  // fKind->Fill(11);  // eta Dalitz
+        return false;
+      else if (!(negDaughter->GetUniqueID() != 5 ||
+                 posDaughter->GetUniqueID() != 5)) {
+        if (pdgCode == 22 && gammaIsPrimary) {
+          // fKind->Fill(0);  // primary photons
+          return true;
+        } else if (pdgCode == 22) {
+          // fKind->Fill(12);  // secondary photons
+          return false;
+        }
+      } else  // fKind->Fill(13);  // garbage
+        return false;
+    } else  // fKind->Fill(14);  // garbage
+      return false;
+  }
 }
 
 //____________________________________________________________________________________________________

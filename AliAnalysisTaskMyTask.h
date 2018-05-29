@@ -20,6 +20,10 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   virtual void UserExec(Option_t* option);
   virtual void Terminate(Option_t* option);
   float GetBeta(AliAODTrack* track);
+  Bool_t IsConvertedPhoton(AliAODMCParticle *posDaughter,
+                           AliAODMCParticle *negDaughter, AliMCEvent *fMCEvent,
+                           AliAODMCParticle *mcMother,
+                           AliConvEventCuts *fEventCuts);
   void StoreGlobalTrackReference();
   void SetIsMC(Bool_t IsMC) { fIsMC = IsMC; };
   void SetV0ReaderName(TString name) { fV0ReaderName = name; }
@@ -36,6 +40,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TList* fOutputList;                               //! output list
   AliPIDResponse* fPIDResponse;                     //!
   TH1F* fHistAllPhotons;                            //!
+  TH1F* fHistAllPhotons2;                           //!
   TH1F* fHistV0mcPhotonPtandArmCut;                 //!
   TH1F* fHistmcDaug1Pt;                             //!
   TH1F* fHistDetAccmcDaug1Pt;                       //!
