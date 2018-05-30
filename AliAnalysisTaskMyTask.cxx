@@ -356,7 +356,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   }
 
   if (!fAOD) return;
-  fKind->Fill(10);
+
   // Event cuts - check whether the event is good for analysis
   if (!fEventCuts2.AcceptEvent(fAOD)) {
     PostData(1, fOutputList);
@@ -365,7 +365,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
   // Keep track of the global tracks
   StoreGlobalTrackReference();
-  fKind->Fill(0);
+
   AliAnalysisManager *man = AliAnalysisManager::GetAnalysisManager();
   fV0Reader = (AliV0ReaderV1 *)man->GetTask(fV0ReaderName.Data());
   if (!fV0Reader) {
@@ -391,7 +391,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
       if (fMCEvent) {
         // 			cout << "generating MC stack"<< endl;
-        fKind->Fill(5);
+
         AliAODMCParticle *posDaughter = static_cast<AliAODMCParticle *>(
             fMCEvent->GetTrack(PhotonCandidate->GetMCLabelPositive()));
         AliAODMCParticle *negDaughter = static_cast<AliAODMCParticle *>(
@@ -724,16 +724,19 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
       if (!mcDaug1) continue;
       if (!mcDaug2) continue;
+
       if (!IsConvertedPhoton(mcDaug1, mcDaug2, fMCEvent, fEventCuts)) continue;
-      fKind->Fill(14);
+
       // Funktion rein druecken!
       // if(!IsConvertedPhoton(mcDaug1, mcDaug2)) continue;
       const float mcDaug1Pt = mcDaug1->Pt();
       const float mcDaug2Pt = mcDaug2->Pt();
       fHistmcDaug1Pt->Fill(mcDaug1Pt);
       fHistmcDaug2Pt->Fill(mcDaug2Pt);
+
       if (mcDaug1Pt < fpTCut || std::abs(mcDaug1->Eta()) > fEtaCut) continue;
       if (mcDaug2Pt < fpTCut || std::abs(mcDaug2->Eta()) > fEtaCut) continue;
+
       fHistDetAccmcDaug1Pt->Fill(mcDaug1Pt);
       fHistDetAccmcDaug2Pt->Fill(mcDaug2Pt);
       fHistV0mcPhotonPtCut->Fill(v0pt);
@@ -801,12 +804,13 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
       fMCEvent->GetTrack(negDaughter->GetMother()));
   auto *mcPosMother = static_cast<AliAODMCParticle *>(
       fMCEvent->GetTrack(posDaughter->GetMother()));
-
+      fKind->Fill(1);
   Int_t pdgCodeNeg = negDaughter->PdgCode();
   Int_t pdgCodePos = posDaughter->PdgCode();
   if(!(mcPosMother == NULL || mcNegMother == NULL)) {
+            fKind->Fill(2);
   if (posDaughter == NULL || negDaughter == NULL) {
-    fKind->Fill(1);  // garbage
+    //fKind->Fill(1);  // garbage
     // 				cout << "one of the daughters not
     // available"
     // <<
@@ -842,35 +846,45 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
       return false;
 
   } else {
+            fKind->Fill(3);
     // 				cout << "same mother" << endl;
     Int_t pdgCode = mcPosMother->GetPdgCode();
     // 				cout << "PDG code: " << pdgCode << endl;
     if (TMath::Abs(pdgCodePos) != 11 || TMath::Abs(pdgCodeNeg) != 11) {
       // fKind->Fill(9);  // combinatorics from hadronic decays
+        fKind->Fill(4);
       return false;
     } else if (!(pdgCodeNeg == pdgCodePos)) {
       Bool_t gammaIsPrimary = fEventCuts->IsConversionPrimaryAOD(
           fMCEvent, mcPosMother, mcProdVtxX, mcProdVtxY, mcProdVtxZ);
-      if (pdgCode == 111)  // fKind->Fill(10);  // pi0 Dalitz
+      if (pdgCode == 111){  // fKind->Fill(10);  // pi0 Dalitz
+          fKind->Fill(5);
         return false;
-      else if (pdgCode == 221)  // fKind->Fill(11);  // eta Dalitz
+     } else if (pdgCode == 221) { // fKind->Fill(11);  // eta Dalitz
+            fKind->Fill(6);
         return false;
-      else if (!(negDaughter->GetUniqueID() != 5 ||
+      }else if (!(negDaughter->GetUniqueID() != 5 ||
                  posDaughter->GetUniqueID() != 5)) {
         if (pdgCode == 22 && gammaIsPrimary) {
           // fKind->Fill(0);  // primary photons
+            fKind->Fill(7);
           return true;
         } else if (pdgCode == 22) {
           // fKind->Fill(12);  // secondary photons
+            fKind->Fill(8);
           return false;
         }
       } else  // fKind->Fill(13);  // garbage
+            fKind->Fill(9);
         return false;
     } else  // fKind->Fill(14);  // garbage
+        fKind->Fill(10);
       return false;
   }
+  fKind->Fill(11);
   return false;
-} return false;
+} fKind->Fill(12);
+  return false;
 }
 //____________________________________________________________________________________________________
 void AliAnalysisTaskMyTask::StoreGlobalTrackReference() {
