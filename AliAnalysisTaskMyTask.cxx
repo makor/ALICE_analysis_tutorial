@@ -323,16 +323,21 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   // but is more cpu/memory unfriendly. for now, we'll stick with aod's
 
   // Get all Photons
+
   AliMCEvent *fMC = nullptr;
   if (fIsMC) {
     AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
         AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
+
     fMC = eventHandler->MCEvent();
-    for (Int_t i = 0; i < fMC->GetNumberOfPrimaries(); i++) {
-      TParticle *particle = (TParticle *)fMC->Particle(i);
+
+    for (int iPart = 1; iPart < (fMC->GetNumberOfTracks()); iPart++) {
+      AliAODMCParticle *particle = (AliAODMCParticle *)fMC->GetTrack(iPart);
       if (!particle) continue;
+      if (!(particle->IsPhysicalPrimary())) continue;
       if (std::abs(particle->Eta()) > fEtaCut) continue;
-      if (particle->Energy() < fECut) continue;
+      if (particle->E() < fECut) continue;
+
       // if(fMCEvent &&
       // ((AliConvEventCuts*)fEventCutArray->At(fiCut))->GetSignalRejection() !=
       // 0){
@@ -345,22 +350,13 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       // if( (isNegFromMBHeader < 1) || (isPosFromMBHeader < 1)) continue;
       //}
 
-      if (particle->GetPdgCode() == 111 &&
-          particle->GetFirstDaughter() >= fMC->GetNumberOfPrimaries()) {
-        // cout << "Undecayed pi0 found with mother: " << particle->GetMother(0)
-        // << endl;
-        fHistAllPhotons2->Fill(particle->Pt());
-        for (Int_t j = 0; j < 2; j++) {
-          // fFillMCHistograms(particle->GetDaughter(j));
-        }
-      } else {
-        if (particle->GetPdgCode() != 22) continue;
-        fHistAllPhotons->Fill(particle->Pt());
-      }
+      if (particle->GetPdgCode() != 22) continue;
+      fHistAllPhotons->Fill(particle->Pt());
     }
   }
-  if (!fAOD) return;
 
+  if (!fAOD) return;
+  fKind->Fill(10);
   // Event cuts - check whether the event is good for analysis
   if (!fEventCuts2.AcceptEvent(fAOD)) {
     PostData(1, fOutputList);
@@ -369,7 +365,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
   // Keep track of the global tracks
   StoreGlobalTrackReference();
-
+  fKind->Fill(0);
   AliAnalysisManager *man = AliAnalysisManager::GetAnalysisManager();
   fV0Reader = (AliV0ReaderV1 *)man->GetTask(fV0ReaderName.Data());
   if (!fV0Reader) {
@@ -383,27 +379,29 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   for (int iGamma = 0; iGamma < fReaderGammas->GetEntriesFast(); ++iGamma) {
     auto *PhotonCandidate =
         dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
+
     if (!PhotonCandidate) continue;
+
     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
 
     if (fIsMC) {
       AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
           AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
       fMCEvent = eventHandler->MCEvent();
+
       if (fMCEvent) {
         // 			cout << "generating MC stack"<< endl;
-
+        fKind->Fill(5);
         AliAODMCParticle *posDaughter = static_cast<AliAODMCParticle *>(
             fMCEvent->GetTrack(PhotonCandidate->GetMCLabelPositive()));
         AliAODMCParticle *negDaughter = static_cast<AliAODMCParticle *>(
             fMCEvent->GetTrack(PhotonCandidate->GetMCLabelNegative()));
-        auto *photon = dynamic_cast<AliAODMCParticle *>(
-            PhotonCandidate->GetMCParticle(fMCEvent));
+
         if (posDaughter == NULL || negDaughter == NULL) continue;
-        if (!photon) continue;
-        if (!IsConvertedPhoton(posDaughter, negDaughter, fMCEvent, photon,
-                               fEventCuts))
+
+        if (!IsConvertedPhoton(posDaughter, negDaughter, fMCEvent, fEventCuts))
           continue;
+
         fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
 
         // TParticle *posDaughter =
@@ -423,7 +421,8 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
         if (posDaughter == NULL || negDaughter == NULL) {
           fKind->Fill(1);  // garbage
-                           // 				cout << "one of the daughters
+                           // 				cout << "one of the
+        daughters
         not
                            // available"
                            // <<
@@ -725,9 +724,8 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
           fMCEvent->GetTrack(mcParticle->GetDaughterLabel(0)));
       if (!mcDaug1) continue;
       if (!mcDaug2) continue;
-      if (!IsConvertedPhoton(mcDaug1, mcDaug2, fMCEvent, mcParticle,
-                             fEventCuts))
-        continue;
+      if (!IsConvertedPhoton(mcDaug1, mcDaug2, fMCEvent, fEventCuts)) continue;
+      fKind->Fill(14);
       // Funktion rein druecken!
       // if(!IsConvertedPhoton(mcDaug1, mcDaug2)) continue;
       const float mcDaug1Pt = mcDaug1->Pt();
@@ -793,52 +791,41 @@ float AliAnalysisTaskMyTask::GetBeta(AliAODTrack *track) {
 Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
                                                 AliAODMCParticle *negDaughter,
                                                 AliMCEvent *fMCEvent,
-                                                AliAODMCParticle *mcMother,
                                                 AliConvEventCuts *fEventCuts) {
   const AliVVertex *primVtxMC = fMCEvent->GetPrimaryVertex();
   Double_t mcProdVtxX = primVtxMC->GetX();
   Double_t mcProdVtxY = primVtxMC->GetY();
   Double_t mcProdVtxZ = primVtxMC->GetZ();
 
+  auto *mcNegMother = static_cast<AliAODMCParticle *>(
+      fMCEvent->GetTrack(negDaughter->GetMother()));
+  auto *mcPosMother = static_cast<AliAODMCParticle *>(
+      fMCEvent->GetTrack(posDaughter->GetMother()));
+
+  Int_t pdgCodeNeg = negDaughter->PdgCode();
+  Int_t pdgCodePos = posDaughter->PdgCode();
+  if(!(mcPosMother == NULL || mcNegMother == NULL)) {
   if (posDaughter == NULL || negDaughter == NULL) {
-    // fKind->Fill(1);  // garbage
+    fKind->Fill(1);  // garbage
     // 				cout << "one of the daughters not
     // available"
     // <<
     // endl;
     return false;
-  } else if (posDaughter->GetMother() != negDaughter->GetMother() ||
-             (posDaughter->GetMother() == negDaughter->GetMother() &&
-              posDaughter->GetMother() == -1)) {
+  } else if (mcPosMother != mcNegMother ||
+             (mcPosMother == mcNegMother && posDaughter->GetMother() == -1)) {
     // Not Same Mother == Combinatorial Bck
     return false;
     // fKind->Fill(2);
     // 				cout << "not the same mother" << endl;
-    Int_t pdgCodePos = 0;
-    if (posDaughter->PdgCode()) {
-      pdgCodePos = posDaughter->PdgCode();
-    } else {
-      return false;
-    }
-    Int_t pdgCodeNeg = 0;
-    if (negDaughter->PdgCode()) {
-      pdgCodeNeg = negDaughter->PdgCode();
-    } else {
-      return false;
-    }
-    // 				cout << "PDG codes daughters: " <<
-    // pdgCodePos
-    // <<
-    // "\t" << pdgCodeNeg << endl;
+
     if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11)
       // fKind->Fill(3);  // Electron Combinatorial
       return false;
     if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11 &&
-        (posDaughter->GetMother() == negDaughter->GetMother() &&
-         posDaughter->GetMother() == -1))
+        (mcPosMother == mcNegMother && posDaughter->GetMother() == -1))
       // fKind->Fill(4);  // direct Electron Combinatorial
       return false;
-
     if (TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 211)
       // fKind->Fill(5);  // Pion Combinatorial
       return false;
@@ -856,31 +843,14 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
 
   } else {
     // 				cout << "same mother" << endl;
-    Int_t pdgCodePos = 0;
-    if (posDaughter->GetPdgCode()) {
-      pdgCodePos = posDaughter->GetPdgCode();
-    } else {
-      return false;
-    }
-    Int_t pdgCodeNeg = 0;
-    if (negDaughter->GetPdgCode()) {
-      pdgCodeNeg = negDaughter->GetPdgCode();
-    } else {
-      return false;
-    }
-    // 				cout << "PDG codes daughters: " <<
-    // pdgCodePos
-    // <<
-    // "\t" << pdgCodeNeg << endl;
-    Int_t pdgCode = 0;
-    pdgCode = mcMother->GetPdgCode();
+    Int_t pdgCode = mcPosMother->GetPdgCode();
     // 				cout << "PDG code: " << pdgCode << endl;
     if (TMath::Abs(pdgCodePos) != 11 || TMath::Abs(pdgCodeNeg) != 11) {
       // fKind->Fill(9);  // combinatorics from hadronic decays
       return false;
     } else if (!(pdgCodeNeg == pdgCodePos)) {
       Bool_t gammaIsPrimary = fEventCuts->IsConversionPrimaryAOD(
-          fMCEvent, mcMother, mcProdVtxX, mcProdVtxY, mcProdVtxZ);
+          fMCEvent, mcPosMother, mcProdVtxX, mcProdVtxY, mcProdVtxZ);
       if (pdgCode == 111)  // fKind->Fill(10);  // pi0 Dalitz
         return false;
       else if (pdgCode == 221)  // fKind->Fill(11);  // eta Dalitz
@@ -899,8 +869,9 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
     } else  // fKind->Fill(14);  // garbage
       return false;
   }
+  return false;
+} return false;
 }
-
 //____________________________________________________________________________________________________
 void AliAnalysisTaskMyTask::StoreGlobalTrackReference() {
   // This method was inherited form H. Beck & O. Arnold analysis

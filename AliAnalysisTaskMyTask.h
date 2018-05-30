@@ -22,7 +22,6 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   float GetBeta(AliAODTrack* track);
   Bool_t IsConvertedPhoton(AliAODMCParticle *posDaughter,
                            AliAODMCParticle *negDaughter, AliMCEvent *fMCEvent,
-                           AliAODMCParticle *mcMother,
                            AliConvEventCuts *fEventCuts);
   void StoreGlobalTrackReference();
   void SetIsMC(Bool_t IsMC) { fIsMC = IsMC; };
