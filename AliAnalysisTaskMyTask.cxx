@@ -265,7 +265,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistKindOfCand->GetXaxis()->SetBinLabel(8, "Pion, Electron Combinatorics");
   fHistKindOfCand->GetXaxis()->SetBinLabel(9, "Kaon Combinatorics");
   fHistKindOfCand->GetXaxis()->SetBinLabel(10, "Same Mother");
-  fHistKindOfCand->GetXaxis()->SetBinLabel(11, "Combinatorics From Hadronic Decays");
+  fHistKindOfCand->GetXaxis()->SetBinLabel(
+      11, "Combinatorics From Hadronic Decays");
   fHistKindOfCand->GetXaxis()->SetBinLabel(12, "Pi0 Dalitz");
   fHistKindOfCand->GetXaxis()->SetBinLabel(13, "Eta Dalitz");
   fHistKindOfCand->GetXaxis()->SetBinLabel(14, "Primary Photons");
@@ -855,28 +856,33 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
       // Not Same Mother == Combinatorial Bck
       fHistKindOfCand->Fill(2);
       // 				cout << "not the same mother" << endl;
-      return false;
-      if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11)
+      if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11) {
         fHistKindOfCand->Fill(3);  // Electron Combinatorial
-      return false;
+        return false;
+      }
       if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11 &&
-          (mcPosMother == mcNegMother && posDaughter->GetMother() == -1))
+          (mcPosMother == mcNegMother && posDaughter->GetMother() == -1)) {
         fHistKindOfCand->Fill(4);  // direct Electron Combinatorial
-      return false;
-      if (TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 211)
+        return false;
+      }
+      if (TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 211) {
         fHistKindOfCand->Fill(5);  // Pion Combinatorial
-      return false;
+        return false;
+      }
       if ((TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 2212) ||
-          (TMath::Abs(pdgCodePos) == 2212 && TMath::Abs(pdgCodeNeg) == 211))
+          (TMath::Abs(pdgCodePos) == 2212 && TMath::Abs(pdgCodeNeg) == 211)) {
         fHistKindOfCand->Fill(6);  // Pion, Proton Combinatorics
-      return false;
+        return false;
+      }
       if ((TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 11) ||
-          (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 211))
+          (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 211)) {
         fHistKindOfCand->Fill(7);  // Pion, Electron Combinatorics
-      return false;
-      if (TMath::Abs(pdgCodePos) == 321 || TMath::Abs(pdgCodeNeg) == 321)
+        return false;
+      }
+      if (TMath::Abs(pdgCodePos) == 321 || TMath::Abs(pdgCodeNeg) == 321) {
         fHistKindOfCand->Fill(8);  // Kaon combinatorics
-      return false;
+        return false;
+      }
 
     } else {
       fHistKindOfCand->Fill(9);
@@ -904,17 +910,20 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
             fHistKindOfCand->Fill(14);  // secondary photons
             return false;
           }
-        } else
+        } else {
           fHistKindOfCand->Fill(15);  // garbage
-        return false;
-      } else
+          return false;
+        }
+      } else {
         fHistKindOfCand->Fill(16);  // garbage
+        return false;
+      }
+      fHistKindOfCand->Fill(11);
       return false;
     }
-    fHistKindOfCand->Fill(11);
+    fHistKindOfCand->Fill(12);
     return false;
   }
-  fHistKindOfCand->Fill(12);
   return false;
 }
 //____________________________________________________________________________________________________
