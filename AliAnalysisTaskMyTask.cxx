@@ -830,6 +830,14 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
                                                 AliAODMCParticle *negDaughter,
                                                 AliMCEvent *fMCEvent,
                                                 AliConvEventCuts *fEventCuts) {
+    //std::cout << "posDaughter ProcessCode"<<posDaughter->GetMCProcessCode()<< "\n";
+    //std::cout << "negDaughter ProcessCode"<<negDaughter->GetMCProcessCode()<< "\n";
+
+    //std::cout << "posDaughter GetUniqueID"<<posDaughter->GetUniqueID()<< "\n";
+    //std::cout << "posDaughter GetUniqueID"<<posDaughter->GetUniqueID()<< "\n";
+
+
+
   const AliVVertex *primVtxMC = fMCEvent->GetPrimaryVertex();
   Double_t mcProdVtxX = primVtxMC->GetX();
   Double_t mcProdVtxY = primVtxMC->GetY();
@@ -901,8 +909,8 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
         } else if (pdgCode == 221) {
           fHistKindOfCand->Fill(12);  // eta Dalitz
           return false;
-        } else if (!(negDaughter->GetUniqueID() != 5 ||
-                     posDaughter->GetUniqueID() != 5)) {
+        } else if (!(negDaughter->GetMCProcessCode() != 5 ||
+                     posDaughter->GetMCProcessCode() != 5)) {
           if (pdgCode == 22 && gammaIsPrimary) {
             fHistKindOfCand->Fill(13);  // primary photons
             return true;
