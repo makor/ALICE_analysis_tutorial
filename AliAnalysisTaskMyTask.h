@@ -21,8 +21,8 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   virtual void Terminate(Option_t* option);
   float GetBeta(AliAODTrack* track);
   Bool_t IsConvertedPhoton(AliAODMCParticle* posDaughter,
-                           AliAODMCParticle* negDaughter, AliMCEvent* fMCEvent,
-                           AliConvEventCuts* fEventCuts);
+                           AliAODMCParticle* negDaughter, AliMCEvent* fMCEvent);
+  Bool_t IsConversionPrimaryAOD(AliVEvent *event, AliAODMCParticle* AODMCParticle,  Double_t prodVtxX, Double_t prodVtxY, Double_t prodVtxZ);
   void StoreGlobalTrackReference();
   void SetIsMC(Bool_t IsMC) { fIsMC = IsMC; };
   void SetV0ReaderName(TString name) { fV0ReaderName = name; }
@@ -53,6 +53,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH2F* fHistArmenterosPodolandskiArmCut;           //!
   TH1F* fHistV0Pt;                                  //!
   TH1F* fHistKindOfCand;                            //!
+  TH1F* fHistKindOfPrim;                            //!
   TH1F* FillMCHistograms;                           //!
   TH1F* fHistReconstrmcPhotonPtMoCh;                //!
   TH1F* fHistReconstrmcPhotonPtCutPt;               //!
@@ -68,6 +69,7 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   const float fEtaCut = 0.8;
   const float farmQtCut = 0.03;
   const float fCluFindRatCut = 0.8;
+  const float fSecProdBoundary = 1.0;
   TH1F* fHistPhotonPt;                          //!
   TH2F* fHistArmenterosPodolandski;             //!
   TH2F* fHistArmenterosPodolandskiV0mcPhotons;  //!

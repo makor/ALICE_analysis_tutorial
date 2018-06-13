@@ -76,7 +76,8 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fEventCuts(nullptr),
       fHistKindOfCand(nullptr),
       FillMCHistograms(nullptr),
-      fHistAllPhotons2(nullptr) {
+      fHistAllPhotons2(nullptr),
+      fHistKindOfPrim(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -118,7 +119,8 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fEventCuts(nullptr),
       fHistKindOfCand(nullptr),
       FillMCHistograms(nullptr),
-      fHistAllPhotons2(nullptr) {
+      fHistAllPhotons2(nullptr),
+      fHistKindOfPrim(nullptr) {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
                                     // case we take a 'chain' of events
@@ -254,6 +256,35 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistClsDistrNegTr->SetTitle("Cluster-Distribution;pt;Clusters");
   fOutputList->Add(fHistClsDistrNegTr);
 
+  fHistKindOfPrim = new TH1F("fHistKindOfPrim", "Entries", 25, 0, 25);
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(1, "All MCs");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(2, "Mothers exist");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(3, "Different Mothers");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(4, "Electron Combinatorial");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(5, "Direct Electron Combinatorial");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(6, "Pion Combinatorics");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(7, "Pion, Proton Combinatorics");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(8, "Pion, Electron Combinatorics");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(9, "Kaon Combinatorics");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(10, "Same Mother");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(
+      11, "Combinatorics From Hadronic Decays");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(12, "Pi0 Dalitz");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(13, "Eta Dalitz");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(14, "Primary Photons");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(15, "Secondary Photons");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(16, "Something Else");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(17, "Something Else");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(18, "Something Else");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(19, "SomeThing ELse");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(20, "Tracks Exit");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(21, "|Eta| < 0.8");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(22, "Pt > 0.1 MeV");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(23, "Findable Cluster Ratio > 80%");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(24, "ArmQt < 0.3");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(25, "Daughters Exit");
+  fOutputList->Add(fHistKindOfPrim);
+
   fHistKindOfCand = new TH1F("fHistKindOfCand", "Entries", 25, 0, 25);
   fHistKindOfCand->GetXaxis()->SetBinLabel(1, "All MCs");
   fHistKindOfCand->GetXaxis()->SetBinLabel(2, "Mothers exist");
@@ -359,24 +390,30 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
     for (int iPart = 1; iPart < (fMC->GetNumberOfTracks()); iPart++) {
       AliAODMCParticle *particle = (AliAODMCParticle *)fMC->GetTrack(iPart);
+      fHistKindOfPrim->Fill(10);
       if (!particle) continue;
+      fHistKindOfPrim->Fill(11);
       if (!(particle->IsPhysicalPrimary())) continue;
+      fHistKindOfPrim->Fill(12);
       if (std::abs(particle->Eta()) > fEtaCut) continue;
+      fHistKindOfPrim->Fill(13);
       if (particle->E() < fECut) continue;
-
-      // if(fMCEvent &&
-      // ((AliConvEventCuts*)fEventCutArray->At(fiCut))->GetSignalRejection() !=
-      // 0){
-      // Int_t isPosFromMBHeader =
-      // ((AliConvEventCuts*)fEventCutArray->At(fiCut))->IsParticleFromBGEvent(i,
-      // fMCEvent, fInputEvent);
-      // Int_t isNegFromMBHeader =
-      // ((AliConvEventCuts*)fEventCutArray->At(fiCut))->IsParticleFromBGEvent(i,
-      // fMCEvent, fInputEvent);
-      // if( (isNegFromMBHeader < 1) || (isPosFromMBHeader < 1)) continue;
-      //}
-
+      fHistKindOfPrim->Fill(14);
       if (particle->GetPdgCode() != 22) continue;
+      fHistKindOfPrim->Fill(15);
+      AliAODMCParticle *firstDaughter = static_cast<AliAODMCParticle *>(
+          fMC->GetTrack(particle->GetFirstDaughter()));
+      AliAODMCParticle *lastDaughter = static_cast<AliAODMCParticle *>(
+          fMC->GetTrack(particle->GetLastDaughter()));
+      if (!firstDaughter) continue;
+      if (!lastDaughter) continue;
+      fHistKindOfPrim->Fill(16);
+      if (firstDaughter->Eta() > fEtaCut) continue;
+      if (lastDaughter->Eta() > fEtaCut) continue;
+      fHistKindOfPrim->Fill(17);
+      if (firstDaughter->Pt() < fpTCut) continue;
+      if (lastDaughter->Pt() < fpTCut) continue;
+      fHistKindOfPrim->Fill(18);
       fHistAllPhotons->Fill(particle->Pt());
     }
   }
@@ -426,257 +463,12 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
         if (posDaughter == NULL || negDaughter == NULL) continue;
         fHistKindOfCand->Fill(23);
 
-        if (!IsConvertedPhoton(posDaughter, negDaughter, fMCEvent, fEventCuts))
-          continue;
+        if (!IsConvertedPhoton(posDaughter, negDaughter, fMCEvent)) continue;
 
         fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
-
-        // TParticle *posDaughter =
-        // PhotonCandidate->GetPositiveMCDaughter(fMCEvent);
-        // TParticle *negDaughter =
-        // PhotonCandidate->GetNegativeMCDaughter(fMCEvent);
-        // 			cout << "generate Daughters: "<<posDaughter <<
-        // "\t" << negDaughter << endl;
-
-        /*if (fMCEvent && fEventCuts->GetSignalRejection() != 0) {
-          Int_t isPosFromMBHeader = fEventCuts->IsParticleFromBGEvent(
-              PhotonCandidate->GetMCLabelPositive(), fMCEvent, fAOD);
-          Int_t isNegFromMBHeader = fEventCuts->IsParticleFromBGEvent(
-              PhotonCandidate->GetMCLabelNegative(), fMCEvent, fAOD);
-          if ((isNegFromMBHeader < 1) || (isPosFromMBHeader < 1)) continue;
-        }
-
-        if (posDaughter == NULL || negDaughter == NULL) {
-          fHistKindOfCand->Fill(1);  // garbage
-                           // 				cout << "one of the
-        daughters
-        not
-                           // available"
-                           // <<
-                           // endl;
-        } else if (posDaughter->GetMother() != negDaughter->GetMother() ||
-                   (posDaughter->GetMother() == negDaughter->GetMother() &&
-                    posDaughter->GetMother() == -1)) {
-          // Not Same Mother == Combinatorial Bck
-          fHistKindOfCand->Fill(2);
-          // 				cout << "not the same mother" << endl;
-          Int_t pdgCodePos;
-          if (posDaughter->PdgCode())
-            pdgCodePos = posDaughter->PdgCode();
-          else
-            continue;
-          Int_t pdgCodeNeg;
-          if (negDaughter->PdgCode())
-            pdgCodeNeg = negDaughter->PdgCode();
-          else
-            continue;
-          // 				cout << "PDG codes daughters: " <<
-          // pdgCodePos
-          // <<
-          // "\t" << pdgCodeNeg << endl;
-          if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11)
-            fHistKindOfCand->Fill(3);  // Electron Combinatorial
-          if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11 &&
-              (posDaughter->GetMother() == negDaughter->GetMother() &&
-               posDaughter->GetMother() == -1))
-            fHistKindOfCand->Fill(4);  // direct Electron Combinatorial
-
-          if (TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 211)
-            fHistKindOfCand->Fill(5);  // Pion Combinatorial
-          if ((TMath::Abs(pdgCodePos) == 211 &&
-               TMath::Abs(pdgCodeNeg) == 2212) ||
-              (TMath::Abs(pdgCodePos) == 2212 && TMath::Abs(pdgCodeNeg) == 211))
-            fHistKindOfCand->Fill(6);  // Pion, Proton Combinatorics
-          if ((TMath::Abs(pdgCodePos) == 211 && TMath::Abs(pdgCodeNeg) == 11) ||
-              (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 211))
-            fHistKindOfCand->Fill(7);  // Pion, Electron Combinatorics
-          if (TMath::Abs(pdgCodePos) == 321 || TMath::Abs(pdgCodeNeg) == 321)
-            fHistKindOfCand->Fill(8);  // Kaon combinatorics
-
-        } else {
-          // 				cout << "same mother" << endl;
-          Int_t pdgCodePos;
-          if (posDaughter->GetPdgCode()) {
-            pdgCodePos = posDaughter->GetPdgCode();
-          } else
-            continue;
-          Int_t pdgCodeNeg;
-          if (negDaughter->GetPdgCode()) {
-            pdgCodeNeg = negDaughter->GetPdgCode();
-          } else
-            continue;
-          // 				cout << "PDG codes daughters: " <<
-          // pdgCodePos
-          // <<
-          // "\t" << pdgCodeNeg << endl;
-          Int_t pdgCode = 0;
-          auto *gamma = dynamic_cast<AliAODMCParticle *>(
-              PhotonCandidate->GetMCParticle(fMCEvent));
-          if (!gamma) continue;
-          pdgCode = gamma->GetPdgCode();
-          // 				cout << "PDG code: " << pdgCode << endl;
-          if (TMath::Abs(pdgCodePos) != 11 || TMath::Abs(pdgCodeNeg) != 11)
-            fHistKindOfCand->Fill(9);  // combinatorics from hadronic decays
-          else if (!(pdgCodeNeg == pdgCodePos)) {
-            Bool_t gammaIsPrimary = fEventCuts->IsConversionPrimaryAOD(
-                fMCEvent, posDaughter, mcProdVtxX, mcProdVtxY, mcProdVtxZ);
-            if (pdgCode == 111)
-              fHistKindOfCand->Fill(10);  // pi0 Dalitz
-            else if (pdgCode == 221)
-              fHistKindOfCand->Fill(11);  // eta Dalitz
-            else if (!(negDaughter->GetUniqueID() != 5 ||
-                       posDaughter->GetUniqueID() != 5)) {
-              if (pdgCode == 22 && gammaIsPrimary) {
-                fHistKindOfCand->Fill(0);  // primary photons
-                fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
-              } else if (pdgCode == 22) {
-                fHistKindOfCand->Fill(12);  // secondary photons
-              }
-            } else
-              fHistKindOfCand->Fill(13);  // garbage
-          } else
-            fHistKindOfCand->Fill(14);  // garbage{
-        }*/
       }
     }
   }
-  /*for (int iGamma = 0; iGamma < fReaderGammas->GetEntriesFast(); ++iGamma)
-  {
-    auto *PhotonCandidate =
-        dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
-    if (!PhotonCandidate) continue;
-    // mcEvent
-    fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
-    if (fIsMC) {
-      AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
-          AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
-      // Check wether real converted Photon was seen
-      fMCEvent = eventHandler->MCEvent();
-      AliMCParticle *fPositiveMCDaugh = static_cast<AliMCParticle *>(
-          fMCEvent->GetTrack(PhotonCandidate->GetMCLabelPositive()));
-      AliMCParticle *fNegativeMCDaugh = static_cast<AliMCParticle *>(
-          fMCEvent->GetTrack(PhotonCandidate->GetMCLabelNegative()));
-      // Check if pointers aren't null
-      if (!fPositiveMCDaugh || !fNegativeMCDaugh) continue;
-       std::cout << "1 " << "\n";
-        fHistReconstrmcPhotonPtNoDetCut->Fill(1);
-      // Check PDG-Codes
-      if (std::abs(fPositiveMCDaugh->PdgCode()) != 11 ||
-          std::abs(fNegativeMCDaugh->PdgCode()) != 11)
-        continue;
-      std::cout << "2 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(2);
-      // Check if Daughters are really created by conversion
-      if (fPositiveMCDaugh->GetUniqueID() != 5 ||
-          fNegativeMCDaugh->GetUniqueID() != 5)
-        continue;
-       std::cout << "3 " << "\n";
-       fHistReconstrmcPhotonPtNoDetCut->Fill(3);
-      // Check if Mother was really photon1
-      AliMCParticle *gamma = static_cast<AliMCParticle *>(
-          fMCEvent->GetTrack(fPositiveMCDaugh->GetMother()));
-      if (!gamma) continue;
-      std::cout << "4 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(4);
-      if (gamma->PdgCode() != 22) continue;
-      std::cout << "5 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(5);{
-      // Check if Grandmother isn't a photon
-      AliMCParticle *grandgamma =
-          static_cast<AliMCParticle
-  *>(fMCEvent->GetTrack(gamma->GetMother()));
-      if (!grandgamma) continue;
-      std::cout << "6 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(6);
-      if (grandgamma->PdgCode() == 22) continue;
-      std::cout << "7 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(7);
-      // Check if the Daughters are electron and positron and fit the
-  detecting
-      // param Hier fliegt einiges/alles an Statistik raus.
-      if (fPositiveMCDaugh->Pt() < fpTCut) continue;
-      std::cout << "8 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(8);
-      if (fNegativeMCDaugh->Pt() < fpTCut) continue;
-      std::cout << "9 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(9);
-      fHistReconstrmcPhotonPtCutPt->Fill(PhotonCandidate->Pt());
-      if (std::abs(fPositiveMCDaugh->Eta()) > fEtaCut) continue;
-      std::cout << "10 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(10);
-      if (std::abs(fNegativeMCDaugh->Eta()) > fEtaCut) continue;
-      std::cout << "11 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(11);
-      fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
-      // Check if daughters have the same mother
-      if (fPositiveMCDaugh->GetMother() != fNegativeMCDaugh->GetMother())
-        continue;
-      std::cout << "12 " << "\n";
-      fHistReconstrmcPhotonPtNoDetCut->Fill(12);
-      fHistReconstrmcPhotonPtMoCh->Fill(PhotonCandidate->Pt());
-    }
-  }*/
-
-  /*for (int iGamma = 0; iGamma < fReaderGammas->GetEntriesFast(); ++iGamma) {
-     auto *PhotonCandidate =
-         dynamic_cast<AliAODConversionPhoton *>(fReaderGammas->At(iGamma));
-     if (!PhotonCandidate) continue;
-     // mcEvent
-     fHistPhotonPt->Fill(PhotonCandidate->GetPhotonPt());
-     if (fIsMC) {
-         AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler
-  *>(
-             AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
-       // Check wether real converted Photon was seen
-       fMCEvent = eventHandler->MCEvent();
-             std::cout << "Test"<< "\n";
-       // Check if the Daughters are electron and positron and fit the
-  detecting
-       // param
-       TParticle *fPositiveMCDaugh =
-           static_cast<TParticle
-  *>(PhotonCandidate->GetPositiveMCDaughter(fMCEvent));
-       TParticle *fNegativeMCDaugh =
-           static_cast<TParticle
-  *>(PhotonCandidate->GetPositiveMCDaughter(fMCEvent));
-       // Check if pointers aren't null
-       if (!fPositiveMCDaugh) continue;
-       if (!fNegativeMCDaugh) continue;
-       // Check PDG-Codes
-       if (fPositiveMCDaugh->GetPdgCode() != -11 ||
-           fNegativeMCDaugh->GetPdgCode() != 11)
-         continue;
-       // Check if Daughters are really created by conversion
-       if (fPositiveMCDaugh->GetUniqueID() != 5 ||
-           fNegativeMCDaugh->GetUniqueID() != 5)
-         continue;
-       // Check if Mother was really photon
-       TParticle *photon =
-           static_cast<TParticle *>(PhotonCandidate->GetMCParticle(fMCEvent));
-       if (!photon) continue;
-       if (photon->GetPdgCode() != 22) continue;
-       // PDG Code Pt und Eta ausgeben lassen! Cuts nochmals genauer
-  ueberpruefen.
-       // Check if daughters lie within the detector acceptance
-       std::cout << "fPositiveMCDaugh"<< "\n";
-       std::cout << fPositiveMCDaugh->GetPdgCode()<< "\n";
-       std::cout << fPositiveMCDaugh->Pt()<< "\n";
-       std::cout << fPositiveMCDaugh->Eta()<< "\n";
-       std::cout << "fNegativeMCDaugh"<< "\n";
-       std::cout << fNegativeMCDaugh->GetPdgCode()<< "\n";
-       std::cout << fNegativeMCDaugh->Pt()<< "\n";
-       std::cout << fNegativeMCDaugh->Eta()<< "\n";
-       std::cout << "PhotonCandidate"<< "\n";
-       std::cout << PhotonCandidate->Pt()<< "\n";
-       if (fPositiveMCDaugh->Pt() < fpTCut ||
-           std::abs(fPositiveMCDaugh->Eta()) > fEtaCut)
-         continue;
-       if (fNegativeMCDaugh->Pt() < fpTCut ||
-           std::abs(fNegativeMCDaugh->Eta()) > fEtaCut)
-         continue;
-     fHistReconstrmcPhotonPtMoCh->Fill(PhotonCandidate->Pt());
-   }
-  }*/
 
   for (auto v0obj : *(fAOD->GetV0s())) {
     auto *v0 = static_cast<AliAODv0 *>(v0obj);
@@ -760,23 +552,11 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       if (!mcDaug1) continue;
       if (!mcDaug2) continue;
       fHistKindOfCand->Fill(24);
-      if (!IsConvertedPhoton(mcDaug1, mcDaug2, fMCEvent, fEventCuts)) continue;
-
-      // Funktion rein druecken!
-      // if(!IsConvertedPhoton(mcDaug1, mcDaug2)) continue;
+      if (!IsConvertedPhoton(mcDaug1, mcDaug2, fMCEvent)) continue;
       const float mcDaug1Pt = mcDaug1->Pt();
       const float mcDaug2Pt = mcDaug2->Pt();
       fHistmcDaug1Pt->Fill(mcDaug1Pt);
       fHistmcDaug2Pt->Fill(mcDaug2Pt);
-
-      if (mcDaug1Pt < fpTCut || std::abs(mcDaug1->Eta()) > fEtaCut) continue;
-      if (mcDaug2Pt < fpTCut || std::abs(mcDaug2->Eta()) > fEtaCut) continue;
-
-      fHistDetAccmcDaug1Pt->Fill(mcDaug1Pt);
-      fHistDetAccmcDaug2Pt->Fill(mcDaug2Pt);
-      fHistV0mcPhotonPtCut->Fill(v0pt);
-      fHistArmenterosPodolandskiV0mcPhotons->Fill(armAlpha, armQt);
-      if (armQt > farmQtCut) continue;
       fHistV0mcPhotonPtandArmCut->Fill(v0pt);
       fHistArmenterosPodolandskiV0mcPhotonsCut->Fill(armAlpha, armQt);
     }
@@ -828,15 +608,17 @@ float AliAnalysisTaskMyTask::GetBeta(AliAODTrack *track) {
 
 Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
                                                 AliAODMCParticle *negDaughter,
-                                                AliMCEvent *fMCEvent,
-                                                AliConvEventCuts *fEventCuts) {
-    //std::cout << "posDaughter ProcessCode"<<posDaughter->GetMCProcessCode()<< "\n";
-    //std::cout << "negDaughter ProcessCode"<<negDaughter->GetMCProcessCode()<< "\n";
-
-    //std::cout << "posDaughter GetUniqueID"<<posDaughter->GetUniqueID()<< "\n";
-    //std::cout << "posDaughter GetUniqueID"<<posDaughter->GetUniqueID()<< "\n";
-
-
+                                                AliMCEvent *fMCEvent) {
+  // Gravierender Unterschied zw. ESDs und AODs, wichtig fuer die Ueberpruefung,
+  // ob e- und e+ aus Conversion (ID = 5) stammen!
+  // AOD:
+  // std::cout << "posDaughter ProcessCode"<<posDaughter->GetMCProcessCode()<<
+  // "\n";
+  // std::cout << "negDaughter ProcessCode"<<negDaughter->GetMCProcessCode()<<
+  // "\n";
+  // ESD:
+  // std::cout << "posDaughter GetUniqueID"<<posDaughter->GetUniqueID()<< "\n";
+  // std::cout << "posDaughter GetUniqueID"<<posDaughter->GetUniqueID()<< "\n";
 
   const AliVVertex *primVtxMC = fMCEvent->GetPrimaryVertex();
   Double_t mcProdVtxX = primVtxMC->GetX();
@@ -901,8 +683,8 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
         fHistKindOfCand->Fill(10);  // combinatorics from hadronic decays
         return false;
       } else if (!(pdgCodeNeg == pdgCodePos)) {
-        Bool_t gammaIsPrimary = fEventCuts->IsConversionPrimaryAOD(
-            fMCEvent, mcPosMother, mcProdVtxX, mcProdVtxY, mcProdVtxZ);
+        Bool_t gammaIsPrimary = IsConversionPrimaryAOD(
+            fAOD, mcPosMother, mcProdVtxX, mcProdVtxY, mcProdVtxZ);
         if (pdgCode == 111) {
           fHistKindOfCand->Fill(11);  // pi0 Dalitz
           return false;
@@ -934,6 +716,146 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
   }
   return false;
 }
+
+//_________________________________________________________________________
+Bool_t AliAnalysisTaskMyTask::IsConversionPrimaryAOD(
+    AliVEvent *event, AliAODMCParticle *AODMCParticle, Double_t prodVtxX,
+    Double_t prodVtxY, Double_t prodVtxZ) {
+  TClonesArray *AODMCTrackArray = dynamic_cast<TClonesArray *>(
+      fAOD->FindListObject(AliAODMCParticle::StdBranchName()));
+  fHistKindOfPrim->Fill(1);
+  if (AODMCTrackArray == NULL) return kFALSE;
+  fHistKindOfPrim->Fill(2);
+  AliAODMCParticle *currentParticle = AODMCParticle;
+  if (TMath::Abs(currentParticle->GetPdgCode()) == 11) {
+    if (currentParticle->GetMother() != -1) {
+      AliAODMCParticle *particleMother = static_cast<AliAODMCParticle *>(
+          AODMCTrackArray->At(currentParticle->GetMother()));
+      if (particleMother) {
+        if (TMath::Abs(particleMother->GetPdgCode()) == 22)
+          currentParticle = particleMother;
+      }
+    }
+  }
+  if (currentParticle->GetMother() > -1) {
+    Double_t deltaX = currentParticle->Xv() - prodVtxX;
+    Double_t deltaY = currentParticle->Yv() - prodVtxY;
+    Double_t deltaZ = currentParticle->Zv() - prodVtxZ;
+
+    // Double_t realRadius2D = TMath::Sqrt(deltaX*deltaX+deltaY*deltaY);
+    Double_t realRadius3D =
+        TMath::Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+
+    Bool_t dalitzCand = kFALSE;
+
+    AliAODMCParticle *firstmother = static_cast<AliAODMCParticle *>(
+        AODMCTrackArray->At(currentParticle->GetMother()));
+    if (!firstmother) return kFALSE;
+    fHistKindOfPrim->Fill(3);
+    Int_t pdgCodeFirstMother = firstmother->GetPdgCode();
+    Bool_t intDecay = kFALSE;
+    if (pdgCodeFirstMother == 111 || pdgCodeFirstMother == 221)
+      intDecay = kTRUE;
+    if (intDecay && TMath::Abs(currentParticle->GetPdgCode()) == 11) {
+      dalitzCand = kTRUE;
+      //       cout << "dalitz candidate found" << endl;
+    }
+
+    Long_t source = currentParticle->GetMother();
+    Bool_t foundExcludedPart = kFALSE;
+    Bool_t foundShower = kFALSE;
+    Int_t pdgCodeMotherPrev = 0;
+    Int_t pdgCodeMotherPPrevMother = 0;
+    Int_t depth = 0;
+    if (dalitzCand || realRadius3D < fSecProdBoundary) {
+      //       if (currentParticle->GetPdgCode() == 22){
+      //         cout << endl << endl << "new particle: " << eventpos <<endl;
+      //         cout << currentParticle->GetPdgCode() << "\t" <<
+      //         currentParticle->R() << "\t" << realRadius2D << "\t" <<
+      //         realRadius3D << endl;
+      //       }
+      while (depth < 20) {
+        AliAODMCParticle *mother =
+            static_cast<AliAODMCParticle *>(AODMCTrackArray->At(source));
+        source = mother->GetMother();
+        //         if (currentParticle->GetPdgCode() == 22)cout <<
+        //         "eventposition: "<< source << endl;
+        Int_t pdgCodeMother = mother->GetPdgCode();
+        //         if (currentParticle->GetPdgCode() == 22)cout << "Previous
+        //         mothers: " << pdgCodeMother << "\t"<< pdgCodeMotherPrev<<
+        //         "\t" << pdgCodeMotherPPrevMother << endl;
+        if (pdgCodeMother == pdgCodeMotherPrev &&
+            pdgCodeMother == pdgCodeMotherPPrevMother)
+          depth = 20;
+        if (TMath::Abs(pdgCodeMother) == 11 &&
+            TMath::Abs(pdgCodeMotherPrev) == 22 &&
+            TMath::Abs(pdgCodeMotherPPrevMother) == 11) {
+          foundShower = kTRUE;
+          depth = 20;
+        }
+        if (TMath::Abs(pdgCodeMother) == 22 &&
+            TMath::Abs(pdgCodeMotherPrev) == 11 &&
+            TMath::Abs(pdgCodeMotherPPrevMother) == 22) {
+          foundShower = kTRUE;
+          depth = 20;
+        }
+
+        // particles to be excluded:
+        // K0s      - 310
+        // K0l      - 130
+        // K+/-     - 321
+        // Lambda   - 3122
+        // Sigma0   - 3212
+        // Sigma+/- - 3222, 3112
+        // Cascades - 3322, 3312
+        if (TMath::Abs(pdgCodeMother) == 310 ||
+            TMath::Abs(pdgCodeMother) == 130 ||
+            TMath::Abs(pdgCodeMother) == 321 ||
+            TMath::Abs(pdgCodeMother) == 3122 ||
+            TMath::Abs(pdgCodeMother) == 3212 ||
+            TMath::Abs(pdgCodeMother) == 3222 ||
+            TMath::Abs(pdgCodeMother) == 3112 ||
+            TMath::Abs(pdgCodeMother) == 3322 ||
+            TMath::Abs(pdgCodeMother) == 3312) {
+          foundExcludedPart = kTRUE;
+        }
+        //      if (currentParticle->GetPdgCode() == 22)cout <<
+        //      mother->GetPdgCode() << "\t" <<  source << "\t" <<
+        //      foundExcludedPart<< endl;
+        pdgCodeMotherPPrevMother = pdgCodeMotherPrev;
+        pdgCodeMotherPrev = pdgCodeMother;
+        if (source == -1) depth = 20;
+
+        //      if (currentParticle->GetPdgCode() == 22)cout << depth << endl;
+        depth++;
+      }
+    }
+    if (foundExcludedPart) {
+      //      if (currentParticle->GetPdgCode() == 22)cout << "This is
+      //      definitely a secondary, manually excluded" << endl;
+      fHistKindOfPrim->Fill(4);
+      return kFALSE;
+    } else if (dalitzCand && realRadius3D < fSecProdBoundary) {
+      //      if (currentParticle->GetPdgCode() == 22)cout << "This was a decay
+      //      via a virtual photon" << endl;
+      fHistKindOfPrim->Fill(5);
+      return kTRUE;
+    } else if (foundShower) {
+      //      if (currentParticle->GetPdgCode() == 22)cout << "This is a shower"
+      //      << endl;
+      fHistKindOfPrim->Fill(6);
+      return kFALSE;
+    } else if (realRadius3D >= fSecProdBoundary) {
+      //      cout << "This is a secondary, too large production radius" <<
+      //      endl;
+      fHistKindOfPrim->Fill(7);
+      return kFALSE;
+    }
+  }
+  fHistKindOfPrim->Fill(8);
+  return kTRUE;
+}
+
 //____________________________________________________________________________________________________
 void AliAnalysisTaskMyTask::StoreGlobalTrackReference() {
   // This method was inherited form H. Beck & O. Arnold analysis
