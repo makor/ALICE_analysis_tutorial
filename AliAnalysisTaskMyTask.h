@@ -26,7 +26,11 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
                                 AliAODMCParticle* AODMCParticle,
                                 Double_t prodVtxX, Double_t prodVtxY,
                                 Double_t prodVtxZ);
-  void Sigma0Descendancy(AliAODMCParticle* posDaughter);
+  void IsConvertedPhotonDaughterIsPhysPrimaryCheck(
+      AliAODMCParticle* posDaughter, AliAODMCParticle* negDaughter);
+  void Sigma0Descendancy(AliAODMCParticle* Daughter);
+  void Sigma0Descendancy2(AliAODMCParticle* Daughter2);
+  void Sigma0DescendancyAll(AliAODMCParticle* DaughterAll);
   void StoreGlobalTrackReference();
   void SetIsMC(Bool_t IsMC) { fIsMC = IsMC; };
   void SetV0ReaderName(TString name) { fV0ReaderName = name; }
@@ -66,20 +70,91 @@ class AliAnalysisTaskMyTask : public AliAnalysisTaskSE {
   TH1F* fHistSigma0Mass2;                          //!
   TH1F* fHistSigma0Tv;                             //!
   TH1F* fHistSigma0OneOverPt;
-  TH1F* fHistNoSigma0Phi;         //!
-  TH1F* fHistNoSigma0Theta;       //!
-  TH1F* fHistNoSigma0Eta;         //!
-  TH1F* fHistNoSigma0Pt;          //!
-  TH1F* fHistNoSigma0P;           //!
-  TH1F* fHistNoSigma0E;           //!
-  TH1F* fHistNoSigma0Mass2;       //!
-  TH1F* fHistNoSigma0Tv;          //!
-  TH1F* fHistNoSigma0OneOverPt;   //!
-  TH1F* fHistReconstrmcPhotonPt;  //!
-  TH1F* fHistV0K0ShortInvMass;    //!
-  TH2F* fHistClsDistrPosTr;       //!
-  TH2F* fHistClsDistrNegTr;       //!
-  AliConvEventCuts* fEventCuts;   //!
+  TH1F* fHistNoSigma0Phi;                   //!
+  TH1F* fHistNoSigma0Theta;                 //!
+  TH1F* fHistNoSigma0Eta;                   //!
+  TH1F* fHistNoSigma0Pt;                    //!
+  TH1F* fHistNoSigma0P;                     //!
+  TH1F* fHistNoSigma0E;                     //!
+  TH1F* fHistNoSigma0Mass2;                 //!
+  TH1F* fHistNoSigma0Tv;                    //!
+  TH1F* fHistNoSigma0OneOverPt;             //!
+  TH1F* fHist2Sigma0E;                      //!
+  TH1F* fHist2Sigma0Pt;                     //!
+  TH1F* fHist2Sigma0Eta;                    //!
+  TH1F* fHist2Sigma0Theta;                  //!
+  TH1F* fHist2Sigma0Mass2;                  //!
+  TH1F* fHist2Sigma0Tv;                     //!
+  TH1F* fHist2Sigma0P;                      //!
+  TH1F* fHist2Sigma0Phi;                    //!
+  TH1F* fHist2Sigma0OneOverPt;              //!
+  TH1F* fHist2NoSigma0E;                    //!
+  TH1F* fHist2NoSigma0Pt;                   //!
+  TH1F* fHist2NoSigma0Eta;                  //!
+  TH1F* fHist2NoSigma0Theta;                //!
+  TH1F* fHist2NoSigma0Mass2;                //!
+  TH1F* fHist2NoSigma0Tv;                   //!
+  TH1F* fHist2NoSigma0P;                    //!
+  TH1F* fHist2NoSigma0Phi;                  //!
+  TH1F* fHist2NoSigma0OneOverPt;            //!
+  TH1F* fHistAllSigma0E;                    //!
+  TH1F* fHistAllSigma0Pt;                   //!
+  TH1F* fHistAllSigma0Eta;                  //!
+  TH1F* fHistAllSigma0Theta;                //!
+  TH1F* fHistAllSigma0Mass2;                //!
+  TH1F* fHistAllSigma0Tv;                   //!
+  TH1F* fHistAllSigma0P;                    //!
+  TH1F* fHistAllSigma0Phi;                  //!
+  TH1F* fHistAllSigma0OneOverPt;            //!
+  TH1F* fHistAllNoSigma0E;                  //!
+  TH1F* fHistAllNoSigma0Pt;                 //!
+  TH1F* fHistAllNoSigma0Eta;                //!
+  TH1F* fHistAllNoSigma0Theta;              //!
+  TH1F* fHistAllNoSigma0Mass2;              //!
+  TH1F* fHistAllNoSigma0Tv;                 //!
+  TH1F* fHistAllNoSigma0P;                  //!
+  TH1F* fHistAllNoSigma0Phi;                //!
+  TH1F* fHistAllNoSigma0OneOverPt;          //!
+  TH1F* fHistReconstrmcPhotonPt;            //!
+  TH1F* fHistV0K0ShortInvMass;              //!
+  TH1F* fHistReconstrmcPhotonPtIsPhysPrim;  //!
+  TH1F* fHistAllPhotonsConvPrim;            //!
+  TH2F* fHistSigma0PhiVsPt;                 //!
+  TH2F* fHistNoSigma0PhiVsPt;               //!
+  TH2F* fHist2Sigma0PhiVsPt;                //!
+  TH2F* fHist2NoSigma0PhiVsPt;              //!
+  TH2F* fHistAllSigma0PhiVsPt;              //!
+  TH2F* fHistAllNoSigma0PhiVsPt;            //!
+  TH2F* fHistSigma0ThetaVsPt;               //!
+  TH2F* fHistNoSigma0ThetaVsPt;             //!
+  TH2F* fHist2Sigma0ThetaVsPt;              //!
+  TH2F* fHist2NoSigma0ThetaVsPt;            //!
+  TH2F* fHistAllSigma0ThetaVsPt;            //!
+  TH2F* fHistAllNoSigma0ThetaVsPt;          //!
+  TH2F* fHistSigma0EtaVsPt;                 //!
+  TH2F* fHistNoSigma0EtaVsPt;               //!
+  TH2F* fHist2Sigma0EtaVsPt;                //!
+  TH2F* fHist2NoSigma0EtaVsPt;              //!
+  TH2F* fHistAllSigma0EtaVsPt;              //!
+  TH2F* fHistAllNoSigma0EtaVsPt;            //!
+  TH2F* fHistSigma0EVsPt;                   //!
+  TH2F* fHistNoSigma0EVsPt;                 //!
+  TH2F* fHist2Sigma0EVsPt;                  //!
+  TH2F* fHist2NoSigma0EVsPt;                //!
+  TH2F* fHistAllSigma0EVsPt;                //!
+  TH2F* fHistAllNoSigma0EVsPt;              //!
+  TH2F* fHistSigma0TvVsPt;                  //!
+  TH2F* fHistNoSigma0TvVsPt;                //!
+  TH2F* fHist2Sigma0TvVsPt;                 //!
+  TH2F* fHist2NoSigma0TvVsPt;               //!
+  TH2F* fHistAllSigma0TvVsPt;               //!
+  TH2F* fHistAllNoSigma0TvVsPt;             //!
+  TH2F* fHistClsDistrPosTr;                 //!
+  TH2F* fHistClsDistrNegTr;                 //!
+  TH2F* fHistPDGsOfMothToPhotons;           //!
+  TH2F* fHist2PDGsOfMothToPhotons;          //!
+  TH2F* fHistAllPDGsOfMothToPhotons;        //!
+  AliConvEventCuts* fEventCuts;             //!
   Bool_t fIsMC;
   const float fpTCut = 0.1;
   const float fECut = 0.001;

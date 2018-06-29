@@ -87,7 +87,78 @@ ClassImp(AliAnalysisTaskMyTask)  // classimp: necessary for root
       fHistNoSigma0Tv(nullptr),
       fHistNoSigma0P(nullptr),
       fHistNoSigma0Phi(nullptr),
-      fHistNoSigma0OneOverPt(nullptr){
+      fHistNoSigma0OneOverPt(nullptr),
+      fHist2Sigma0E(nullptr),
+      fHist2Sigma0Pt(nullptr),
+      fHist2Sigma0Eta(nullptr),
+      fHist2Sigma0Theta(nullptr),
+      fHist2Sigma0Mass2(nullptr),
+      fHist2Sigma0Tv(nullptr),
+      fHist2Sigma0P(nullptr),
+      fHist2Sigma0Phi(nullptr),
+      fHist2Sigma0OneOverPt(nullptr),
+      fHist2NoSigma0E(nullptr),
+      fHist2NoSigma0Pt(nullptr),
+      fHist2NoSigma0Eta(nullptr),
+      fHist2NoSigma0Theta(nullptr),
+      fHist2NoSigma0Mass2(nullptr),
+      fHist2NoSigma0Tv(nullptr),
+      fHist2NoSigma0P(nullptr),
+      fHist2NoSigma0Phi(nullptr),
+      fHist2NoSigma0OneOverPt(nullptr),
+      fHistAllSigma0E(nullptr),
+      fHistAllSigma0Pt(nullptr),
+      fHistAllSigma0Eta(nullptr),
+      fHistAllSigma0Theta(nullptr),
+      fHistAllSigma0Mass2(nullptr),
+      fHistAllSigma0Tv(nullptr),
+      fHistAllSigma0P(nullptr),
+      fHistAllSigma0Phi(nullptr),
+      fHistAllSigma0OneOverPt(nullptr),
+      fHistAllNoSigma0E(nullptr),
+      fHistAllNoSigma0Pt(nullptr),
+      fHistAllNoSigma0Eta(nullptr),
+      fHistAllNoSigma0Theta(nullptr),
+      fHistAllNoSigma0Mass2(nullptr),
+      fHistAllNoSigma0Tv(nullptr),
+      fHistAllNoSigma0P(nullptr),
+      fHistAllNoSigma0Phi(nullptr),
+      fHistAllNoSigma0OneOverPt(nullptr),
+      fHistSigma0PhiVsPt(nullptr),
+      fHistNoSigma0PhiVsPt(nullptr),
+      fHist2Sigma0PhiVsPt(nullptr),
+      fHist2NoSigma0PhiVsPt(nullptr),
+      fHistAllSigma0PhiVsPt(nullptr),
+      fHistAllNoSigma0PhiVsPt(nullptr),
+      fHistSigma0ThetaVsPt(nullptr),
+      fHistNoSigma0ThetaVsPt(nullptr),
+      fHist2Sigma0ThetaVsPt(nullptr),
+      fHist2NoSigma0ThetaVsPt(nullptr),
+      fHistAllSigma0ThetaVsPt(nullptr),
+      fHistAllNoSigma0ThetaVsPt(nullptr),
+      fHistSigma0EtaVsPt(nullptr),
+      fHistNoSigma0EtaVsPt(nullptr),
+      fHist2Sigma0EtaVsPt(nullptr),
+      fHist2NoSigma0EtaVsPt(nullptr),
+      fHistAllSigma0EtaVsPt(nullptr),
+      fHistAllNoSigma0EtaVsPt(nullptr),
+      fHistSigma0EVsPt(nullptr),
+      fHistNoSigma0EVsPt(nullptr),
+      fHist2Sigma0EVsPt(nullptr),
+      fHist2NoSigma0EVsPt(nullptr),
+      fHistAllSigma0EVsPt(nullptr),
+      fHistAllNoSigma0EVsPt(nullptr),
+      fHistSigma0TvVsPt(nullptr),
+      fHistNoSigma0TvVsPt(nullptr),
+      fHist2Sigma0TvVsPt(nullptr),
+      fHist2NoSigma0TvVsPt(nullptr),
+      fHistAllSigma0TvVsPt(nullptr),
+      fHistAllNoSigma0TvVsPt(nullptr),
+      fHistPDGsOfMothToPhotons(nullptr),
+      fHist2PDGsOfMothToPhotons(nullptr),
+      fHistAllPDGsOfMothToPhotons(nullptr),
+      fHistReconstrmcPhotonPtIsPhysPrim(nullptr),
+      fHistAllPhotonsConvPrim(nullptr) {
   // default constructor, don't allocate memory here!
   // this is used by root for IO purposes, it needs to remain empty
 }
@@ -131,7 +202,87 @@ AliAnalysisTaskMyTask::AliAnalysisTaskMyTask(const char *name)
       fHistSigma0P(nullptr),
       fHistSigma0Phi(nullptr),
       fHistKindOfPrim(nullptr),
-      fHistSigma0OneOverPt(nullptr) {
+      fHistSigma0OneOverPt(nullptr),
+      fHistNoSigma0E(nullptr),
+      fHistNoSigma0Pt(nullptr),
+      fHistNoSigma0Eta(nullptr),
+      fHistNoSigma0Theta(nullptr),
+      fHistNoSigma0Mass2(nullptr),
+      fHistNoSigma0Tv(nullptr),
+      fHistNoSigma0P(nullptr),
+      fHistNoSigma0Phi(nullptr),
+      fHistNoSigma0OneOverPt(nullptr),
+      fHist2Sigma0E(nullptr),
+      fHist2Sigma0Pt(nullptr),
+      fHist2Sigma0Eta(nullptr),
+      fHist2Sigma0Theta(nullptr),
+      fHist2Sigma0Mass2(nullptr),
+      fHist2Sigma0Tv(nullptr),
+      fHist2Sigma0P(nullptr),
+      fHist2Sigma0Phi(nullptr),
+      fHist2Sigma0OneOverPt(nullptr),
+      fHist2NoSigma0E(nullptr),
+      fHist2NoSigma0Pt(nullptr),
+      fHist2NoSigma0Eta(nullptr),
+      fHist2NoSigma0Theta(nullptr),
+      fHist2NoSigma0Mass2(nullptr),
+      fHist2NoSigma0Tv(nullptr),
+      fHist2NoSigma0P(nullptr),
+      fHist2NoSigma0Phi(nullptr),
+      fHist2NoSigma0OneOverPt(nullptr),
+      fHistAllSigma0E(nullptr),
+      fHistAllSigma0Pt(nullptr),
+      fHistAllSigma0Eta(nullptr),
+      fHistAllSigma0Theta(nullptr),
+      fHistAllSigma0Mass2(nullptr),
+      fHistAllSigma0Tv(nullptr),
+      fHistAllSigma0P(nullptr),
+      fHistAllSigma0Phi(nullptr),
+      fHistAllSigma0OneOverPt(nullptr),
+      fHistAllNoSigma0E(nullptr),
+      fHistAllNoSigma0Pt(nullptr),
+      fHistAllNoSigma0Eta(nullptr),
+      fHistAllNoSigma0Theta(nullptr),
+      fHistAllNoSigma0Mass2(nullptr),
+      fHistAllNoSigma0Tv(nullptr),
+      fHistAllNoSigma0P(nullptr),
+      fHistAllNoSigma0Phi(nullptr),
+      fHistAllNoSigma0OneOverPt(nullptr),
+      fHistSigma0PhiVsPt(nullptr),
+      fHistNoSigma0PhiVsPt(nullptr),
+      fHist2Sigma0PhiVsPt(nullptr),
+      fHist2NoSigma0PhiVsPt(nullptr),
+      fHistAllSigma0PhiVsPt(nullptr),
+      fHistAllNoSigma0PhiVsPt(nullptr),
+      fHistSigma0ThetaVsPt(nullptr),
+      fHistNoSigma0ThetaVsPt(nullptr),
+      fHist2Sigma0ThetaVsPt(nullptr),
+      fHist2NoSigma0ThetaVsPt(nullptr),
+      fHistAllSigma0ThetaVsPt(nullptr),
+      fHistAllNoSigma0ThetaVsPt(nullptr),
+      fHistSigma0EtaVsPt(nullptr),
+      fHistNoSigma0EtaVsPt(nullptr),
+      fHist2Sigma0EtaVsPt(nullptr),
+      fHist2NoSigma0EtaVsPt(nullptr),
+      fHistAllSigma0EtaVsPt(nullptr),
+      fHistAllNoSigma0EtaVsPt(nullptr),
+      fHistSigma0EVsPt(nullptr),
+      fHistNoSigma0EVsPt(nullptr),
+      fHist2Sigma0EVsPt(nullptr),
+      fHist2NoSigma0EVsPt(nullptr),
+      fHistAllSigma0EVsPt(nullptr),
+      fHistAllNoSigma0EVsPt(nullptr),
+      fHistSigma0TvVsPt(nullptr),
+      fHistNoSigma0TvVsPt(nullptr),
+      fHist2Sigma0TvVsPt(nullptr),
+      fHist2NoSigma0TvVsPt(nullptr),
+      fHistAllSigma0TvVsPt(nullptr),
+      fHistAllNoSigma0TvVsPt(nullptr),
+      fHistPDGsOfMothToPhotons(nullptr),
+      fHist2PDGsOfMothToPhotons(nullptr),
+      fHistAllPDGsOfMothToPhotons(nullptr),
+      fHistReconstrmcPhotonPtIsPhysPrim(nullptr),
+      fHistAllPhotonsConvPrim(nullptr) {
   // constructor
   DefineInput(0, TChain::Class());  // define the input of the analysis: in this
                                     // case we take a 'chain' of events
@@ -181,124 +332,523 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   // will be written to file, so if you want
   // your histogram in the output file, add it to the list!
 
-  fHistSigma0E = new TH1F("Sigma0E", "Sigma0E", 200, 0, 10);
-  fHistSigma0E->SetTitle("Sigma0E;momentum p;counts N");
+  fHistSigma0E = new TH1F("Sigma0E", "Sigma0E", 500, 0, 10);
+  fHistSigma0E->SetTitle("Sigma0E;Energy #it{E} [GeV];Counts #it{N}");
   fOutputList->Add(fHistSigma0E);
 
-  fHistNoSigma0E = new TH1F("NoSigma0E", "NoSigma0E", 200, 0, 10);
-  fHistNoSigma0E->SetTitle("NoSigma0E;momentum p;counts N");
+  fHistNoSigma0E = new TH1F("NoSigma0E", "NoSigma0E", 500, 0, 10);
+  fHistNoSigma0E->SetTitle("NoSigma0E;Energy #it{E} [GeV];Counts #it{N}");
   fOutputList->Add(fHistNoSigma0E);
 
-  fHistSigma0P = new TH1F("Sigma0P", "Sigma0P", 200, 0, 10);
-  fHistSigma0P->SetTitle("Sigma0P;momentum p;counts N");
+  fHist2Sigma0E = new TH1F("2Sigma0E", "2Sigma0E", 500, 0, 10);
+  fHist2Sigma0E->SetTitle("2Sigma0E;Energy #it{E} [GeV];Counts #it{N}");
+  fOutputList->Add(fHist2Sigma0E);
+
+  fHist2NoSigma0E = new TH1F("2NoSigma0E", "2NoSigma0E", 500, 0, 10);
+  fHist2NoSigma0E->SetTitle("2NoSigma0E;Energy #it{E} [GeV];Counts #it{N}");
+  fOutputList->Add(fHist2NoSigma0E);
+
+  fHistAllSigma0E = new TH1F("AllSigma0E", "AllSigma0E", 500, 0, 10);
+  fHistAllSigma0E->SetTitle("AllSigma0E;Energy #it{E} [GeV];Counts #it{N}");
+  fOutputList->Add(fHistAllSigma0E);
+
+  fHistAllNoSigma0E = new TH1F("AllNoSigma0E", "AllNoSigma0E", 500, 0, 10);
+  fHistAllNoSigma0E->SetTitle("AllNoSigma0E;Energy #it{E} [GeV];Counts #it{N}");
+  fOutputList->Add(fHistAllNoSigma0E);
+
+  fHistSigma0P = new TH1F("Sigma0P", "Sigma0P", 500, 0, 10);
+  fHistSigma0P->SetTitle("Sigma0P;momentum #it{p} [GeV/#it{c}];Counts #it{N}");
   fOutputList->Add(fHistSigma0P);
 
-  fHistNoSigma0P = new TH1F("NoSigma0P", "NoSigma0P", 200, 0, 10);
-  fHistNoSigma0P->SetTitle("NoSigma0P;momentum p;counts N");
+  fHistNoSigma0P = new TH1F("NoSigma0P", "NoSigma0P", 500, 0, 10);
+  fHistNoSigma0P->SetTitle(
+      "NoSigma0P;momentum #it{p} [GeV/#it{c}];Counts #it{N}");
   fOutputList->Add(fHistNoSigma0P);
 
-  fHistV0PhotonCandPt =
-      new TH1F("fHistV0PhotonCandPt", "fHistV0PhotonCandPt", 200, 0, 10);
-  fHistV0PhotonCandPt->SetTitle("fHistV0PhotonCandPt;momentum p;counts N");
-  fOutputList->Add(fHistV0PhotonCandPt);
+  fHist2Sigma0P = new TH1F("2Sigma0P", "2Sigma0P", 500, 0, 10);
+  fHist2Sigma0P->SetTitle(
+      "2Sigma0P;momentum #it{p} [GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHist2Sigma0P);
 
-  fHistSigma0Pt = new TH1F("Sigma0Pt", "Sigma0Pt", 200, 0, 10);
-  fHistSigma0Pt->SetTitle("Sigma0Pt;momentum p;counts N");
+  fHist2NoSigma0P = new TH1F("2NoSigma0P", "2NoSigma0P", 500, 0, 10);
+  fHist2NoSigma0P->SetTitle(
+      "2NoSigma0P;momentum #it{p} [GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHist2NoSigma0P);
+
+  fHistAllSigma0P = new TH1F("AllSigma0P", "AllSigma0P", 500, 0, 10);
+  fHistAllSigma0P->SetTitle(
+      "AllSigma0P;momentum #it{p} [GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHistAllSigma0P);
+
+  fHistAllNoSigma0P = new TH1F("AllNoSigma0P", "AllNoSigma0P", 500, 0, 10);
+  fHistAllNoSigma0P->SetTitle(
+      "AllNoSigma0P;momentum #it{p} [GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHistAllNoSigma0P);
+
+  fHistSigma0Pt = new TH1F("Sigma0Pt", "Sigma0Pt", 500, 0, 10);
+  fHistSigma0Pt->SetTitle(
+      "Sigma0Pt;transverse momentum #it{p}_{T} [GeV/#it{c}];Counts #it{N}");
   fOutputList->Add(fHistSigma0Pt);
 
-  fHistNoSigma0Pt = new TH1F("NoSigma0Pt", "NoSigma0Pt", 200, 0, 10);
-  fHistNoSigma0Pt->SetTitle("NoSigma0Pt;momentum p;counts N");
+  fHistNoSigma0Pt = new TH1F("NoSigma0Pt", "NoSigma0Pt", 500, 0, 10);
+  fHistNoSigma0Pt->SetTitle(
+      "NoSigma0Pt;transverse momentum #it{p}_{T} [GeV/#it{c}];Counts #it{N}");
   fOutputList->Add(fHistNoSigma0Pt);
 
+  fHist2Sigma0Pt = new TH1F("2Sigma0Pt", "2Sigma0Pt", 500, 0, 10);
+  fHist2Sigma0Pt->SetTitle(
+      "2Sigma0Pt;transverse momentum #it{p}_{T} [GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHist2Sigma0Pt);
+
+  fHist2NoSigma0Pt = new TH1F("2NoSigma0Pt", "2NoSigma0Pt", 500, 0, 10);
+  fHist2NoSigma0Pt->SetTitle(
+      "2NoSigma0Pt;transverse momentum #it{p}_{T} [GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHist2NoSigma0Pt);
+
+  fHistAllSigma0Pt = new TH1F("AllSigma0Pt", "AllSigma0Pt", 500, 0, 10);
+  fHistAllSigma0Pt->SetTitle(
+      "AllSigma0Pt;transverse momentum #it{p}_{T} [GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHistAllSigma0Pt);
+
+  fHistAllNoSigma0Pt = new TH1F("AllNoSigma0Pt", "AllNoSigma0Pt", 500, 0, 10);
+  fHistAllNoSigma0Pt->SetTitle(
+      "AllNoSigma0Pt;transverse momentum #it{p}_{T} [GeV/#it{c}];Counts "
+      "#it{N}");
+  fOutputList->Add(fHistAllNoSigma0Pt);
+
   fHistSigma0OneOverPt =
-      new TH1F("Sigma0OneOverPt", "Sigma0OneOverPt", 200, 0, 20);
+      new TH1F("Sigma0OneOverPt", "Sigma0OneOverPt", 500, 0, 20);
   fHistSigma0OneOverPt->SetTitle(
-      "Sigma0OneOverPt;inverse transverse momentum 1/pt;counts N");
+      "Sigma0OneOverPt;transverse momentum 1/ #it{p}_{T} [#it{c}/GeV];Counts "
+      "#it{N}");
   fOutputList->Add(fHistSigma0OneOverPt);
 
   fHistNoSigma0OneOverPt =
-      new TH1F("NoSigmaOneOverPt", "NoSigma0OneOverPt", 200, 0, 20);
+      new TH1F("NoSigma0OneOverPt", "NoSigma0OneOverPt", 500, 0, 20);
   fHistNoSigma0OneOverPt->SetTitle(
-      "NoSigma0OneOverPt;inverse transverse momentum 1/pt;counts N");
+      "NoSigma0OneOverPt;transverse momentum 1/ #it{p}_{T} [#it{c}/GeV];Counts "
+      "#it{N}");
   fOutputList->Add(fHistNoSigma0OneOverPt);
 
-  fHistArmenterosPodolandskiV0mcPhotonsCut = new TH2F(
-      "fHistArmenterosPodolandskiV0mcPhotonsCut",
-      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, farmQtCut);
-  fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotonsCut);
+  fHist2Sigma0OneOverPt =
+      new TH1F("2Sigma0OneOverPt", "2Sigma0OneOverPt", 500, 0, 20);
+  fHist2Sigma0OneOverPt->SetTitle(
+      "2Sigma0OneOverPt;transverse momentum 1/ #it{p}_{T} [#it{c}/GeV];Counts "
+      "#it{N}");
+  fOutputList->Add(fHist2Sigma0OneOverPt);
 
-  fHistmcDaug2Pt = new TH1F("fHistmcDaug2Pt", "fHistmcDaug2Pt", 200, 0, 10);
-  fHistmcDaug2Pt->SetTitle("fHistmcDaug2Pt;momentum p;counts N");
-  fOutputList->Add(fHistmcDaug2Pt);
+  fHist2NoSigma0OneOverPt =
+      new TH1F("2NoSigma0OneOverPt", "2NoSigma0OneOverPt", 500, 0, 20);
+  fHist2NoSigma0OneOverPt->SetTitle(
+      "2NoSigma0OneOverPt;transverse momentum 1/ #it{p}_{T} "
+      "[#it{c}/GeV];Counts #it{N}");
+  fOutputList->Add(fHist2NoSigma0OneOverPt);
 
-  fHistSigma0Eta = new TH1F("Sigma0Eta", "Sigma0Eta", 200, 0, 6);
-  fHistSigma0Eta->SetTitle("Sigma0Eta;momentum p;counts N");
+  fHistAllSigma0OneOverPt =
+      new TH1F("AllSigma0OneOverPt", "AllSigma0OneOverPt", 500, 0, 20);
+  fHistAllSigma0OneOverPt->SetTitle(
+      "AllSigma0OneOverPt;transverse momentum 1/ #it{p}_{T} "
+      "[#it{c}/GeV];Counts #it{N}");
+  fOutputList->Add(fHistAllSigma0OneOverPt);
+
+  fHistAllNoSigma0OneOverPt =
+      new TH1F("AllNoSigma0OneOverPt", "AllNoSigma0OneOverPt", 500, 0, 20);
+  fHistAllNoSigma0OneOverPt->SetTitle(
+      "AllNoSigma0OneOverPt;transverse momentum 1/ #it{p}_{T} "
+      "[#it{c}/GeV];Counts #it{N}");
+  fOutputList->Add(fHistAllNoSigma0OneOverPt);
+
+  fHistSigma0Eta = new TH1F("Sigma0Eta", "Sigma0Eta", 500, 0, 6);
+  fHistSigma0Eta->SetTitle("Sigma0Eta;Pseudorapidity #eta ;Counts #it{N}");
   fOutputList->Add(fHistSigma0Eta);
 
-  fHistNoSigma0Eta = new TH1F("NoSigma0Eta", "Sigma0Eta", 200, 0, 6);
-  fHistNoSigma0Eta->SetTitle("NoSigma0Eta;momentum p;counts N");
+  fHistNoSigma0Eta = new TH1F("NoSigma0Eta", "Sigma0Eta", 500, 0, 6);
+  fHistNoSigma0Eta->SetTitle("NoSigma0Eta;Pseudorapidity #eta ;Counts #it{N}");
   fOutputList->Add(fHistNoSigma0Eta);
 
-  fHistmcDaug1Pt = new TH1F("fHistmcDaug1Pt", "fHistmcDaug1Pt", 200, 0, 10);
-  fHistmcDaug1Pt->SetTitle("fHistmcDaug1Pt;momentum p;counts N");
-  fOutputList->Add(fHistmcDaug1Pt);
+  fHist2Sigma0Eta = new TH1F("2Sigma0Eta", "2Sigma0Eta", 500, 0, 6);
+  fHist2Sigma0Eta->SetTitle("2Sigma0Eta;Pseudorapidity #eta ;Counts #it{N}");
+  fOutputList->Add(fHist2Sigma0Eta);
 
-  fHistSigma0Theta = new TH1F("Sigma0Theta", "Sigma0Theta", 200, 0, 3.2);
-  fHistSigma0Theta->SetTitle("Sigma0Theta;momentum p;counts N");
+  fHist2NoSigma0Eta = new TH1F("2NoSigma0Eta", "2NoSigma0Eta", 500, 0, 6);
+  fHist2NoSigma0Eta->SetTitle(
+      "2NoSigma0Eta;Pseudorapidity #eta ;Counts #it{N}");
+  fOutputList->Add(fHist2NoSigma0Eta);
+
+  fHistAllSigma0Eta = new TH1F("AllSigma0Eta", "AllSigma0Eta", 500, 0, 6);
+  fHistAllSigma0Eta->SetTitle(
+      "AllSigma0Eta;Pseudorapidity #eta ;Counts #it{N}");
+  fOutputList->Add(fHistAllSigma0Eta);
+
+  fHistAllNoSigma0Eta = new TH1F("AllNoSigma0Eta", "AllNoSigma0Eta", 500, 0, 6);
+  fHistAllNoSigma0Eta->SetTitle(
+      "AllNoSigma0Eta;Pseudorapidity #eta ;Counts #it{N}");
+  fOutputList->Add(fHistAllNoSigma0Eta);
+
+  fHistSigma0Theta = new TH1F("Sigma0Theta", "Sigma0Theta", 500, 0, 3.2);
+  fHistSigma0Theta->SetTitle("Sigma0Theta;Polar angle #theta ;Counts #it{N}");
   fOutputList->Add(fHistSigma0Theta);
 
-  fHistNoSigma0Theta = new TH1F("NoSigma0Theta", "NoSigma0Theta", 200, 0, 3.2);
-  fHistNoSigma0Theta->SetTitle("NoSigma0Theta;momentum p;counts N");
+  fHistNoSigma0Theta = new TH1F("NoSigma0Theta", "NoSigma0Theta", 500, 0, 3.2);
+  fHistNoSigma0Theta->SetTitle(
+      "NoSigma0Theta;Polar angle #theta ;Counts #it{N}");
   fOutputList->Add(fHistNoSigma0Theta);
 
+  fHist2Sigma0Theta = new TH1F("2Sigma0Theta", "2Sigma0Theta", 500, 0, 3.2);
+  fHist2Sigma0Theta->SetTitle("2Sigma0Theta;Polar angle #theta ;Counts #it{N}");
+  fOutputList->Add(fHist2Sigma0Theta);
 
-  fHistV0Pt = new TH1F("fHistV0Pt", "fHistV0Pt", 200, 0, 10);
-  fHistV0Pt->SetTitle(
-      "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
-  fOutputList->Add(fHistV0Pt);
+  fHist2NoSigma0Theta =
+      new TH1F("2NoSigma0Theta", "2NoSigma0Theta", 500, 0, 3.2);
+  fHist2NoSigma0Theta->SetTitle(
+      "2NoSigma0Theta;Polar angle #theta ;Counts #it{N}");
+  fOutputList->Add(fHist2NoSigma0Theta);
 
-  fHistSigma0Mass2 = new TH1F("Sigma0Mass2", "Sigma0Mass2", 200, 0, 10);
+  fHistAllSigma0Theta =
+      new TH1F("AllSigma0Theta", "AllSigma0Theta", 500, 0, 3.2);
+  fHistAllSigma0Theta->SetTitle(
+      "AllSigma0Theta;Polar angle #theta ;Counts #it{N}");
+  fOutputList->Add(fHistAllSigma0Theta);
+
+  fHistAllNoSigma0Theta =
+      new TH1F("AllNoSigma0Theta", "AllNoSigma0Theta", 500, 0, 3.2);
+  fHistAllNoSigma0Theta->SetTitle(
+      "AllNoSigma0Theta;Polar angle #theta ;Counts #it{N}");
+  fOutputList->Add(fHistAllNoSigma0Theta);
+
+  fHistSigma0Mass2 = new TH1F("Sigma0Mass2", "Sigma0Mass2", 500, 0, 10);
   fHistSigma0Mass2->SetTitle(
-      "Mass distribution of accepted Sigma0 candidates;invariant mass^2 "
-      "m^2;counts N");
+      "Mass distribution of accepted Sigma0 candidates;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
   fOutputList->Add(fHistSigma0Mass2);
 
-  fHistNoSigma0Mass2 = new TH1F("NoSigma0Mass2", "NoSigma0Mass2", 200, 0, 10);
+  fHistNoSigma0Mass2 = new TH1F("NoSigma0Mass2", "NoSigma0Mass2", 500, 0, 10);
   fHistNoSigma0Mass2->SetTitle(
-      "Mass distribution of accepted NoSigma0 candidates;invariant mass^2 "
-      "m^2;counts N");
+      "Mass distribution of accepted NoSigma0 candidates;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
   fOutputList->Add(fHistNoSigma0Mass2);
 
-  fHistSigma0Tv = new TH1F("Sigma0Tv", "Sigma0Tv", 200, 0, 100);
+  fHist2Sigma0Mass2 = new TH1F("2Sigma0Mass2", "2Sigma0Mass2", 500, 0, 10);
+  fHist2Sigma0Mass2->SetTitle(
+      "Mass distribution of accepted Sigma0 candidates;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
+  fOutputList->Add(fHist2Sigma0Mass2);
+
+  fHist2NoSigma0Mass2 =
+      new TH1F("2NoSigma0Mass2", "2NoSigma0Mass2", 500, 0, 10);
+  fHist2NoSigma0Mass2->SetTitle(
+      "Mass distribution of accepted NoSigma0 candidates;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
+  fOutputList->Add(fHist2NoSigma0Mass2);
+
+  fHistAllSigma0Mass2 =
+      new TH1F("AllSigma0Mass2", "AllSigma0Mass2", 500, 0, 10);
+  fHistAllSigma0Mass2->SetTitle(
+      "Mass distribution of accepted Sigma0 candidates;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
+  fOutputList->Add(fHistAllSigma0Mass2);
+
+  fHistAllNoSigma0Mass2 =
+      new TH1F("AllNoSigma0Mass2", "AllNoSigma0Mass2", 500, 0, 10);
+  fHistAllNoSigma0Mass2->SetTitle(
+      "Mass distribution of accepted NoSigma0 candidates;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
+  fOutputList->Add(fHistAllNoSigma0Mass2);
+
+  fHistSigma0Tv = new TH1F("Sigma0Tv", "Sigma0Tv", 500, 0, 1);
   fHistSigma0Tv->SetTitle(
-      "Distribution of T coordinate of prod.vertex;Time t;counts N");
+      "Distribution of T coordinate of prod.vertex;Time #it{t} [?s];Counts "
+      "#it{N}");
   fOutputList->Add(fHistSigma0Tv);
 
-  fHistNoSigma0Tv = new TH1F("NoSigma0Tv", "NoSigma0Tv", 200, 0, 100);
+  fHistNoSigma0Tv = new TH1F("NoSigma0Tv", "NoSigma0Tv", 500, 0, 1);
   fHistNoSigma0Tv->SetTitle(
-      "Distribution of T coordinate of prod.vertex;Time t;counts N");
+      "Distribution of T coordinate of prod.vertex;Time #it{t} [?s];Counts "
+      "#it{N}");
   fOutputList->Add(fHistNoSigma0Tv);
 
+  fHist2Sigma0Tv = new TH1F("2Sigma0Tv", "2Sigma0Tv", 500, 0, 1);
+  fHist2Sigma0Tv->SetTitle(
+      "Distribution of T coordinate of prod.vertex;Time #it{t} [?s];Counts "
+      "#it{N}");
+  fOutputList->Add(fHist2Sigma0Tv);
+
+  fHist2NoSigma0Tv = new TH1F("2NoSigma0Tv", "2NoSigma0Tv", 500, 0, 1);
+  fHist2NoSigma0Tv->SetTitle(
+      "Distribution of T coordinate of prod.vertex;Time #it{t} [?s];Counts "
+      "#it{N}");
+  fOutputList->Add(fHist2NoSigma0Tv);
+
+  fHistAllSigma0Tv = new TH1F("AllSigma0Tv", "AllSigma0Tv", 500, 0, 1);
+  fHistAllSigma0Tv->SetTitle(
+      "Distribution of T coordinate of prod.vertex;Time #it{t} [?s];Counts "
+      "#it{N}");
+  fOutputList->Add(fHistAllSigma0Tv);
+
+  fHistAllNoSigma0Tv = new TH1F("AllNoSigma0Tv", "AllNoSigma0Tv", 500, 0, 1);
+  fHistAllNoSigma0Tv->SetTitle(
+      "Distribution of T coordinate of prod.vertex;Time #it{t} [?s];Counts "
+      "#it{N}");
+  fOutputList->Add(fHistAllNoSigma0Tv);
+
+  fHistSigma0Phi =
+      new TH1F("Sigma0Phi", ";Azimuthal angle #phi ; Entries", 500, 0, 6.3);
+  fOutputList->Add(fHistSigma0Phi);
+
+  fHistNoSigma0Phi = new TH1F(
+      "NoSigma0Phi", ";Azimuthal angle #phi ; Counts #it{N}", 500, 0, 6.3);
+  fOutputList->Add(fHistNoSigma0Phi);
+
+  fHist2Sigma0Phi = new TH1F(
+      "2Sigma0Phi", ";Azimuthal angle #phi ; Counts #it{N}", 500, 0, 6.3);
+  fOutputList->Add(fHist2Sigma0Phi);
+
+  fHist2NoSigma0Phi = new TH1F(
+      "2NoSigma0Phi", ";Azimuthal angle #phi ; Counts #it{N}", 500, 0, 6.3);
+  fOutputList->Add(fHist2NoSigma0Phi);
+
+  fHistAllSigma0Phi = new TH1F(
+      "AllSigma0Phi", ";Azimuthal angle #phi ; Counts #it{N}", 500, 0, 6.3);
+  fOutputList->Add(fHistAllSigma0Phi);
+
+  fHistAllNoSigma0Phi = new TH1F(
+      "AllNoSigma0Phi", ";Azimuthal angle #phi ; Counts #it{N}", 500, 0, 6.3);
+  fOutputList->Add(fHistAllNoSigma0Phi);
+
+  fHistSigma0PhiVsPt =
+      new TH2F("Sigma0PhiVsPt", "Sigma0PhiVsPt", 500, 0, 10, 500, 0, 6.3);
+  fHistSigma0PhiVsPt->SetTitle(
+      "Sigma0PhiVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Azimuthal "
+      "angle #phi");
+  fOutputList->Add(fHistSigma0PhiVsPt);
+
+  fHistNoSigma0PhiVsPt =
+      new TH2F("NoSigma0PhiVsPt", "NoSigma0PhiVsPt", 500, 0, 10, 500, 0, 6.3);
+  fHistNoSigma0PhiVsPt->SetTitle(
+      "NoSigma0PhiVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Azimuthal "
+      "angle #phi");
+  fOutputList->Add(fHistNoSigma0PhiVsPt);
+
+  fHist2Sigma0PhiVsPt =
+      new TH2F("2Sigma0PhiVsPt", "2Sigma0PhiVsPt", 500, 0, 10, 500, 0, 6.3);
+  fHist2Sigma0PhiVsPt->SetTitle(
+      "2Sigma0PhiVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Azimuthal "
+      "angle #phi");
+  fOutputList->Add(fHist2Sigma0PhiVsPt);
+
+  fHist2NoSigma0PhiVsPt =
+      new TH2F("2NoSigma0PhiVsPt", "2NoSigma0PhiVsPt", 500, 0, 10, 500, 0, 6.3);
+  fHist2NoSigma0PhiVsPt->SetTitle(
+      "2NoSigma0PhiVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Azimuthal "
+      "angle #phi");
+  fOutputList->Add(fHist2NoSigma0PhiVsPt);
+
+  fHistAllSigma0PhiVsPt =
+      new TH2F("AllSigma0PhiVsPt", "AllSigma0PhiVsPt", 500, 0, 10, 500, 0, 6.3);
+  fHistAllSigma0PhiVsPt->SetTitle(
+      "AllSigma0PhiVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Azimuthal "
+      "angle #phi");
+  fOutputList->Add(fHistAllSigma0PhiVsPt);
+
+  fHistAllNoSigma0PhiVsPt = new TH2F("AllNoSigma0PhiVsPt", "AllNoSigma0PhiVsPt",
+                                     500, 0, 10, 500, 0, 6.3);
+  fHistAllNoSigma0PhiVsPt->SetTitle(
+      "AllNoSigma0PhiVsPt;transverse momentum  #it{p}_{T} "
+      "[GeV/#it{c}];Azimuthal angle #phi");
+  fOutputList->Add(fHistAllNoSigma0PhiVsPt);
+
+  fHistSigma0ThetaVsPt =
+      new TH2F("Sigma0ThetaVsPt", "Sigma0ThetaVsPt", 500, 0, 10, 500, 0, 3.2);
+  fHistSigma0ThetaVsPt->SetTitle(
+      "Sigma0ThetaVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Polar "
+      "angle #theta");
+  fOutputList->Add(fHistSigma0ThetaVsPt);
+
+  fHistNoSigma0ThetaVsPt = new TH2F("NoSigma0ThetaVsPt", "NoSigma0ThetaVsPt",
+                                    500, 0, 10, 500, 0, 3.2);
+  fHistNoSigma0ThetaVsPt->SetTitle(
+      "NoSigma0ThetaVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Polar "
+      "angle #theta");
+  fOutputList->Add(fHistNoSigma0ThetaVsPt);
+
+  fHist2Sigma0ThetaVsPt =
+      new TH2F("2Sigma0ThetaVsPt", "2Sigma0ThetaVsPt", 500, 0, 10, 500, 0, 3.2);
+  fHist2Sigma0ThetaVsPt->SetTitle(
+      "2Sigma0ThetaVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Polar "
+      "angle #theta");
+  fOutputList->Add(fHist2Sigma0ThetaVsPt);
+
+  fHist2NoSigma0ThetaVsPt = new TH2F("2NoSigma0ThetaVsPt", "2NoSigma0ThetaVsPt",
+                                     500, 0, 10, 500, 0, 3.2);
+  fHist2NoSigma0ThetaVsPt->SetTitle(
+      "2NoSigma0ThetaVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Polar "
+      "angle #theta");
+  fOutputList->Add(fHist2NoSigma0ThetaVsPt);
+
+  fHistAllSigma0ThetaVsPt = new TH2F("AllSigma0ThetaVsPt", "AllSigma0ThetaVsPt",
+                                     500, 0, 10, 500, 0, 3.2);
+  fHistAllSigma0ThetaVsPt->SetTitle(
+      "AllSigma0ThetaVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Polar "
+      "angle #theta");
+  fOutputList->Add(fHistAllSigma0ThetaVsPt);
+
+  fHistAllNoSigma0ThetaVsPt = new TH2F(
+      "AllNoSigma0ThetaVsPt", "AllNoSigma0ThetaVsPt", 500, 0, 10, 500, 0, 3.2);
+  fHistAllNoSigma0ThetaVsPt->SetTitle(
+      "AllNoSigma0ThetaVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Polar "
+      "angle #theta");
+  fOutputList->Add(fHistAllNoSigma0ThetaVsPt);
+
+  fHistSigma0EtaVsPt =
+      new TH2F("Sigma0EtaVsPt", "Sigma0EtaVsPt", 500, 0, 10, 500, 0, 6);
+  fHistSigma0EtaVsPt->SetTitle(
+      "Sigma0EtaVsPt;transverse momentum  #it{p}_{T} "
+      "[GeV/#it{c}];Pseudorapidity #eta");
+  fOutputList->Add(fHistSigma0EtaVsPt);
+
+  fHistNoSigma0EtaVsPt =
+      new TH2F("NoSigma0EtaVsPt", "NoSigma0EtaVsPt", 500, 0, 10, 500, 0, 6);
+  fHistNoSigma0EtaVsPt->SetTitle(
+      "NoSigma0EtaVsPt;transverse momentum  #it{p}_{T} "
+      "[GeV/#it{c}];Pseudorapidity #eta");
+  fOutputList->Add(fHistNoSigma0EtaVsPt);
+
+  fHist2Sigma0EtaVsPt =
+      new TH2F("2Sigma0EtaVsPt", "2Sigma0EtaVsPt", 500, 0, 10, 500, 0, 6);
+  fHist2Sigma0EtaVsPt->SetTitle(
+      "2Sigma0EtaVsPt;transverse momentum  #it{p}_{T} "
+      "[GeV/#it{c}];Pseudorapidity #eta");
+  fOutputList->Add(fHist2Sigma0EtaVsPt);
+
+  fHist2NoSigma0EtaVsPt =
+      new TH2F("2NoSigma0EtaVsPt", "2NoSigma0EtaVsPt", 500, 0, 10, 500, 0, 6);
+  fHist2NoSigma0EtaVsPt->SetTitle(
+      "2NoSigma0EtaVsPt;transverse momentum  #it{p}_{T} "
+      "[GeV/#it{c}];Pseudorapidity #eta");
+  fOutputList->Add(fHist2NoSigma0EtaVsPt);
+
+  fHistAllSigma0EtaVsPt =
+      new TH2F("AllSigma0EtaVsPt", "AllSigma0EtaVsPt", 500, 0, 10, 500, 0, 6);
+  fHistAllSigma0EtaVsPt->SetTitle(
+      "AllSigma0EtaVsPt;transverse momentum  #it{p}_{T} "
+      "[GeV/#it{c}];Pseudorapidity #eta");
+  fOutputList->Add(fHistAllSigma0EtaVsPt);
+
+  fHistAllNoSigma0EtaVsPt = new TH2F("AllNoSigma0EtaVsPt", "AllNoSigma0EtaVsPt",
+                                     500, 0, 10, 500, 0, 6);
+  fHistAllNoSigma0EtaVsPt->SetTitle(
+      "AllNoSigma0EtaVsPt;transverse momentum  #it{p}_{T} "
+      "[GeV/#it{c}];Pseudorapidity #eta");
+  fOutputList->Add(fHistAllNoSigma0EtaVsPt);
+
+  fHistSigma0EVsPt =
+      new TH2F("Sigma0EVsPt", "Sigma0EVsPt", 500, 0, 10, 500, 0, 1);
+  fHistSigma0EVsPt->SetTitle(
+      "Sigma0EVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Energy #it{E} "
+      "[GeV]");
+  fOutputList->Add(fHistSigma0EVsPt);
+
+  fHistNoSigma0EVsPt =
+      new TH2F("NoSigma0EVsPt", "NoSigma0EVsPt", 500, 0, 10, 500, 0, 1);
+  fHistNoSigma0EVsPt->SetTitle(
+      "NoSigma0EVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Energy "
+      "#it{E} [GeV]");
+  fOutputList->Add(fHistNoSigma0EVsPt);
+
+  fHist2Sigma0EVsPt =
+      new TH2F("2Sigma0EVsPt", "2Sigma0EVsPt", 500, 0, 10, 500, 0, 1);
+  fHist2Sigma0EVsPt->SetTitle(
+      "2Sigma0EVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Energy #it{E} "
+      "[GeV]");
+  fOutputList->Add(fHist2Sigma0EVsPt);
+
+  fHist2NoSigma0EVsPt =
+      new TH2F("2NoSigma0EVsPt", "2NoSigma0EVsPt", 500, 0, 10, 500, 0, 1);
+  fHist2NoSigma0EVsPt->SetTitle(
+      "2NoSigma0EVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Energy "
+      "#it{E} [GeV]");
+  fOutputList->Add(fHist2NoSigma0EVsPt);
+
+  fHistAllSigma0EVsPt =
+      new TH2F("AllSigma0EVsPt", "AllSigma0EVsPt", 500, 0, 10, 500, 0, 1);
+  fHistAllSigma0EVsPt->SetTitle(
+      "AllSigma0EVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Energy "
+      "#it{E} [GeV]");
+  fOutputList->Add(fHistAllSigma0EVsPt);
+
+  fHistAllNoSigma0EVsPt =
+      new TH2F("AllNoSigma0EVsPt", "AllNoSigma0EVsPt", 500, 0, 10, 500, 0, 1);
+  fHistAllNoSigma0EVsPt->SetTitle(
+      "AllNoSigma0EVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Energy "
+      "#it{E} [GeV]");
+  fOutputList->Add(fHistAllNoSigma0EVsPt);
+
+  fHistSigma0TvVsPt =
+      new TH2F("Sigma0TvVsPt", "Sigma0TvVsPt", 500, 0, 10, 500, 0, 1);
+  fHistSigma0TvVsPt->SetTitle(
+      "Sigma0TvVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Time coord. "
+      "of prod.vertex #it{t} [?s]");
+  fOutputList->Add(fHistSigma0TvVsPt);
+
+  fHistNoSigma0TvVsPt =
+      new TH2F("NoSigma0TvVsPt", "NoSigma0TvVsPt", 500, 0, 10, 500, 0, 1);
+  fHistNoSigma0TvVsPt->SetTitle(
+      "NoSigma0TvVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Time coord. "
+      "of prod.vertex #it{t} [?s]");
+  fOutputList->Add(fHistNoSigma0TvVsPt);
+
+  fHist2Sigma0TvVsPt =
+      new TH2F("2Sigma0TvVsPt", "2Sigma0TvVsPt", 500, 0, 10, 500, 0, 1);
+  fHist2Sigma0TvVsPt->SetTitle(
+      "2Sigma0TvVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Time coord. "
+      "of prod.vertex #it{t} [?s]");
+  fOutputList->Add(fHist2Sigma0TvVsPt);
+
+  fHist2NoSigma0TvVsPt =
+      new TH2F("2NoSigma0TvVsPt", "2NoSigma0TvVsPt", 500, 0, 10, 500, 0, 1);
+  fHist2NoSigma0TvVsPt->SetTitle(
+      "2NoSigma0TvVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Time "
+      "coord. of prod.vertex #it{t} [?s]");
+  fOutputList->Add(fHist2NoSigma0TvVsPt);
+
+  fHistAllSigma0TvVsPt =
+      new TH2F("AllSigma0TvVsPt", "AllSigma0TvVsPt", 500, 0, 10, 500, 0, 1);
+  fHistAllSigma0TvVsPt->SetTitle(
+      "AllSigma0TvVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Time "
+      "coord. of prod.vertex #it{t} [?s]");
+  fOutputList->Add(fHistAllSigma0TvVsPt);
+
+  fHistAllNoSigma0TvVsPt =
+      new TH2F("AllNoSigma0TvVsPt", "AllNoSigma0TvVsPt", 500, 0, 10, 500, 0, 1);
+  fHistAllNoSigma0TvVsPt->SetTitle(
+      "AllNoSigma0TvVsPt;transverse momentum  #it{p}_{T} [GeV/#it{c}];Time "
+      "coord. of prod.vertex #it{t} [?s]");
+  fOutputList->Add(fHistAllNoSigma0TvVsPt);
+
   fHistReconstrmcPhotonPt = new TH1F("fHistReconstrmcPhotonPt",
-                                     "fHistReconstrmcPhotonPt", 200, 0, 10);
+                                     "fHistReconstrmcPhotonPt", 500, 0, 10);
   fHistReconstrmcPhotonPt->SetTitle(
-      "Pt Distribution of accepted V0s;transverse momentum Pt;counts N");
+      "Pt Distribution of accepted V0s;transverse momentum #it{p}_{T} "
+      "[GeV/#it{c}];Counts #it{N}");
   fOutputList->Add(fHistReconstrmcPhotonPt);
 
   fHistV0mcPhotonPtandArmCut = new TH1F(
-      "fHistV0mcPhotonPtandArmCut", "fHistV0mcPhotonPtandArmCut", 200, 0, 10);
+      "fHistV0mcPhotonPtandArmCut", "fHistV0mcPhotonPtandArmCut", 500, 0, 10);
   fHistV0mcPhotonPtandArmCut->SetTitle(
-      "MCTrueV0Photons;transverse momentum pt;counts N");
+      "MCTrueV0Photons;transverse momentum #it{p}_{T} [GeV/#it{c}];Counts "
+      "#it{N}");
   fOutputList->Add(fHistV0mcPhotonPtandArmCut);
 
-  fHistClsDistrPosTr = new TH2F("fHistClsDistrPosTr", "fHistClsDistrPosTr", 200,
-                                0, 1.5, 200, 0, 200);
-  fHistClsDistrPosTr->SetTitle("Cluster-Distribution;pt;Clusters");
+  fHistClsDistrPosTr = new TH2F("fHistClsDistrPosTr", "fHistClsDistrPosTr", 500,
+                                0, 1.5, 500, 0, 200);
+  fHistClsDistrPosTr->SetTitle(
+      "Cluster-Distribution;#it{p}_{T} [GeV/#it{c}];Number of Clusters");
   fOutputList->Add(fHistClsDistrPosTr);
 
-  fHistClsDistrNegTr = new TH2F("fHistClsDistrNegTr", "fHistClsDistrNegTr", 200,
-                                0, 1.5, 200, 0, 200);
-  fHistClsDistrNegTr->SetTitle("Cluster-Distribution;pt;Clusters");
+  fHistClsDistrNegTr = new TH2F("fHistClsDistrNegTr", "fHistClsDistrNegTr", 500,
+                                0, 1.5, 500, 0, 200);
+  fHistClsDistrNegTr->SetTitle(
+      "Cluster-Distribution;#it{p}_{T} [GeV/#it{c}];Number of Clusters");
   fOutputList->Add(fHistClsDistrNegTr);
 
   fHistKindOfPrim = new TH1F("fHistKindOfPrim", "Entries", 25, 0, 25);
@@ -323,8 +873,8 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistKindOfPrim->GetXaxis()->SetBinLabel(18, "Something Else");
   fHistKindOfPrim->GetXaxis()->SetBinLabel(19, "SomeThing ELse");
   fHistKindOfPrim->GetXaxis()->SetBinLabel(20, "Tracks Exit");
-  fHistKindOfPrim->GetXaxis()->SetBinLabel(21, "|Eta| < 0.8");
-  fHistKindOfPrim->GetXaxis()->SetBinLabel(22, "Pt > 0.1 MeV");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(21, "|#eta| < 0.8");
+  fHistKindOfPrim->GetXaxis()->SetBinLabel(22, "#it{p}_{T} > 0.1 MeV");
   fHistKindOfPrim->GetXaxis()->SetBinLabel(23, "Findable Cluster Ratio > 80%");
   fHistKindOfPrim->GetXaxis()->SetBinLabel(24, "ArmQt < 0.3");
   fHistKindOfPrim->GetXaxis()->SetBinLabel(25, "Daughters Exit");
@@ -352,46 +902,46 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
   fHistKindOfCand->GetXaxis()->SetBinLabel(18, "Something Else");
   fHistKindOfCand->GetXaxis()->SetBinLabel(19, "SomeThing ELse");
   fHistKindOfCand->GetXaxis()->SetBinLabel(20, "Tracks Exit");
-  fHistKindOfCand->GetXaxis()->SetBinLabel(21, "|Eta| < 0.8");
-  fHistKindOfCand->GetXaxis()->SetBinLabel(22, "Pt > 0.1 MeV");
+  fHistKindOfCand->GetXaxis()->SetBinLabel(21, "|#eta| < 0.8");
+  fHistKindOfCand->GetXaxis()->SetBinLabel(22, "#it{p}_{T} > 0.1 MeV");
   fHistKindOfCand->GetXaxis()->SetBinLabel(23, "Findable Cluster Ratio > 80%");
   fHistKindOfCand->GetXaxis()->SetBinLabel(24, "ArmQt < 0.3");
   fHistKindOfCand->GetXaxis()->SetBinLabel(25, "Daughters Exit");
   fOutputList->Add(fHistKindOfCand);
 
   fHistV0LambdaInvMass =
-      new TH1F("fHistV0LambdaInvMass", "fHistV0LambdaInvMass", 200, 0, 1.5);
+      new TH1F("fHistV0LambdaInvMass", "fHistV0LambdaInvMass", 500, 0, 1.5);
   fHistV0LambdaInvMass->SetTitle(
-      "Invariantmass-Distribution Lambda;m*m;Counts");
+      "Invariantmass-Distribution Lambda;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
   fOutputList->Add(fHistV0LambdaInvMass);
 
   fHistV0AntiLambdaInvMass = new TH1F("fHistV0AntiLambdaInvMass",
-                                      "fHistV0AntiLambdaInvMass", 200, 0, 1.5);
+                                      "fHistV0AntiLambdaInvMass", 500, 0, 1.5);
   fHistV0AntiLambdaInvMass->SetTitle(
-      "Invariantmass-Distribution AntiLambda;m*m;Counts");
+      "Invariantmass-Distribution AntiLambda;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
   fOutputList->Add(fHistV0AntiLambdaInvMass);
 
   fHistV0K0ShortInvMass =
-      new TH1F("fHistV0K0ShortInvMass", "fHistV0K0ShortInvMass", 200, 0, 1.5);
+      new TH1F("fHistV0K0ShortInvMass", "fHistV0K0ShortInvMass", 500, 0, 1.5);
   fHistV0K0ShortInvMass->SetTitle(
-      "Invariantmass-Distribution K0Short;m*m;Counts");
+      "Invariantmass-Distribution K0Short;invariant mass #it{m} "
+      "[GeV/#it{c}^{2}];Counts #it{N}");
   fOutputList->Add(fHistV0K0ShortInvMass);
 
-  fHistPhotonPt = new TH1F("fHistPhotonPt",
-                           "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
+  fHistPhotonPt = new TH1F(
+      "fHistPhotonPt", "; #it{p}_{T} (GeV/#it{c}); Counts #it{N}", 500, 0, 10);
   fOutputList->Add(fHistPhotonPt);
 
-  fHistAllPhotons = new TH1F("fHistAllPhotons",
-                             "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 10);
+  fHistAllPhotons = new TH1F(
+      "AllPhotons", "; #it{p}_{T} (GeV/#it{c}); Counts #it{N}", 500, 0, 10);
   fOutputList->Add(fHistAllPhotons);
 
-  fHistSigma0Phi =
-      new TH1F("Sigma0Phi", "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 6.3);
-  fOutputList->Add(fHistSigma0Phi);
-
-  fHistNoSigma0Phi =
-      new TH1F("NoSigma0Phi", "; #it{p}_{T} (GeV/#it{c}); Entries", 100, 0, 6.3);
-  fOutputList->Add(fHistNoSigma0Phi);
+  fHistAllPhotonsConvPrim =
+      new TH1F("AllPhotonsConvPrim", "; #it{p}_{T} (GeV/#it{c}); Counts #it{N}",
+               500, 0, 10);
+  fOutputList->Add(fHistAllPhotonsConvPrim);
 
   fHistArmenterosPodolandski = new TH2F(
       "fHistArmenterosPodolandski", " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]",
@@ -407,6 +957,68 @@ void AliAnalysisTaskMyTask::UserCreateOutputObjects() {
       "fHistArmenterosPodolandskiArmCut",
       " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, farmQtCut);
   fOutputList->Add(fHistArmenterosPodolandskiArmCut);
+
+  fHistV0PhotonCandPt =
+      new TH1F("fHistV0PhotonCandPt", "fHistV0PhotonCandPt", 500, 0, 10);
+  fHistV0PhotonCandPt->SetTitle(
+      "fHistV0PhotonCandPt;transverse momentum #it{q}_{T} [GeV/#it{c}];Counts "
+      "#it{N}");
+  fOutputList->Add(fHistV0PhotonCandPt);
+
+  fHistArmenterosPodolandskiV0mcPhotonsCut = new TH2F(
+      "fHistArmenterosPodolandskiV0mcPhotonsCut",
+      " ; #alpha; #it{q}_{T} p#pi [GeV/#it{c}]", 500, -1, 1, 500, 0, farmQtCut);
+  fOutputList->Add(fHistArmenterosPodolandskiV0mcPhotonsCut);
+
+  fHistmcDaug2Pt = new TH1F("fHistmcDaug2Pt", "fHistmcDaug2Pt", 500, 0, 10);
+  fHistmcDaug2Pt->SetTitle(
+      "fHistmcDaug2Pt;transverse momentum #it{q}_{T} [GeV/#it{c}];Counts "
+      "#it{N}");
+  fOutputList->Add(fHistmcDaug2Pt);
+
+  fHistmcDaug1Pt = new TH1F("fHistmcDaug1Pt", "fHistmcDaug1Pt", 500, 0, 10);
+  fHistmcDaug1Pt->SetTitle(
+      "fHistmcDaug1Pt;transverse momentum #it{q}_{T} [GeV/#it{c}];Counts "
+      "#it{N}");
+  fOutputList->Add(fHistmcDaug1Pt);
+
+  fHistV0Pt = new TH1F("fHistV0Pt", "fHistV0Pt", 500, 0, 10);
+  fHistV0Pt->SetTitle(
+      "Pt Distribution of accepted V0s;transverse momentum #it{q}_{T} "
+      "[GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHistV0Pt);
+
+  fHistPDGsOfMothToPhotons =
+      new TH2F("PDGsOfMothToPhotons", "PDGsOfMothToPhotons", 8000, -4000, 4000,
+               500, 0, 10);
+  fHistPDGsOfMothToPhotons->SetTitle(
+      "PDGsOfMothToPhotons;PDG-Code "
+      "; transverse momentum  #it{p}_{T} [GeV/#it{c}]");
+  fOutputList->Add(fHistPDGsOfMothToPhotons);
+
+  fHist2PDGsOfMothToPhotons =
+      new TH2F("2PDGsOfMothToPhotons", "2PDGsOfMothToPhotons", 8000, -4000,
+               4000, 500, 0, 10);
+  fHist2PDGsOfMothToPhotons->SetTitle(
+      "2PDGsOfMothToPhotons;PDG-Code "
+      "; transverse momentum  #it{p}_{T} [GeV/#it{c}]");
+  fOutputList->Add(fHist2PDGsOfMothToPhotons);
+
+  fHistAllPDGsOfMothToPhotons =
+      new TH2F("AllPDGsOfMothToPhotons", "AllPDGsOfMothToPhotons", 8000, -4000,
+               4000, 500, 0, 10);
+  fHistAllPDGsOfMothToPhotons->SetTitle(
+      "AllPDGsOfMothToPhotons;PDG-Code "
+      "; transverse momentum  #it{p}_{T} [GeV/#it{c}]");
+  fOutputList->Add(fHistAllPDGsOfMothToPhotons);
+
+  fHistReconstrmcPhotonPtIsPhysPrim =
+      new TH1F("ReconstrmcPhotonPtIsPhysPrim", "ReconstrmcPhotonPtIsPhysPrim",
+               500, 0, 10);
+  fHistReconstrmcPhotonPtIsPhysPrim->SetTitle(
+      "ReconstrmcPhotonPtIsPhysPrim;transverse momentum #it{p}_{T} "
+      "[GeV/#it{c}];Counts #it{N}");
+  fOutputList->Add(fHistReconstrmcPhotonPtIsPhysPrim);
 
   PostData(1, fOutputList);  // postdata will notify the analysis manager of
                              // changes / updates to the
@@ -428,22 +1040,28 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
   // there's another event format (ESD) which works in a similar way
   // but is more cpu/memory unfriendly. for now, we'll stick with aod's
 
+  if (!fAOD) return;
+
+  // Event cuts - check whether the event is good for analysis
+  if (!fEventCuts2.AcceptEvent(fAOD)) {
+    PostData(1, fOutputList);
+    return;
+  }
+
   // Get all Photons
 
-  AliMCEvent *fMC = nullptr;
   if (fIsMC) {
     AliAODInputHandler *eventHandler = dynamic_cast<AliAODInputHandler *>(
         AliAnalysisManager::GetAnalysisManager()->GetInputEventHandler());
 
-    fMC = eventHandler->MCEvent();
+    fMCEvent = eventHandler->MCEvent();
 
-    for (int iPart = 1; iPart < (fMC->GetNumberOfTracks()); iPart++) {
-      AliAODMCParticle *particle = (AliAODMCParticle *)fMC->GetTrack(iPart);
+    for (int iPart = 1; iPart < (fMCEvent->GetNumberOfTracks()); iPart++) {
+      AliAODMCParticle *particle =
+          (AliAODMCParticle *)fMCEvent->GetTrack(iPart);
       fHistKindOfPrim->Fill(10);
       if (!particle) continue;
       fHistKindOfPrim->Fill(11);
-      if (!(particle->IsPhysicalPrimary())) continue;
-      fHistKindOfPrim->Fill(12);
       if (std::abs(particle->Eta()) > fEtaCut) continue;
       fHistKindOfPrim->Fill(13);
       if (particle->E() < fECut) continue;
@@ -451,9 +1069,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       if (particle->GetPdgCode() != 22) continue;
       fHistKindOfPrim->Fill(15);
       AliAODMCParticle *firstDaughter = static_cast<AliAODMCParticle *>(
-          fMC->GetTrack(particle->GetFirstDaughter()));
+          fMCEvent->GetTrack(particle->GetFirstDaughter()));
       AliAODMCParticle *lastDaughter = static_cast<AliAODMCParticle *>(
-          fMC->GetTrack(particle->GetLastDaughter()));
+          fMCEvent->GetTrack(particle->GetLastDaughter()));
       if (!firstDaughter) continue;
       if (!lastDaughter) continue;
       fHistKindOfPrim->Fill(16);
@@ -463,16 +1081,20 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       if (firstDaughter->Pt() < fpTCut) continue;
       if (lastDaughter->Pt() < fpTCut) continue;
       fHistKindOfPrim->Fill(18);
+      const AliVVertex *primVtxMC = fMCEvent->GetPrimaryVertex();
+      Double_t mcProdVtxX = primVtxMC->GetX();
+      Double_t mcProdVtxY = primVtxMC->GetY();
+      Double_t mcProdVtxZ = primVtxMC->GetZ();
+      Bool_t fIsConvPrim = IsConversionPrimaryAOD(fAOD, particle, mcProdVtxX,
+                                                  mcProdVtxY, mcProdVtxZ);
+      if (fIsConvPrim) {
+        fHistAllPhotonsConvPrim->Fill(particle->Pt());
+      };
+      if (!(particle->IsPhysicalPrimary())) continue;
+      fHistKindOfPrim->Fill(12);
       fHistAllPhotons->Fill(particle->Pt());
+      Sigma0DescendancyAll(firstDaughter);
     }
-  }
-
-  if (!fAOD) return;
-
-  // Event cuts - check whether the event is good for analysis
-  if (!fEventCuts2.AcceptEvent(fAOD)) {
-    PostData(1, fOutputList);
-    return;
   }
 
   // Keep track of the global tracks
@@ -511,9 +1133,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
 
         if (posDaughter == NULL || negDaughter == NULL) continue;
         fHistKindOfCand->Fill(23);
-
+        IsConvertedPhotonDaughterIsPhysPrimaryCheck(posDaughter, negDaughter);
         if (!IsConvertedPhoton(posDaughter, negDaughter, fMCEvent)) continue;
-
+        Sigma0Descendancy(posDaughter);
         fHistReconstrmcPhotonPt->Fill(PhotonCandidate->Pt());
       }
     }
@@ -539,6 +1161,8 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     if (point < 0.99) continue;
     // DCA of the daughter tracks at the decay vertex
     if (dcaV0Dau > 1.5) continue;
+    const float transverseRadius = v0->DecayLengthXY(PV);
+    if (transverseRadius < 5.) continue;
     AliAODTrack *posTrack =
         static_cast<AliAODTrack *>(fGlobalTrackReference[v0->GetPosID()]);
     AliAODTrack *negTrack =
@@ -602,6 +1226,7 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
       if (!mcDaug2) continue;
       fHistKindOfCand->Fill(24);
       if (!IsConvertedPhoton(mcDaug1, mcDaug2, fMCEvent)) continue;
+      Sigma0Descendancy2(mcDaug1);
       const float mcDaug1Pt = mcDaug1->Pt();
       const float mcDaug2Pt = mcDaug2->Pt();
       fHistmcDaug1Pt->Fill(mcDaug1Pt);
@@ -619,9 +1244,9 @@ void AliAnalysisTaskMyTask::UserExec(Option_t *) {
     if (!track || !track->TestFilterBit(1))
       continue;  // if we failed, skip this track
     AliMCParticle *mcParticle = nullptr;
-    if (fIsMC && fMC)
+    if (fIsMC && fMCEvent)
       mcParticle =
-          static_cast<AliMCParticle *>(fMC->GetTrack(track->GetLabel()));
+          static_cast<AliMCParticle *>(fMCEvent->GetTrack(track->GetLabel()));
     if (fIsMC && !mcParticle) continue;
     AliAnalysisManager *man = AliAnalysisManager::GetAnalysisManager();
     if (man) {
@@ -692,7 +1317,7 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
       return false;
     } else if (mcPosMother != mcNegMother ||
                (mcPosMother == mcNegMother && posDaughter->GetMother() == -1)) {
-      // Not Same Mother == Combinatorial Bck
+      // Not Same Mother == Combinatorial bkrg
       fHistKindOfCand->Fill(2);
       // 				cout << "not the same mother" << endl;
       if (TMath::Abs(pdgCodePos) == 11 && TMath::Abs(pdgCodeNeg) == 11) {
@@ -744,7 +1369,6 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
                      posDaughter->GetMCProcessCode() != 5)) {
           if (pdgCode == 22 && gammaIsPrimary) {
             fHistKindOfCand->Fill(13);  // primary photons
-            Sigma0Descendancy(posDaughter);
             return true;
           } else if (pdgCode == 22) {
             fHistKindOfCand->Fill(14);  // secondary photons
@@ -768,6 +1392,60 @@ Bool_t AliAnalysisTaskMyTask::IsConvertedPhoton(AliAODMCParticle *posDaughter,
 }
 
 //_________________________________________________________________________
+void AliAnalysisTaskMyTask::IsConvertedPhotonDaughterIsPhysPrimaryCheck(
+    AliAODMCParticle *posDaughter, AliAODMCParticle *negDaughter) {
+  auto *mcNegMother = static_cast<AliAODMCParticle *>(
+      fMCEvent->GetTrack(negDaughter->GetMother()));
+  auto *mcPosMother = static_cast<AliAODMCParticle *>(
+      fMCEvent->GetTrack(posDaughter->GetMother()));
+
+  Int_t pdgCodeNeg = negDaughter->PdgCode();
+  Int_t pdgCodePos = posDaughter->PdgCode();
+
+  if (!(mcPosMother == NULL || mcNegMother == NULL)) {
+    if (posDaughter == NULL || negDaughter == NULL) {
+      // garbage
+      // 				cout << "one of the daughters not
+      // available"
+      // <<
+      // endl;
+    } else if (mcPosMother != mcNegMother ||
+               (mcPosMother == mcNegMother && posDaughter->GetMother() == -1)) {
+      // Not Same Mother == Combinatorial bkrg
+      // 				cout << "not the same mother" << endl;
+    } else {
+      // 				cout << "same mother" << endl;
+      Int_t pdgCode = mcPosMother->GetPdgCode();
+      // 				cout << "PDG code: " << pdgCode << endl;
+      if (TMath::Abs(pdgCodePos) != 11 || TMath::Abs(pdgCodeNeg) != 11) {
+        // combinatorics from hadronic decays
+      } else if (!(pdgCodeNeg == pdgCodePos)) {
+        if (!(negDaughter->GetMCProcessCode() != 5 ||
+              posDaughter->GetMCProcessCode() != 5)) {
+          Bool_t fIsPrimary = mcPosMother->IsPhysicalPrimary();
+          if (pdgCode == 22 && fIsPrimary) {
+            // primary photons
+            fHistReconstrmcPhotonPtIsPhysPrim->Fill(mcPosMother->Pt());
+          } else if (pdgCode == 22) {
+            // photons without vertex correlation, and checking for cascades
+          }
+        } else {
+          // garbage
+
+        }
+      } else {
+        // garbage
+      }
+
+
+    }
+
+  }
+
+}
+
+//_________________________________________________________________________
+
 Bool_t AliAnalysisTaskMyTask::IsConversionPrimaryAOD(
     AliVEvent *event, AliAODMCParticle *AODMCParticle, Double_t prodVtxX,
     Double_t prodVtxY, Double_t prodVtxZ) {
@@ -907,34 +1585,139 @@ Bool_t AliAnalysisTaskMyTask::IsConversionPrimaryAOD(
 }
 
 //_________________________________________________________________________
-void AliAnalysisTaskMyTask::Sigma0Descendancy(
-    AliAODMCParticle *posDaughter) {
+void AliAnalysisTaskMyTask::Sigma0Descendancy(AliAODMCParticle *Daughter) {
   auto *mcPosMother = static_cast<AliAODMCParticle *>(
-      fMCEvent->GetTrack(posDaughter->GetMother()));
+      fMCEvent->GetTrack(Daughter->GetMother()));
   auto *mcGrandMother = static_cast<AliAODMCParticle *>(
       fMCEvent->GetTrack(mcPosMother->GetMother()));
-  if (!mcGrandMother) continue;
-  Int_t pdgCode = mcGrandMother->PdgCode();
-  if (pdgCode != 3212) {
-      fHistNoSigma0Phi->Fill(mcGrandMother->Eta());
-      fHistNoSigma0Theta->Fill(mcGrandMother->Theta());
-      fHistNoSigma0Eta->Fill(mcGrandMother->Eta());
-      fHistNoSigma0Pt->Fill(mcGrandMother->Pt());
-      fHistNoSigma0P->Fill(mcGrandMother->P());
-      fHistNoSigma0E->Fill(mcGrandMother->E());
-      fHistNoSigma0Mass2->Fill(mcGrandMother->GetCalcMass());
-      fHistNoSigma0Tv->Fill(mcGrandMother->Tv());
-      fHistNoSigma0OneOverPt->Fill(mcGrandMother->OneOverPt());
+  if (!mcGrandMother) {
   } else {
-      fHistSigma0Phi->Fill(mcGrandMother->Eta());
-      fHistSigma0Theta->Fill(mcGrandMother->Theta());
-      fHistSigma0Eta->Fill(mcGrandMother->Eta());
-      fHistSigma0Pt->Fill(mcGrandMother->Pt());
-      fHistSigma0P->Fill(mcGrandMother->P());
-      fHistSigma0E->Fill(mcGrandMother->E());
-      fHistSigma0Mass2->Fill(mcGrandMother->GetCalcMass());
-      fHistSigma0Tv->Fill(mcGrandMother->Tv());
-      fHistSigma0OneOverPt->Fill(mcGrandMother->OneOverPt());
+    Int_t pdgCode = mcGrandMother->PdgCode();
+    const float mcPosMotherPt = mcPosMother->Pt();
+    fHistPDGsOfMothToPhotons->Fill(pdgCode, mcGrandMother->Pt());
+    if (pdgCode != 3212) {
+      fHistNoSigma0Phi->Fill(mcPosMother->Phi());
+      fHistNoSigma0Theta->Fill(mcPosMother->Theta());
+      fHistNoSigma0Eta->Fill(mcPosMother->Eta());
+      fHistNoSigma0Pt->Fill(mcPosMotherPt);
+      fHistNoSigma0P->Fill(mcPosMother->P());
+      fHistNoSigma0E->Fill(mcPosMother->E());
+      fHistNoSigma0Mass2->Fill(mcPosMother->GetCalcMass());
+      fHistNoSigma0Tv->Fill(mcPosMother->Tv());
+      fHistNoSigma0OneOverPt->Fill(mcPosMother->OneOverPt());
+      fHistNoSigma0PhiVsPt->Fill(mcPosMotherPt, mcPosMother->Phi());
+      fHistNoSigma0ThetaVsPt->Fill(mcPosMotherPt, mcPosMother->Theta());
+      fHistNoSigma0EtaVsPt->Fill(mcPosMotherPt, mcPosMother->Eta());
+      fHistNoSigma0EVsPt->Fill(mcPosMotherPt, mcPosMother->E());
+      fHistNoSigma0TvVsPt->Fill(mcPosMotherPt, mcPosMother->Tv());
+    } else {
+      fHistSigma0Phi->Fill(mcPosMother->Phi());
+      fHistSigma0Theta->Fill(mcPosMother->Theta());
+      fHistSigma0Eta->Fill(mcPosMother->Eta());
+      fHistSigma0Pt->Fill(mcPosMotherPt);
+      fHistSigma0P->Fill(mcPosMother->P());
+      fHistSigma0E->Fill(mcPosMother->E());
+      fHistSigma0Mass2->Fill(mcPosMother->GetCalcMass());
+      fHistSigma0Tv->Fill(mcPosMother->Tv());
+      fHistSigma0OneOverPt->Fill(mcPosMother->OneOverPt());
+      fHistSigma0PhiVsPt->Fill(mcPosMotherPt, mcPosMother->Phi());
+      fHistSigma0ThetaVsPt->Fill(mcPosMotherPt, mcPosMother->Theta());
+      fHistSigma0EtaVsPt->Fill(mcPosMotherPt, mcPosMother->Eta());
+      fHistSigma0EVsPt->Fill(mcPosMotherPt, mcPosMother->E());
+      fHistSigma0TvVsPt->Fill(mcPosMotherPt, mcPosMother->Tv());
+    }
+  }
+}
+
+//_________________________________________________________________________
+void AliAnalysisTaskMyTask::Sigma0Descendancy2(AliAODMCParticle *Daughter2) {
+  auto *mcPosMother = static_cast<AliAODMCParticle *>(
+      fMCEvent->GetTrack(Daughter2->GetMother()));
+  auto *mcGrandMother = static_cast<AliAODMCParticle *>(
+      fMCEvent->GetTrack(mcPosMother->GetMother()));
+  if (!mcGrandMother) {
+  } else {
+    Int_t pdgCode = mcGrandMother->PdgCode();
+    const float mcPosMotherPt = mcPosMother->Pt();
+    fHist2PDGsOfMothToPhotons->Fill(pdgCode, mcGrandMother->Pt());
+    if (pdgCode != 3212) {
+      fHist2NoSigma0Phi->Fill(mcPosMother->Phi());
+      fHist2NoSigma0Theta->Fill(mcPosMother->Theta());
+      fHist2NoSigma0Eta->Fill(mcPosMother->Eta());
+      fHist2NoSigma0Pt->Fill(mcPosMotherPt);
+      fHist2NoSigma0P->Fill(mcPosMother->P());
+      fHist2NoSigma0E->Fill(mcPosMother->E());
+      fHist2NoSigma0Mass2->Fill(mcPosMother->GetCalcMass());
+      fHist2NoSigma0Tv->Fill(mcPosMother->Tv());
+      fHist2NoSigma0OneOverPt->Fill(mcPosMother->OneOverPt());
+      fHist2NoSigma0PhiVsPt->Fill(mcPosMotherPt, mcPosMother->Phi());
+      fHist2NoSigma0ThetaVsPt->Fill(mcPosMotherPt, mcPosMother->Theta());
+      fHist2NoSigma0EtaVsPt->Fill(mcPosMotherPt, mcPosMother->Eta());
+      fHist2NoSigma0EVsPt->Fill(mcPosMotherPt, mcPosMother->E());
+      fHist2NoSigma0TvVsPt->Fill(mcPosMotherPt, mcPosMother->Tv());
+    } else {
+      fHist2Sigma0Phi->Fill(mcPosMother->Phi());
+      fHist2Sigma0Theta->Fill(mcPosMother->Theta());
+      fHist2Sigma0Eta->Fill(mcPosMother->Eta());
+      fHist2Sigma0Pt->Fill(mcPosMotherPt);
+      fHist2Sigma0P->Fill(mcPosMother->P());
+      fHist2Sigma0E->Fill(mcPosMother->E());
+      fHist2Sigma0Mass2->Fill(mcPosMother->GetCalcMass());
+      fHist2Sigma0Tv->Fill(mcPosMother->Tv());
+      fHist2Sigma0OneOverPt->Fill(mcPosMother->OneOverPt());
+      fHist2Sigma0PhiVsPt->Fill(mcPosMotherPt, mcPosMother->Phi());
+      fHist2Sigma0ThetaVsPt->Fill(mcPosMotherPt, mcPosMother->Theta());
+      fHist2Sigma0EtaVsPt->Fill(mcPosMotherPt, mcPosMother->Eta());
+      fHist2Sigma0EVsPt->Fill(mcPosMotherPt, mcPosMother->E());
+      fHist2Sigma0TvVsPt->Fill(mcPosMotherPt, mcPosMother->Tv());
+    }
+  }
+}
+
+//_________________________________________________________________________
+void AliAnalysisTaskMyTask::Sigma0DescendancyAll(
+    AliAODMCParticle *DaughterAll) {
+  auto *mcPosMother = static_cast<AliAODMCParticle *>(
+      fMCEvent->GetTrack(DaughterAll->GetMother()));
+  if (!mcPosMother) return;
+  auto *mcGrandMother = static_cast<AliAODMCParticle *>(
+      fMCEvent->GetTrack(mcPosMother->GetMother()));
+  if (!mcGrandMother) {
+  } else {
+    Int_t pdgCode = mcGrandMother->PdgCode();
+    const float mcPosMotherPt = mcPosMother->Pt();
+    fHistAllPDGsOfMothToPhotons->Fill(pdgCode, mcGrandMother->Pt());
+    if (pdgCode != 3212) {
+      fHistAllNoSigma0Phi->Fill(mcPosMother->Phi());
+      fHistAllNoSigma0Theta->Fill(mcPosMother->Theta());
+      fHistAllNoSigma0Eta->Fill(mcPosMother->Eta());
+      fHistAllNoSigma0Pt->Fill(mcPosMotherPt);
+      fHistAllNoSigma0P->Fill(mcPosMother->P());
+      fHistAllNoSigma0E->Fill(mcPosMother->E());
+      fHistAllNoSigma0Mass2->Fill(mcPosMother->GetCalcMass());
+      fHistAllNoSigma0Tv->Fill(mcPosMother->Tv());
+      fHistAllNoSigma0OneOverPt->Fill(mcPosMother->OneOverPt());
+      fHistAllNoSigma0PhiVsPt->Fill(mcPosMotherPt, mcPosMother->Phi());
+      fHistAllNoSigma0ThetaVsPt->Fill(mcPosMotherPt, mcPosMother->Theta());
+      fHistAllNoSigma0EtaVsPt->Fill(mcPosMotherPt, mcPosMother->Eta());
+      fHistAllNoSigma0EVsPt->Fill(mcPosMotherPt, mcPosMother->E());
+      fHistAllNoSigma0TvVsPt->Fill(mcPosMotherPt, mcPosMother->Tv());
+    } else {
+      fHistAllSigma0Phi->Fill(mcPosMother->Phi());
+      fHistAllSigma0Theta->Fill(mcPosMother->Theta());
+      fHistAllSigma0Eta->Fill(mcPosMother->Eta());
+      fHistAllSigma0Pt->Fill(mcPosMotherPt);
+      fHistAllSigma0P->Fill(mcPosMother->P());
+      fHistAllSigma0E->Fill(mcPosMother->E());
+      fHistAllSigma0Mass2->Fill(mcPosMother->GetCalcMass());
+      fHistAllSigma0Tv->Fill(mcPosMother->Tv());
+      fHistAllSigma0OneOverPt->Fill(mcPosMother->OneOverPt());
+      fHistAllSigma0PhiVsPt->Fill(mcPosMotherPt, mcPosMother->Phi());
+      fHistAllSigma0ThetaVsPt->Fill(mcPosMotherPt, mcPosMother->Theta());
+      fHistAllSigma0EtaVsPt->Fill(mcPosMotherPt, mcPosMother->Eta());
+      fHistAllSigma0EVsPt->Fill(mcPosMotherPt, mcPosMother->E());
+      fHistAllSigma0TvVsPt->Fill(mcPosMotherPt, mcPosMother->Tv());
+    }
   }
 }
 
